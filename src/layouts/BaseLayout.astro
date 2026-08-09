@@ -1,0 +1,40 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import type { Lang } from '../data/site';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  path: string;
+}
+
+const { lang, title, description, path } = Astro.props;
+const canonical = new URL(`${import.meta.env.BASE_URL}${lang}${path}`, Astro.site);
+---
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#07111f" />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="en" href={new URL(`${import.meta.env.BASE_URL}en${path}`, Astro.site)} />
+    <link rel="alternate" hreflang="zh" href={new URL(`${import.meta.env.BASE_URL}zh${path}`, Astro.site)} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip" href="#main">{lang === 'en' ? 'Skip to content' : '跳到主要内容'}</a>
+    <Nav lang={lang} path={path} />
+    <main id="main"><slot /></main>
+    <Footer lang={lang} />
+  </body>
+</html>
+
+<style>
+  .skip { position: fixed; top: .5rem; left: .5rem; z-index: 100; padding: .6rem .8rem; background: white; color: black; transform: translateY(-150%); }
+  .skip:focus { transform: translateY(0); }
+</style>

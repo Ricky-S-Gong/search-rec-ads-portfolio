@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { algorithms, copy, href, languages, type Lang } from '../../../data/site';
+export const getStaticPaths = () => languages.flatMap((lang) => algorithms.map((algorithm) => ({ params: { lang, slug: algorithm.slug }, props: { algorithm } })));
+const lang = Astro.params.lang as Lang;
+const { algorithm } = Astro.props;
+const t = copy[lang];
+const labels = lang === 'en'
+  ? { signals: 'Required signals', cold: 'Cold start', train: 'Training cost', serve: 'Serving cost', explain: 'Explainability', intuition: 'Core intuition', use: 'Use when', avoid: 'Avoid when', related: 'See it in a project' }
+  : { signals: '所需信号', cold: '冷启动', train: '训练成本', serve: '服务成本', explain: '可解释性', intuition: '核心直觉', use: '适用场景', avoid: '不适用场景', related: '在项目中查看' };
+---
+<BaseLayout lang={lang} title={`${algorithm.name[lang]} — ${t.siteName}`} description={algorithm.intuition[lang]} path={`/algorithms/${algorithm.slug}/`}>
+  <article class="section container algorithm-page">
+    <header><p class="eyebrow">{algorithm.family}</p><h1>{algorithm.name[lang]}</h1><p>{algorithm.intuition[lang]}</p></header>
+    <div class="specs">
+      <dl><dt>{labels.signals}</dt><dd>{algorithm.requiredSignals}</dd></dl><dl><dt>{labels.cold}</dt><dd>{algorithm.coldStart}</dd></dl><dl><dt>{labels.train}</dt><dd>{algorithm.trainCost}</dd></dl><dl><dt>{labels.serve}</dt><dd>{algorithm.serveCost}</dd></dl><dl><dt>{labels.explain}</dt><dd>{algorithm.explainability}</dd></dl>
+    </div>
+    <div class="guidance"><section><p class="eyebrow">{labels.use}</p><h2>{algorithm.useWhen[lang]}</h2></section><section><p class="eyebrow avoid">{labels.avoid}</p><h2>{algorithm.avoidWhen[lang]}</h2></section></div>
+    <a class="button" href={href(`/${lang}/projects/spotify-content-recommender/`)}>{labels.related}</a>
+  </article>
+</BaseLayout>
+<style>
+  .algorithm-page{display:grid;gap:3rem}.algorithm-page header{display:grid;gap:1.2rem;max-width:900px}.algorithm-page h1{font-size:clamp(2.3rem,7vw,5.5rem)}.algorithm-page header>p:last-child{max-width:720px;color:var(--muted);font-size:1.2rem}
+  .specs{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}dl{margin:0;padding:1rem;background:var(--deep)}dt{color:var(--muted);font:.68rem 'IBM Plex Mono',monospace;text-transform:uppercase}dd{margin:1rem 0 0}
+  .guidance{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.guidance section{padding:1.5rem;border:1px solid var(--line);border-radius:var(--radius)}.guidance h2{margin-top:1rem;font:600 clamp(1.3rem,3vw,2rem) 'IBM Plex Sans',sans-serif;letter-spacing:0}.avoid{color:var(--danger)}
+  .button{justify-self:start}@media(max-width:850px){.specs{grid-template-columns:repeat(2,1fr)}.guidance{grid-template-columns:1fr}}@media(max-width:480px){.specs{grid-template-columns:1fr}}
+</style>

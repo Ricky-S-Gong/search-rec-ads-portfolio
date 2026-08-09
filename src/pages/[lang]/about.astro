@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { copy, languages, type Lang } from '../../data/site';
+export const getStaticPaths = () => languages.map((lang) => ({ params: { lang } }));
+const lang = Astro.params.lang as Lang; const t = copy[lang];
+---
+<BaseLayout lang={lang} title={`${t.nav.about} — ${t.siteName}`} description={t.byline} path="/about/">
+  <section class="section container"><div class="section-heading"><p class="eyebrow">Joint portfolio</p><h1>{t.nav.about}</h1><p class="muted">{t.byline}</p></div>
+    <div class="crew"><article><span>RG</span><div><h2>Ricky Gong</h2><a href="https://github.com/Ricky-S-Gong">@Ricky-S-Gong ↗</a></div></article><article><span>ZX</span><div><h2>Ziqi Xu</h2><a href="https://github.com/ziqixu22">@ziqixu22 ↗</a></div></article></div>
+    <div class="principles"><section><p class="eyebrow">01 / Reproduce</p><h3>{lang === 'en' ? 'Results come from scripts, never from hand-edited copy.' : '结果由脚本生成，不在页面中手工编写。'}</h3></section><section><p class="eyebrow">02 / Bound</p><h3>{lang === 'en' ? 'Every claim names the data and constraint that make it valid.' : '每个结论都说明成立所需的数据与约束。'}</h3></section><section><p class="eyebrow">03 / Compare</p><h3>{lang === 'en' ? 'A model earns its place by beating a relevant baseline.' : '模型必须超过合理基线，才有存在价值。'}</h3></section></div>
+    <p class="license">{lang === 'en' ? 'Code: MIT · Original writing and charts: CC BY 4.0 · Third-party data retains its original terms.' : '代码：MIT · 原创文字与图表：CC BY 4.0 · 第三方数据遵循其原始许可。'}</p>
+  </section>
+</BaseLayout>
+<style>
+  h1{font-size:clamp(2.5rem,7vw,5.5rem)}.crew{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.crew article{display:flex;align-items:center;gap:1.2rem;padding:1.5rem;border:1px solid var(--line);border-radius:var(--radius)}.crew article>span{display:grid;place-items:center;width:72px;aspect-ratio:1;border-radius:50%;background:var(--panel);color:var(--rec);font:600 1rem 'Unbounded',sans-serif}.crew h2{font-size:1.5rem}.crew a{color:var(--muted)}.principles{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:3rem 0}.principles section{padding:1.3rem;border-top:1px solid var(--line)}.principles h3{margin-top:1rem}.license{color:var(--muted);font:.78rem 'IBM Plex Mono',monospace}@media(max-width:700px){.crew,.principles{grid-template-columns:1fr}}
+</style>

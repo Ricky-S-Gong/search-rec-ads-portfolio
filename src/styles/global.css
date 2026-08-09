@@ -1,0 +1,83 @@
+@import '@fontsource/unbounded/600.css';
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import 'katex/dist/katex.min.css';
+
+:root {
+  --void: #07111f;
+  --deep: #0c1b30;
+  --panel: #10243d;
+  --starlight: #edf5ff;
+  --muted: #9cb0c8;
+  --line: #29435f;
+  --search: #35d0e2;
+  --rec: #a78bfa;
+  --ads: #f7b955;
+  --danger: #ff7d8b;
+  --radius: 18px;
+  --max: 1180px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; background: var(--void); color-scheme: dark; }
+body {
+  margin: 0;
+  color: var(--starlight);
+  background:
+    radial-gradient(circle at 12% 12%, rgba(53, 208, 226, .08), transparent 28rem),
+    radial-gradient(circle at 85% 28%, rgba(167, 139, 250, .09), transparent 32rem),
+    var(--void);
+  font-family: 'IBM Plex Sans', system-ui, sans-serif;
+  line-height: 1.65;
+}
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: .22em; }
+a:hover { color: white; }
+img, svg { max-width: 100%; }
+button, input { font: inherit; touch-action: manipulation; }
+:focus-visible { outline: 3px solid var(--search); outline-offset: 3px; }
+.container { width: min(calc(100% - 2rem), var(--max)); margin-inline: auto; }
+.eyebrow { color: var(--search); font: 400 .75rem/1.2 'IBM Plex Mono', monospace; letter-spacing: .13em; text-transform: uppercase; }
+h1, h2, h3 { margin: 0; line-height: 1.08; text-wrap: balance; }
+h1, h2 { font-family: 'Unbounded', sans-serif; }
+h1 { font-size: clamp(2.55rem, 8vw, 6.8rem); letter-spacing: -.06em; }
+h2 { font-size: clamp(1.8rem, 4vw, 3.4rem); letter-spacing: -.045em; }
+h3 { font-size: 1.22rem; }
+h1[id], h2[id], h3[id] { scroll-margin-top: 88px; }
+p { margin: 0; }
+.muted { color: var(--muted); }
+.section { padding: clamp(4rem, 9vw, 8rem) 0; }
+.section-heading { display: grid; gap: 1rem; max-width: 760px; margin-bottom: 2.5rem; }
+.button-row { display: flex; flex-wrap: wrap; gap: .8rem; }
+.button {
+  display: inline-flex; align-items: center; justify-content: center; min-height: 46px;
+  padding: .72rem 1.05rem; border: 1px solid var(--line); border-radius: 999px;
+  text-decoration: none; background: var(--starlight); color: var(--void); font-weight: 600;
+}
+.button.secondary { background: transparent; color: var(--starlight); }
+.tag { display: inline-flex; padding: .22rem .55rem; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font: .72rem 'IBM Plex Mono', monospace; }
+.prose { max-width: 780px; overflow-wrap: anywhere; }
+.prose h2 { margin-top: 3.8rem; font-size: clamp(1.55rem, 3vw, 2.25rem); }
+.prose h3 { margin-top: 2.2rem; }
+.prose p, .prose ul, .prose ol, .prose pre, .prose table, .prose blockquote { margin: 1rem 0; }
+.prose li + li { margin-top: .4rem; }
+.prose blockquote { margin-left: 0; padding: .8rem 1rem; border-left: 3px solid var(--rec); background: rgba(167,139,250,.07); }
+.prose pre { overflow: auto; padding: 1rem; border: 1px solid var(--line); border-radius: 12px; }
+.prose table { width: 100%; border-collapse: collapse; }
+.prose th, .prose td { padding: .7rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.metric-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.metric { min-height: 145px; padding: 1.1rem; background: var(--deep); }
+.metric strong { display: block; margin-top: 1.2rem; font: 600 clamp(1.5rem, 4vw, 2.6rem) 'Unbounded', sans-serif; font-variant-numeric: tabular-nums; }
+.domain-search { --domain: var(--search); }
+.domain-recommendation { --domain: var(--rec); }
+.domain-ads { --domain: var(--ads); }
+@media (max-width: 760px) {
+  .metric-grid { grid-template-columns: repeat(2, 1fr); }
+  .section { padding-block: 4rem; }
+}
+@media (max-width: 480px) { .metric-grid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}

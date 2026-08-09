@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import AlgorithmTable from '../../components/AlgorithmTable.astro';
+import { copy, languages, type Lang } from '../../data/site';
+export const getStaticPaths = () => languages.map((lang) => ({ params: { lang } }));
+const lang = Astro.params.lang as Lang; const t = copy[lang];
+---
+<BaseLayout lang={lang} title={`${t.nav.compare} — ${t.siteName}`} description={t.decisionIntro} path="/compare/">
+  <section class="section container"><div class="section-heading"><p class="eyebrow">Signals × constraints × decisions</p><h1>{t.nav.compare}</h1><p class="muted">{t.decisionIntro}</p></div><AlgorithmTable lang={lang} />
+    <div class="decision-notes">
+      <article><span>01</span><h3>{lang === 'en' ? 'No behavior signal' : '没有行为信号'}</h3><p>{lang === 'en' ? 'Start with content or popularity. Do not manufacture collaborative metrics.' : '从内容或流行度开始，不要制造虚假的协同指标。'}</p></article>
+      <article><span>02</span><h3>{lang === 'en' ? 'Latency becomes binding' : '延迟成为硬约束'}</h3><p>{lang === 'en' ? 'Add candidate retrieval, then measure quality loss against exact search.' : '增加候选召回，并相对精确检索测量质量损失。'}</p></article>
+      <article><span>03</span><h3>{lang === 'en' ? 'Interactions arrive' : '获得用户交互'}</h3><p>{lang === 'en' ? 'Collaborative models become valid, but cold start and feedback loops remain.' : '协同模型开始成立，但冷启动和反馈循环仍需处理。'}</p></article>
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  h1{font-size:clamp(2.5rem,7vw,5.5rem)} .decision-notes{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:2rem;background:var(--line);border:1px solid var(--line)}
+  article{padding:1.3rem;background:var(--deep)} article span{color:var(--rec);font: .72rem 'IBM Plex Mono',monospace} article h3{margin:.8rem 0} article p{color:var(--muted)}
+  @media(max-width:760px){.decision-notes{grid-template-columns:1fr}}
+</style>

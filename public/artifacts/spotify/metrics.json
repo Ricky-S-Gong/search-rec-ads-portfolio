@@ -1,0 +1,32 @@
+{
+  "version": "spotify-experiment-v1",
+  "randomSeed": 42,
+  "runtime": {
+    "python": "3.12.12",
+    "pandas": "3.0.5",
+    "numpy": "2.5.1",
+    "scikitLearn": "1.9.0",
+    "compute": "CPU"
+  },
+  "dataset": {
+    "source": "vatsalmavani/spotify-dataset",
+    "rawRows": 170653,
+    "deduplicatedRows": 170653,
+    "demoRows": 5000,
+    "genreLabelCoverage": 0.896878
+  },
+  "evaluation": {
+    "queryCount": 40,
+    "exactLatencyMs": 1.747,
+    "clusterLatencyMs": 0.2655,
+    "euclideanKnnLatencyMs": 0.3266,
+    "clusterRecallAt10": 0.7775,
+    "diversityAt10": 0.003558,
+    "coverageAt10": 0.002344,
+    "neighborhoodDistanceAt10": 0.002284,
+    "recommendedPopularityMean": 30.325,
+    "catalogPopularityMean": 31.4318,
+    "clusterSilhouette": 0.109859
+  },
+  "metricCaveat": "Proxy and systems metrics only; the dataset has no user relevance labels."
+}

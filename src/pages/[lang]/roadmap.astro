@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { copy, languages, type Lang } from '../../data/site';
+export const getStaticPaths = () => languages.map((lang) => ({ params: { lang } }));
+const lang = Astro.params.lang as Lang; const t = copy[lang];
+const stages = lang === 'en' ? [
+  ['Now', 'Content signals', 'Spotify audio features · cosine, KNN, K-Means retrieval', 'CPU'],
+  ['Next', 'Collaborative signals', 'MovieLens · UserCF, ItemCF, matrix factorization', 'CPU'],
+  ['Then', 'Implicit ranking', 'Clicks and exposure · BPR, ALS, negative sampling', 'CPU'],
+  ['Later', 'Sequential & deep retrieval', 'SASRec and two-tower retrieval', 'GPU / Colab'],
+  ['Expansion', 'Search and ads', 'BM25 → LTR; CTR/CVR → calibration and bidding', 'CPU → GPU'],
+] : [
+  ['当前', '内容信号', 'Spotify 音频特征 · 余弦、KNN、K-Means 召回', 'CPU'],
+  ['下一步', '协同信号', 'MovieLens · UserCF、ItemCF、矩阵分解', 'CPU'],
+  ['随后', '隐式反馈排序', '点击与曝光 · BPR、ALS、负采样', 'CPU'],
+  ['进阶', '序列与深度召回', 'SASRec 与双塔召回', 'GPU / Colab'],
+  ['扩展', '搜索与广告', 'BM25 → LTR；CTR/CVR → 校准与竞价', 'CPU → GPU'],
+];
+---
+<BaseLayout lang={lang} title={`${t.nav.roadmap} — ${t.siteName}`} description="Learning roadmap" path="/roadmap/">
+  <section class="section container"><div class="section-heading"><p class="eyebrow">Learning route</p><h1>{t.nav.roadmap}</h1><p class="muted">{lang === 'en' ? 'Each mission unlocks a signal the previous dataset could not provide.' : '每项任务都补充上一份数据无法提供的关键信号。'}</p></div>
+    <ol>{stages.map(([state,title,body,compute],i)=><li><span>{state}</span><div><small>MISSION 0{i+1}</small><h2>{title}</h2><p>{body}</p></div><strong>{compute}</strong></li>)}</ol>
+  </section>
+</BaseLayout>
+<style>
+  h1{font-size:clamp(2.5rem,7vw,5.5rem)}ol{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}li{display:grid;grid-template-columns:100px 1fr auto;gap:1.2rem;padding:1.4rem 0;border-bottom:1px solid var(--line);align-items:center}li>span,li small{color:var(--rec);font:.7rem 'IBM Plex Mono',monospace;text-transform:uppercase}li h2{margin:.35rem 0;font-size:clamp(1.4rem,3vw,2.2rem)}li p{color:var(--muted)}li>strong{font:.72rem 'IBM Plex Mono',monospace;color:var(--search)}@media(max-width:650px){li{grid-template-columns:1fr}li>span{margin-top:1rem}}
+</style>

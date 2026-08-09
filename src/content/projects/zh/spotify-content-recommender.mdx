@@ -1,0 +1,73 @@
+---
+title: Spotify 内容推荐系统
+description: 在冷启动和延迟约束下，对音频特征召回进行可复现实验。
+lang: zh
+slug: spotify-content-recommender
+---
+
+## 1. 业务问题
+
+当音乐产品**不了解听众历史行为**时，能否提供有价值的“相似歌曲”发现？这是物品到物品的召回问题，而不是完整的个性化推荐。系统接收一首种子歌曲，根据音频相似度排列其他歌曲。
+
+这个边界是面试重点：内容特征可以立即处理新歌曲，但无法推断新用户的兴趣。产品仍需用户选择种子歌曲、完成兴趣冷启动，或使用流行度策略兜底。
+
+## 2. 数据审计与边界
+
+Kaggle 数据包含 170,653 首歌曲，以及艺术家、流派和年份聚合表。歌曲表提供 acousticness、danceability、energy、instrumentalness、liveness、loudness、speechiness、tempo 和 valence。
+
+数据中**没有**用户、曝光、点击、跳过、收藏或歌单关系。因此：
+
+- 不能在这份数据上合理实现协同过滤和矩阵分解；
+- Precision@K、Recall@K、NDCG 和 MAP 无法评价用户相关性；
+- 艺术家流派只能作为诊断用弱标签，不能作为真实偏好；
+- Kaggle 没有给出明确许可，因此仓库不重新发布原始 CSV。
+
+## 3. 模型与公式
+
+主模型对音频特征进行 MinMax 缩放，再计算加权余弦相似度：
+
+$$
+s_w(x,y)=\frac{(w\odot x)^T(w\odot y)}{\lVert w\odot x\rVert_2\lVert w\odot y\rVert_2}
+$$
+
+对比模型包括流行度兜底、StandardScaler 加欧氏距离 KNN，以及 K-Means 候选召回后使用余弦精排的两阶段方案。PCA 仅用于可视化特征空间。
+
+```python
+similarity = cosine_similarity(seed_vector, catalog_vectors)
+top_k = np.argpartition(-similarity, k)[:k]
+```
+
+## 4. 指标究竟说明什么
+
+这里的结果是**代理指标和系统指标**，不能证明用户一定喜欢推荐歌曲：
+
+- 邻域距离检查内容特征一致性；
+- 列表内多样性检查推荐是否过窄；
+- 目录覆盖率和平均流行度揭示集中与头部偏差；
+- K-Means Recall@10 衡量近似召回保留精确余弦近邻的比例；
+- 查询耗时表示系统成本；
+- Silhouette score 只描述聚类分离度，不代表推荐质量。
+
+## 5. 算法决策备忘录
+
+当场景需要可解释的相似物品、新歌曲冷启动，或“更有活力”“更少原声”等可控推荐时，内容召回很合适。当兴趣取决于音频属性无法表达的文化、情境和协同行为时，不应把它视作完整个性化。
+
+目录扩大后，可将聚类扫描替换为近似最近邻索引。获得用户交互日志后，应增加协同召回或矩阵分解，并按用户和时间划分数据进行评价。生产音乐系统通常需要融合内容、协同、流行度、时效性和策略信号。
+
+## 6. 面试追问
+
+**为什么不报告 NDCG？** 数据没有用户相关性标签，强行计算等于创造虚假真值。
+
+**为什么必须缩放特征？** tempo 和 loudness 与 0–1 特征量纲不同；未经缩放的距离主要反映单位选择。
+
+**K-Means 为什么损失效果？** 真正的最近邻可能位于聚类边界另一侧；限制候选集用可测的召回损失换取速度。
+
+**为什么相似不等于喜欢？** 内容接近只代表声学相似；偏好还受到身份、场景、新颖性、曝光和社会影响。
+
+## 7. 复现与署名
+
+运行 `uv sync`，下载 `vatsalmavani/spotify-dataset`，然后执行 `uv run python research/spotify-music/run_experiment.py --data <data.csv路径>`。页面中的指标、图表和交互数据全部由脚本生成。
+
+资料来源：[Kaggle notebook](https://www.kaggle.com/code/vatsalmavani/music-recommendation-system-using-spotify-dataset/notebook)、[数据集](https://www.kaggle.com/datasets/vatsalmavani/spotify-dataset)与[搜广推宇宙漫游指南](https://1985312383.github.io/search-rec-ads-cosmos-explorer/zh/)。
+
+贡献者：Ricky Gong 与 Ziqi Xu。具体实验和写作归属记录在 Pull Request 中。

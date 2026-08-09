@@ -1,0 +1,33 @@
+---
+import { algorithms, href, type Lang } from '../data/site';
+const { lang } = Astro.props as { lang: Lang };
+const labels = lang === 'en'
+  ? { algorithm: 'Algorithm', signals: 'Required signals', cold: 'Cold start', train: 'Train', serve: 'Serve', explain: 'Explain' }
+  : { algorithm: '算法', signals: '所需信号', cold: '冷启动', train: '训练', serve: '服务', explain: '可解释性' };
+---
+<div class="table-wrap" tabindex="0" role="region" aria-label={lang === 'en' ? 'Algorithm comparison table' : '算法对比表'}>
+  <table>
+    <thead><tr>
+      <th>{labels.algorithm}</th><th>{labels.signals}</th><th>{labels.cold}</th><th>{labels.train}</th><th>{labels.serve}</th><th>{labels.explain}</th>
+    </tr></thead>
+    <tbody>
+      {algorithms.map((algorithm) => (
+        <tr>
+          <th><a href={href(`/${lang}/algorithms/${algorithm.slug}/`)}>{algorithm.name[lang]}</a><small>{algorithm.family}</small></th>
+          <td>{algorithm.requiredSignals}</td><td>{algorithm.coldStart}</td><td>{algorithm.trainCost}</td><td>{algorithm.serveCost}</td><td>{algorithm.explainability}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; }
+  table { width: 100%; min-width: 980px; border-collapse: collapse; background: rgba(12,27,48,.7); }
+  th, td { padding: 1rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; font-size: .82rem; }
+  thead th { color: var(--muted); font: .68rem 'IBM Plex Mono', monospace; text-transform: uppercase; }
+  tbody th { width: 200px; }
+  tbody th a { color: var(--starlight); }
+  tbody th small { display: block; margin-top: .25rem; color: var(--muted); font-weight: 400; }
+  tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+</style>

@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import MetricsPanel from '../../../components/MetricsPanel';
+import SpotifyLab from '../../../components/SpotifyLab';
+import EnglishContent from '../../../content/projects/en/spotify-content-recommender.mdx';
+import ChineseContent from '../../../content/projects/zh/spotify-content-recommender.mdx';
+import { copy, href, languages, projects, type Lang } from '../../../data/site';
+export const getStaticPaths = () => languages.flatMap((lang) => projects.filter((p) => p.status === 'complete').map((project) => ({ params: { lang, slug: project.slug }, props: { project } })));
+const lang = Astro.params.lang as Lang;
+const { project } = Astro.props;
+const Content = lang === 'en' ? EnglishContent : ChineseContent;
+const t = copy[lang];
+---
+<BaseLayout lang={lang} title={`${project.title[lang]} — ${t.siteName}`} description={project.summary[lang]} path={`/projects/${project.slug}/`}>
+  <article>
+    <header class="project-hero container">
+      <div><p class="eyebrow">Recommendation / Content retrieval / CPU</p><h1>{project.title[lang]}</h1><p class="lede">{project.summary[lang]}</p></div>
+      <dl><div><dt>{lang === 'en' ? 'Catalog' : '歌曲目录'}</dt><dd>170,653</dd></div><div><dt>{lang === 'en' ? 'Behavior signal' : '行为信号'}</dt><dd>{lang === 'en' ? 'None' : '无'}</dd></div><div><dt>{lang === 'en' ? 'GPU' : 'GPU'}</dt><dd>{lang === 'en' ? 'Not needed' : '不需要'}</dd></div></dl>
+    </header>
+    <div class="wave" aria-hidden="true">{Array.from({length:64},(_,i)=><i style={`--h:${18 + ((i * 47) % 72)}%;--d:${i * 12}ms`}></i>)}</div>
+    <section class="section container"><MetricsPanel client:load lang={lang} /></section>
+    <figure class="container feature-figure">
+      <img src={href('/artifacts/spotify/feature-space.svg')} alt={lang === 'en' ? 'PCA projection of Spotify audio features colored by K-Means cluster' : '按 K-Means 聚类着色的 Spotify 音频特征 PCA 投影'} width="720" height="432" loading="lazy" />
+      <figcaption>{lang === 'en' ? 'PCA is used here to inspect structure, not to claim recommendation relevance.' : 'PCA 在这里只用于观察结构，不用于声称推荐相关性。'}</figcaption>
+    </figure>
+    <section class="container prose"><Content /></section>
+    <section class="container"><SpotifyLab client:visible lang={lang} /></section>
+  </article>
+</BaseLayout>
+<style>
+  .project-hero{display:grid;grid-template-columns:1fr 260px;gap:3rem;align-items:end;padding-block:clamp(4rem,10vw,8rem)}.project-hero>div{display:grid;gap:1.2rem}.project-hero h1{font-size:clamp(2.35rem,7vw,5.7rem)}.lede{max-width:760px;color:var(--muted);font-size:1.15rem}.project-hero dl{margin:0;border-left:1px solid var(--line)}.project-hero dl div{padding:.85rem 1rem;border-bottom:1px solid var(--line)}dt{color:var(--muted);font:.68rem 'IBM Plex Mono',monospace;text-transform:uppercase}dd{margin:.25rem 0 0;font-weight:600}.wave{height:120px;display:flex;align-items:center;gap:3px;padding-inline:1rem;border-block:1px solid var(--line);overflow:hidden}.wave i{flex:1;max-width:18px;height:var(--h);background:linear-gradient(var(--search),var(--rec));opacity:.55;transform-origin:center;animation:pulse 1.8s ease-in-out infinite alternate var(--d)}.feature-figure{margin-bottom:5rem;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--deep)}.feature-figure img{display:block;width:100%}.feature-figure figcaption{padding:.8rem 1rem;color:var(--muted);font:.72rem 'IBM Plex Mono',monospace;border-top:1px solid var(--line)}@keyframes pulse{to{transform:scaleY(.5);opacity:.85}}@media(max-width:700px){.project-hero{grid-template-columns:1fr}.project-hero dl{border-left:0}.wave{height:80px}}
+</style>

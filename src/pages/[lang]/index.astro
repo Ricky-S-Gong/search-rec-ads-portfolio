@@ -1,0 +1,37 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StarMap from '../../components/StarMap.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import AlgorithmTable from '../../components/AlgorithmTable.astro';
+import { copy, href, languages, projects, type Lang } from '../../data/site';
+export const getStaticPaths = () => languages.map((lang) => ({ params: { lang } }));
+const lang = Astro.params.lang as Lang;
+const t = copy[lang];
+---
+<BaseLayout lang={lang} title={`${t.siteName} — Ricky Gong & Ziqi Xu`} description={t.heroBody} path="/">
+  <section class="hero container">
+    <div class="hero-copy">
+      <p class="eyebrow">{t.heroEyebrow}</p>
+      <h1>{t.heroTitle}</h1>
+      <p class="lede">{t.heroBody}</p>
+      <div class="button-row"><a class="button" href={href(`/${lang}/projects/spotify-content-recommender/`)}>{t.explore}</a><a class="button secondary" href={href(`/${lang}/compare/`)}>{t.compare}</a></div>
+    </div>
+    <StarMap lang={lang} />
+  </section>
+  <section class="section container">
+    <div class="section-heading"><p class="eyebrow">Projects / 任务</p><h2>{t.projectsTitle}</h2><p class="muted">{t.projectsIntro}</p></div>
+    <div>{projects.map((project) => <ProjectCard project={project} lang={lang} />)}</div>
+  </section>
+  <section class="section compare-section">
+    <div class="container">
+      <div class="section-heading"><p class="eyebrow">Decision matrix / 决策矩阵</p><h2>{t.decisionTitle}</h2><p class="muted">{t.decisionIntro}</p></div>
+      <AlgorithmTable lang={lang} />
+    </div>
+  </section>
+</BaseLayout>
+<style>
+  .hero { min-height: calc(100vh - 68px); display: grid; align-content: center; gap: 3rem; padding-block: clamp(4rem, 9vw, 7rem); }
+  .hero-copy { display: grid; gap: 1.35rem; max-width: 980px; }
+  .lede { max-width: 760px; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.35rem); }
+  .compare-section { border-top: 1px solid var(--line); background: rgba(12,27,48,.38); }
+</style>

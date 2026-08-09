@@ -1,0 +1,73 @@
+---
+title: Spotify content recommender
+description: A reproducible study of audio-feature retrieval under cold-start and latency constraints.
+lang: en
+slug: spotify-content-recommender
+---
+
+## 1. Business question
+
+Can a music product offer useful **“more like this” discovery when it knows nothing about a listener**? This is an item-to-item retrieval problem, not a personalized recommender. The system receives a seed track and ranks other tracks by audio similarity.
+
+The distinction matters in interviews: content features can place a new song immediately, but they cannot infer a new user's taste. The product still needs an explicit seed, onboarding choices, or a popularity fallback.
+
+## 2. Data audit and boundary
+
+The Kaggle release contains 170,653 tracks plus aggregates by artist, genre, and year. The track table includes acousticness, danceability, energy, instrumentalness, liveness, loudness, speechiness, tempo, and valence.
+
+It does **not** contain users, impressions, clicks, skips, saves, or playlist membership. Therefore:
+
+- collaborative filtering and matrix factorization are not valid for this dataset;
+- Precision@K, Recall@K, NDCG, and MAP cannot measure user relevance;
+- artist genres are weak labels for diagnostics, not ground-truth preference;
+- the original CSV is not redistributed because Kaggle reports an unspecified license.
+
+## 3. Models and formula
+
+The primary model uses MinMax-scaled audio attributes and weighted cosine similarity:
+
+$$
+s_w(x,y)=\frac{(w\odot x)^T(w\odot y)}{\lVert w\odot x\rVert_2\lVert w\odot y\rVert_2}
+$$
+
+It is compared with a popularity fallback, StandardScaler plus Euclidean KNN, and a two-stage K-Means candidate retriever followed by cosine ranking. PCA is used only to visualize the feature space.
+
+```python
+similarity = cosine_similarity(seed_vector, catalog_vectors)
+top_k = np.argpartition(-similarity, k)[:k]
+```
+
+## 4. What the metrics mean
+
+The reported metrics are **proxy and systems metrics**, not evidence that a listener would enjoy a track:
+
+- exact-search neighborhood distance checks content coherence;
+- intra-list diversity exposes overly narrow result sets;
+- catalog coverage and average popularity expose concentration bias;
+- K-Means recall@10 measures how often approximate retrieval preserves exact cosine neighbors;
+- latency measures the systems trade-off;
+- silhouette score describes cluster separation only, never recommendation quality.
+
+## 5. Decision memo
+
+Use content retrieval for explainable item-to-item discovery, new-item cold start, and controls such as “more energetic” or “less acoustic.” Avoid treating it as full personalization when taste depends on culture, context, or collaborative behavior that audio attributes cannot encode.
+
+At larger catalog sizes, replace cluster scanning with an approximate nearest-neighbor index. When interaction logs become available, add collaborative retrieval or matrix factorization and evaluate against temporal user-level splits. A production music system would normally blend content, collaborative, popularity, freshness, and policy signals.
+
+## 6. Interview checks
+
+**Why not report NDCG?** There are no user relevance labels. Computing it would require inventing ground truth.
+
+**Why scale features?** Tempo and loudness have different numerical ranges from attributes bounded between zero and one. Without scaling, distance is mostly a unit-choice artifact.
+
+**Why can K-Means hurt?** A true nearest neighbor can sit across a cluster boundary. Candidate restriction buys latency by accepting measurable recall loss.
+
+**Why does similar not mean liked?** Content proximity captures acoustic resemblance, while preference also depends on identity, novelty, context, exposure, and social influence.
+
+## 7. Reproduce and credit
+
+Run `uv sync`, download `vatsalmavani/spotify-dataset`, then execute `uv run python research/spotify-music/run_experiment.py --data <path-to-data.csv>`. The script generates every metric, chart, and browser artifact shown here.
+
+Source material: [Kaggle notebook](https://www.kaggle.com/code/vatsalmavani/music-recommendation-system-using-spotify-dataset/notebook), [dataset](https://www.kaggle.com/datasets/vatsalmavani/spotify-dataset), and the [Search–Recommendation–Ads Cosmos guide](https://1985312383.github.io/search-rec-ads-cosmos-explorer/zh/).
+
+Contributors: Ricky Gong and Ziqi Xu. Detailed experiment and writing ownership is tracked in pull requests.

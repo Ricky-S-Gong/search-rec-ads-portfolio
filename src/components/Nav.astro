@@ -1,0 +1,38 @@
+---
+import { copy, href, oppositeLang, type Lang } from '../data/site';
+interface Props { lang: Lang; path: string; }
+const { lang, path } = Astro.props;
+const t = copy[lang];
+const other = oppositeLang(lang);
+const links = [
+  ['home', `/${lang}/`],
+  ['projects', `/${lang}/projects/`],
+  ['compare', `/${lang}/compare/`],
+  ['roadmap', `/${lang}/roadmap/`],
+  ['about', `/${lang}/about/`],
+] as const;
+---
+<header class="nav-shell">
+  <nav class="container nav" aria-label={lang === 'en' ? 'Primary navigation' : '主要导航'}>
+    <a class="brand" href={href(`/${lang}/`)} aria-label={t.siteName}>
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span>S·R·A</span>
+    </a>
+    <div class="nav-links">
+      {links.map(([key, url]) => <a href={href(url)}>{t.nav[key]}</a>)}
+    </div>
+    <a class="language" href={href(`/${other}${path}`)} hreflang={other}>{t.language}</a>
+  </nav>
+</header>
+
+<style>
+  .nav-shell { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid rgba(41,67,95,.7); background: rgba(7,17,31,.82); backdrop-filter: blur(18px); }
+  .nav { min-height: 68px; display: flex; align-items: center; gap: 1.2rem; }
+  .brand { display: inline-flex; align-items: center; gap: .7rem; margin-right: auto; font: 600 .82rem 'Unbounded', sans-serif; text-decoration: none; }
+  .brand-mark { width: 12px; aspect-ratio: 1; border-radius: 50%; background: var(--rec); box-shadow: 0 0 20px var(--rec), 18px 0 0 -4px var(--search), 36px 0 0 -4px var(--ads); margin-right: 32px; }
+  .nav-links { display: flex; gap: 1.15rem; }
+  .nav-links a, .language { color: var(--muted); font-size: .88rem; text-decoration: none; }
+  .nav-links a:hover, .language:hover { color: white; }
+  .language { padding: .35rem .65rem; border: 1px solid var(--line); border-radius: 999px; }
+  @media (max-width: 760px) { .nav-links { display: none; } }
+</style>

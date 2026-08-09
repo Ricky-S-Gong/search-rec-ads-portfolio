@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+/data/
+research/**/data/
+*.csv
+*.zip
+.env
+.env.*
+!.env.example

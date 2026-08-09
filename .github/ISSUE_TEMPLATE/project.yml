@@ -1,0 +1,35 @@
+name: Research mission
+description: Plan a dataset-to-portfolio project
+title: "[Project] "
+labels: ["research"]
+body:
+  - type: textarea
+    attributes:
+      label: Business question
+      description: What decision will this model support?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Dataset audit
+      description: Signals, labels, scale, license, leakage risks, and known biases.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Baselines and candidates
+      description: Include the cheapest credible baseline.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Evaluation
+      description: Separate relevance, proxy, systems, and qualitative evidence.
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Compute
+      options: [CPU, GPU recommended, GPU required]
+    validations:
+      required: true
