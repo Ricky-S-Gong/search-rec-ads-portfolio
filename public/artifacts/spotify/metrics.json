@@ -13,13 +13,65 @@
     "rawRows": 170653,
     "deduplicatedRows": 170653,
     "demoRows": 5000,
-    "genreLabelCoverage": 0.896878
+    "genreLabelCoverage": 0.896878,
+    "yearRange": [
+      1921,
+      2020
+    ],
+    "featureProfile": {
+      "acousticness": {
+        "median": 0.516,
+        "q1": 0.102,
+        "q3": 0.893
+      },
+      "danceability": {
+        "median": 0.548,
+        "q1": 0.415,
+        "q3": 0.668
+      },
+      "energy": {
+        "median": 0.471,
+        "q1": 0.255,
+        "q3": 0.703
+      },
+      "instrumentalness": {
+        "median": 0.0002,
+        "q1": 0.0,
+        "q3": 0.102
+      },
+      "liveness": {
+        "median": 0.136,
+        "q1": 0.0988,
+        "q3": 0.261
+      },
+      "loudness": {
+        "median": -10.58,
+        "q1": -14.615,
+        "q3": -7.183
+      },
+      "speechiness": {
+        "median": 0.045,
+        "q1": 0.0349,
+        "q3": 0.0756
+      },
+      "tempo": {
+        "median": 114.729,
+        "q1": 93.421,
+        "q3": 135.537
+      },
+      "valence": {
+        "median": 0.54,
+        "q1": 0.317,
+        "q3": 0.747
+      }
+    }
   },
   "evaluation": {
     "queryCount": 40,
-    "exactLatencyMs": 1.747,
-    "clusterLatencyMs": 0.2655,
-    "euclideanKnnLatencyMs": 0.3266,
+    "exactLatencyMs": 1.6629,
+    "clusterLatencyMs": 0.3168,
+    "euclideanKnnLatencyMs": 0.2732,
+    "euclideanOverlapWithCosineAt10": 0.4075,
     "clusterRecallAt10": 0.7775,
     "diversityAt10": 0.003558,
     "coverageAt10": 0.002344,
@@ -28,5 +80,22 @@
     "catalogPopularityMean": 31.4318,
     "clusterSilhouette": 0.109859
   },
-  "metricCaveat": "Proxy and systems metrics only; the dataset has no user relevance labels."
+  "metricCaveat": "Proxy and systems metrics only; the dataset has no user relevance labels.",
+  "methodComparison": {
+    "popularity": {
+      "role": "Fallback with no seed or user signal"
+    },
+    "euclideanKnn": {
+      "scaler": "StandardScaler",
+      "metric": "Euclidean distance"
+    },
+    "exactCosine": {
+      "scaler": "MinMaxScaler",
+      "metric": "Cosine similarity"
+    },
+    "clusterCosine": {
+      "candidates": 64,
+      "metric": "Cosine similarity within cluster"
+    }
+  }
 }

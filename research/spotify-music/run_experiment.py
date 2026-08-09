@@ -143,11 +143,13 @@ def run(data_path: Path, output_dir: Path, demo_size: int = 5000) -> dict:
     query_count = min(40, len(tracks))
     query_indices = rng.choice(len(tracks), size=query_count, replace=False)
     exact_times, cluster_times, recalls, diversities, recommended = [], [], [], [], set()
+    exact_neighbors = []
     neighborhood_distances = []
     rec_popularity = []
     for query_index in query_indices:
         started = time.perf_counter()
         exact_indices, exact_scores = exact_top_k(cosine_matrix, int(query_index))
+        exact_neighbors.append(exact_indices)
         exact_times.append((time.perf_counter() - started) * 1000)
 
         started = time.perf_counter()
@@ -167,8 +169,21 @@ def run(data_path: Path, output_dir: Path, demo_size: int = 5000) -> dict:
     )
 
     knn_started = time.perf_counter()
-    knn.kneighbors(standard_values[query_indices[: min(10, query_count)]])
-    knn_latency = (time.perf_counter() - knn_started) * 1000 / min(10, query_count)
+    knn_indices = knn.kneighbors(standard_values[query_indices], return_distance=False)[:, 1:11]
+    knn_latency = (time.perf_counter() - knn_started) * 1000 / query_count
+    euclidean_overlap = float(np.mean([
+        len(set(cosine) & set(euclidean)) / len(cosine)
+        for cosine, euclidean in zip(exact_neighbors, knn_indices, strict=True)
+    ]))
+
+    feature_profile = {
+        feature: {
+            "median": round(float(tracks[feature].median()), 4),
+            "q1": round(float(tracks[feature].quantile(0.25)), 4),
+            "q3": round(float(tracks[feature].quantile(0.75)), 4),
+        }
+        for feature in FEATURES
+    }
 
     demo = stratified_demo(tracks, min(demo_size, len(tracks)))
     demo_features = minmax.transform(demo[FEATURES].to_numpy(dtype=np.float32))
@@ -208,12 +223,15 @@ def run(data_path: Path, output_dir: Path, demo_size: int = 5000) -> dict:
             "deduplicatedRows": int(len(tracks)),
             "demoRows": int(len(demo)),
             "genreLabelCoverage": round(genre_label_coverage(data_path, tracks), 6),
+            "yearRange": [int(tracks["year"].min()), int(tracks["year"].max())],
+            "featureProfile": feature_profile,
         },
         "evaluation": {
             "queryCount": query_count,
             "exactLatencyMs": round(float(np.median(exact_times)), 4),
             "clusterLatencyMs": round(float(np.median(cluster_times)), 4),
             "euclideanKnnLatencyMs": round(float(knn_latency), 4),
+            "euclideanOverlapWithCosineAt10": round(euclidean_overlap, 6),
             "clusterRecallAt10": round(float(np.mean(recalls)), 6),
             "diversityAt10": round(float(np.mean(diversities)), 6),
             "coverageAt10": round(len(recommended) / len(tracks), 6),
@@ -223,6 +241,12 @@ def run(data_path: Path, output_dir: Path, demo_size: int = 5000) -> dict:
             "clusterSilhouette": round(cluster_silhouette, 6),
         },
         "metricCaveat": "Proxy and systems metrics only; the dataset has no user relevance labels.",
+        "methodComparison": {
+            "popularity": {"role": "Fallback with no seed or user signal"},
+            "euclideanKnn": {"scaler": "StandardScaler", "metric": "Euclidean distance"},
+            "exactCosine": {"scaler": "MinMaxScaler", "metric": "Cosine similarity"},
+            "clusterCosine": {"candidates": clusters, "metric": "Cosine similarity within cluster"},
+        },
     }
     (output_dir / "metrics.json").write_text(json.dumps(metrics, indent=2), encoding="utf-8")
 
@@ -247,6 +271,26 @@ def run(data_path: Path, output_dir: Path, demo_size: int = 5000) -> dict:
     fig.tight_layout()
     fig.savefig(output_dir / "feature-space.svg", format="svg", transparent=True)
     plt.close(fig)
+
+    decade_features = ["danceability", "energy", "valence", "acousticness"]
+    decade_frame = tracks.assign(decade=(tracks["year"] // 10 * 10).astype(int))
+    decade_means = decade_frame.loc[decade_frame["decade"].between(1920, 2010)].groupby("decade")[decade_features].mean()
+    trend_fig, trend_ax = plt.subplots(figsize=(10, 5.5), facecolor="#07111f")
+    trend_ax.set_facecolor("#07111f")
+    trend_colors = ["#35d0e2", "#a78bfa", "#f7b955", "#55d98b"]
+    for feature, color in zip(decade_features, trend_colors, strict=True):
+        trend_ax.plot(decade_means.index, decade_means[feature], marker="o", linewidth=2, label=feature, color=color)
+    trend_ax.set_title("Average audio features by decade", color="#edf5ff", loc="left")
+    trend_ax.set_xlabel("Decade", color="#9cb0c8")
+    trend_ax.set_ylabel("Mean feature value", color="#9cb0c8")
+    trend_ax.tick_params(colors="#9cb0c8")
+    trend_ax.grid(color="#29435f", alpha=0.45, linewidth=0.7)
+    trend_ax.legend(frameon=False, labelcolor="#edf5ff", ncol=2)
+    for spine in trend_ax.spines.values():
+        spine.set_color("#29435f")
+    trend_fig.tight_layout()
+    trend_fig.savefig(output_dir / "feature-trends.svg", format="svg", transparent=True)
+    plt.close(trend_fig)
     return metrics
 
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 type Metrics = {
   dataset: { rawRows: number; deduplicatedRows: number; demoRows: number };
-  evaluation: { exactLatencyMs: number; clusterLatencyMs: number; clusterRecallAt10: number; diversityAt10: number; coverageAt10: number };
+  evaluation: { exactLatencyMs: number; clusterLatencyMs: number; euclideanOverlapWithCosineAt10: number; clusterRecallAt10: number; diversityAt10: number; coverageAt10: number };
 };
 
 const assetBase = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/`;
@@ -22,13 +22,17 @@ export default function MetricsPanel({ lang }: { lang: 'en' | 'zh' }) {
     ? [
         ['Deduplicated catalog', metrics.dataset.deduplicatedRows.toLocaleString()],
         ['Exact query', `${metrics.evaluation.exactLatencyMs.toFixed(2)} ms`],
+        ['Cluster query', `${metrics.evaluation.clusterLatencyMs.toFixed(2)} ms`],
         ['Cluster recall@10', `${(metrics.evaluation.clusterRecallAt10 * 100).toFixed(1)}%`],
+        ['KNN overlap with cosine', `${(metrics.evaluation.euclideanOverlapWithCosineAt10 * 100).toFixed(1)}%`],
         ['Diversity@10', metrics.evaluation.diversityAt10.toFixed(3)],
       ]
     : [
         ['去重后的歌曲目录', metrics.dataset.deduplicatedRows.toLocaleString()],
         ['精确查询耗时', `${metrics.evaluation.exactLatencyMs.toFixed(2)} ms`],
+        ['聚类查询耗时', `${metrics.evaluation.clusterLatencyMs.toFixed(2)} ms`],
         ['聚类召回 Recall@10', `${(metrics.evaluation.clusterRecallAt10 * 100).toFixed(1)}%`],
+        ['KNN 与余弦重合率', `${(metrics.evaluation.euclideanOverlapWithCosineAt10 * 100).toFixed(1)}%`],
         ['多样性@10', metrics.evaluation.diversityAt10.toFixed(3)],
       ];
   return <div className="metric-grid">{items.map(([label, value]) => <div className="metric" key={label}><span className="eyebrow">{label}</span><strong>{value}</strong></div>)}</div>;

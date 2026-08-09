@@ -1,20 +1,21 @@
 ---
-import { algorithms, href, type Lang } from '../data/site';
-const { lang } = Astro.props as { lang: Lang };
+import { algorithms, href, type Domain, type Lang } from '../data/site';
+const { lang, domain } = Astro.props as { lang: Lang; domain: Domain };
 const labels = lang === 'en'
-  ? { algorithm: 'Algorithm', signals: 'Required signals', cold: 'Cold start', train: 'Train', serve: 'Serve', explain: 'Explain' }
-  : { algorithm: '算法', signals: '所需信号', cold: '冷启动', train: '训练', serve: '服务', explain: '可解释性' };
+  ? { algorithm: 'Method', signals: 'Required signals', best: 'Best for', cold: 'Cold start', cost: 'Train / serve', explain: 'Explainability', limitation: 'Main limitation' }
+  : { algorithm: '方法', signals: '所需信号', best: '最适合', cold: '冷启动', cost: '训练 / 服务', explain: '可解释性', limitation: '主要局限' };
+const rows = algorithms.filter((algorithm) => algorithm.domain === domain);
 ---
 <div class="table-wrap" tabindex="0" role="region" aria-label={lang === 'en' ? 'Algorithm comparison table' : '算法对比表'}>
   <table>
     <thead><tr>
-      <th>{labels.algorithm}</th><th>{labels.signals}</th><th>{labels.cold}</th><th>{labels.train}</th><th>{labels.serve}</th><th>{labels.explain}</th>
+      <th>{labels.algorithm}</th><th>{labels.signals}</th><th>{labels.best}</th><th>{labels.cold}</th><th>{labels.cost}</th><th>{labels.explain}</th><th>{labels.limitation}</th>
     </tr></thead>
     <tbody>
-      {algorithms.map((algorithm) => (
+      {rows.map((algorithm) => (
         <tr>
-          <th><a href={href(`/${lang}/algorithms/${algorithm.slug}/`)}>{algorithm.name[lang]}</a><small>{algorithm.family}</small></th>
-          <td>{algorithm.requiredSignals}</td><td>{algorithm.coldStart}</td><td>{algorithm.trainCost}</td><td>{algorithm.serveCost}</td><td>{algorithm.explainability}</td>
+          <th><a href={href(`/${lang}/algorithms/${algorithm.slug}/`)}>{algorithm.name[lang]}</a><small>{algorithm.family[lang]}</small></th>
+          <td>{algorithm.requiredSignals[lang]}</td><td>{algorithm.bestFor[lang]}</td><td>{algorithm.coldStart[lang]}</td><td>{algorithm.trainCost[lang]} / {algorithm.serveCost[lang]}</td><td>{algorithm.explainability[lang]}</td><td>{algorithm.limitation[lang]}</td>
         </tr>
       ))}
     </tbody>
@@ -23,7 +24,7 @@ const labels = lang === 'en'
 
 <style>
   .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; }
-  table { width: 100%; min-width: 980px; border-collapse: collapse; background: rgba(12,27,48,.7); }
+  table { width: 100%; min-width: 1180px; border-collapse: collapse; background: rgba(12,27,48,.7); }
   th, td { padding: 1rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; font-size: .82rem; }
   thead th { color: var(--muted); font: .68rem 'IBM Plex Mono', monospace; text-transform: uppercase; }
   tbody th { width: 200px; }
