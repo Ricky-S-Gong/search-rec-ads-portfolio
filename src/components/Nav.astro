@@ -15,8 +15,8 @@ const links = [
 <header class="nav-shell">
   <nav class="container nav" aria-label={lang === 'en' ? 'Primary navigation' : '主要导航'}>
     <a class="brand" href={href(`/${lang}/`)} aria-label={t.siteName}>
-      <span class="brand-mark" aria-hidden="true"></span>
-      <span>S·R·A</span>
+      <img src={href('/favicon.svg')} width="34" height="34" alt="" aria-hidden="true" />
+      <span>{lang === 'en' ? 'S·A·R Lab' : '搜广推实验室'}</span>
     </a>
     <div class="nav-links">
       {links.map(([key, url]) => <a href={href(url)}>{t.nav[key]}</a>)}
@@ -29,7 +29,7 @@ const links = [
   .nav-shell { position: sticky; top: 0; z-index: 20; border-bottom: 1px solid rgba(41,67,95,.7); background: rgba(7,17,31,.82); backdrop-filter: blur(18px); }
   .nav { min-height: 68px; display: flex; align-items: center; gap: 1.2rem; }
   .brand { display: inline-flex; align-items: center; gap: .7rem; margin-right: auto; font: 600 .82rem 'Unbounded', sans-serif; text-decoration: none; }
-  .brand-mark { width: 12px; aspect-ratio: 1; border-radius: 50%; background: var(--rec); box-shadow: 0 0 20px var(--rec), 18px 0 0 -4px var(--search), 36px 0 0 -4px var(--ads); margin-right: 32px; }
+  .brand img { flex: 0 0 auto; filter: drop-shadow(0 0 10px rgba(167,139,250,.42)); }
   .nav-links { display: flex; gap: 1.15rem; }
   .nav-links a, .language { color: var(--muted); font-size: .88rem; text-decoration: none; }
   .nav-links a:hover, .language:hover { color: white; }

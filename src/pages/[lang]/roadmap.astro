@@ -1,27 +1,98 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { copy, languages, type Lang } from '../../data/site';
+import { copy, domainNames, languages, roadmapTracks, type Domain, type Lang, type ProjectStatus } from '../../data/site';
+
 export const getStaticPaths = () => languages.map((lang) => ({ params: { lang } }));
-const lang = Astro.params.lang as Lang; const t = copy[lang];
-const stages = lang === 'en' ? [
-  ['Now', 'Content signals', 'Spotify audio features · cosine, KNN, K-Means retrieval', 'CPU'],
-  ['Next', 'Collaborative signals', 'MovieLens · UserCF, ItemCF, matrix factorization', 'CPU'],
-  ['Then', 'Implicit ranking', 'Clicks and exposure · BPR, ALS, negative sampling', 'CPU'],
-  ['Later', 'Sequential & deep retrieval', 'SASRec and two-tower retrieval', 'GPU / Colab'],
-  ['Expansion', 'Search and ads', 'BM25 → LTR; CTR/CVR → calibration and bidding', 'CPU → GPU'],
-] : [
-  ['当前', '内容信号', 'Spotify 音频特征 · 余弦、KNN、K-Means 召回', 'CPU'],
-  ['下一步', '协同信号', 'MovieLens · UserCF、ItemCF、矩阵分解', 'CPU'],
-  ['随后', '隐式反馈排序', '点击与曝光 · BPR、ALS、负采样', 'CPU'],
-  ['进阶', '序列与深度召回', 'SASRec 与双塔召回', 'GPU / Colab'],
-  ['扩展', '搜索与广告', 'BM25 → LTR；CTR/CVR → 校准与竞价', 'CPU → GPU'],
-];
+const lang = Astro.params.lang as Lang;
+const t = copy[lang];
+const initialDomain: Domain = 'recommendation';
+const statusLabel = (status: ProjectStatus) => status === 'complete' ? t.complete : status === 'in-progress' ? t.inProgress : t.planned;
 ---
-<BaseLayout lang={lang} title={`${t.nav.roadmap} — ${t.siteName}`} description="Learning roadmap" path="/roadmap/">
-  <section class="section container"><div class="section-heading"><h1>{t.nav.roadmap}</h1><p class="muted">{lang === 'en' ? 'Planned projects and the data signals each one adds.' : '后续项目计划，以及每个项目新增的数据与信号。'}</p></div>
-    <ol>{stages.map(([state,title,body,compute],i)=><li><span>{state}</span><div><small>{lang === 'en' ? 'Stage' : '阶段'} 0{i+1}</small><h2>{title}</h2><p>{body}</p></div><strong>{compute}</strong></li>)}</ol>
+
+<BaseLayout lang={lang} title={`${t.nav.roadmap} — ${t.siteName}`} description="Search, ads, and recommendation learning roadmap" path="/roadmap/">
+  <section class="section container roadmap">
+    <div class="section-heading">
+      <h1>{t.nav.roadmap}</h1>
+      <p class="muted">{lang === 'en' ? 'Separate learning paths for Search, Ads, and Recommendation, with the project and compute needed at each stage.' : '分别规划搜索、广告与推荐的学习路径，并标明每个阶段对应的项目与计算环境。'}</p>
+    </div>
+
+    <div class="roadmap-tabs" data-roadmap-tabs>
+      <div class="tab-list" role="tablist" aria-label={lang === 'en' ? 'Roadmap domains' : '路线方向'}>
+        {roadmapTracks.map(({ domain }) => (
+          <button type="button" role="tab" id={`roadmap-tab-${domain}`} aria-controls={`roadmap-panel-${domain}`} aria-selected={domain === initialDomain ? 'true' : 'false'} tabindex={domain === initialDomain ? 0 : -1} data-domain={domain}>
+            {domainNames[domain][lang]}
+          </button>
+        ))}
+      </div>
+
+      {roadmapTracks.map((track) => (
+        <section class={`track domain-${track.domain}`} role="tabpanel" id={`roadmap-panel-${track.domain}`} aria-labelledby={`roadmap-tab-${track.domain}`} hidden={track.domain !== initialDomain}>
+          <p class="track-intro">{track.introduction[lang]}</p>
+          <ol>
+            {track.stages.map((stage, index) => (
+              <li>
+                <div class="stage-number"><span>{lang === 'en' ? 'Stage' : '阶段'}</span><strong>{String(index + 1).padStart(2, '0')}</strong></div>
+                <div class="stage-copy"><h2>{stage.title[lang]}</h2><p>{stage.topics[lang]}</p><small>{stage.project[lang]}</small></div>
+                <div class="stage-meta"><span class={`status status-${stage.status}`}><i></i>{statusLabel(stage.status)}</span><strong>{stage.compute}</strong></div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))}
+    </div>
+
+    <p class="source">{lang === 'en' ? 'Learning sequence informed by' : '学习顺序参考'} <a href="https://1985312383.github.io/search-rec-ads-cosmos-explorer/zh/" target="_blank" rel="noreferrer">{lang === 'en' ? 'Zhang Jie’s Search · Ads · Recommendation Cosmos Explorer' : '张杰的搜广推宇宙漫游指南'} ↗</a></p>
   </section>
 </BaseLayout>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-roadmap-tabs]').forEach((tabs) => {
+    const buttons = [...tabs.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = [...tabs.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+    const select = (button: HTMLButtonElement) => {
+      buttons.forEach((item) => { const selected = item === button; item.setAttribute('aria-selected', String(selected)); item.tabIndex = selected ? 0 : -1; });
+      panels.forEach((panel) => { panel.hidden = panel.id !== button.getAttribute('aria-controls'); });
+    };
+    buttons.forEach((button, index) => {
+      button.addEventListener('click', () => select(button));
+      button.addEventListener('keydown', (event) => {
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        event.preventDefault();
+        const next = buttons[(index + (event.key === 'ArrowRight' ? 1 : -1) + buttons.length) % buttons.length];
+        select(next); next.focus();
+      });
+    });
+  });
+</script>
+
 <style>
-  h1{font-size:clamp(2.5rem,7vw,5.5rem)}ol{margin:0;padding:0;list-style:none;border-top:1px solid var(--line)}li{display:grid;grid-template-columns:100px 1fr auto;gap:1.2rem;padding:1.4rem 0;border-bottom:1px solid var(--line);align-items:center}li>span,li small{color:var(--rec);font:.7rem 'IBM Plex Mono',monospace;text-transform:uppercase}li h2{margin:.35rem 0;font-size:clamp(1.4rem,3vw,2.2rem)}li p{color:var(--muted)}li>strong{font:.72rem 'IBM Plex Mono',monospace;color:var(--search)}@media(max-width:650px){li{grid-template-columns:1fr}li>span{margin-top:1rem}}
+  .roadmap h1 { font-size: clamp(2.5rem, 7vw, 5rem); }
+  .roadmap-tabs { border-top: 1px solid var(--line); }
+  .tab-list { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
+  .tab-list button { min-height: 68px; color: var(--muted); background: transparent; border: 0; border-right: 1px solid var(--line); cursor: pointer; font-weight: 600; }
+  .tab-list button:last-child { border-right: 0; }
+  .tab-list button[data-domain='search'] { --domain-color: var(--search); }.tab-list button[data-domain='ads'] { --domain-color: var(--ads); }.tab-list button[data-domain='recommendation'] { --domain-color: var(--rec); }
+  .tab-list button[aria-selected='true'] { color: var(--starlight); background: color-mix(in srgb, var(--domain-color) 10%, transparent); box-shadow: inset 0 -3px var(--domain-color); }
+  .track { padding-top: 1.4rem; }
+  .track-intro { max-width: 760px; margin-bottom: 1.4rem; color: var(--muted); }
+  ol { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+  li { display: grid; grid-template-columns: 90px minmax(0, 1fr) 170px; gap: 1.3rem; align-items: center; padding: 1.45rem 0; border-bottom: 1px solid var(--line); }
+  .stage-number { display: flex; align-items: baseline; gap: .4rem; color: var(--domain); font: .68rem 'IBM Plex Mono', monospace; text-transform: uppercase; }
+  .stage-number strong { font-size: 1.2rem; }
+  .stage-copy { display: grid; gap: .38rem; }
+  .stage-copy h2 { font-size: clamp(1.3rem, 2.5vw, 1.9rem); }
+  .stage-copy p { color: var(--muted); }
+  .stage-copy small { color: var(--starlight); font: .72rem/1.5 'IBM Plex Mono', monospace; }
+  .stage-meta { display: grid; justify-items: end; gap: .55rem; }
+  .stage-meta > strong { color: var(--search); font: .7rem 'IBM Plex Mono', monospace; }
+  .status { display: inline-flex; align-items: center; gap: .4rem; color: var(--status-color); font: .68rem 'IBM Plex Mono', monospace; text-transform: uppercase; }
+  .status i { width: 7px; aspect-ratio: 1; border-radius: 50%; background: currentColor; box-shadow: 0 0 10px currentColor; }
+  .status-complete { --status-color: var(--complete); }.status-in-progress { --status-color: var(--in-progress); }.status-planned { --status-color: var(--planned); }
+  .source { margin-top: 2rem; color: var(--muted); font-size: .86rem; }
+  .source a { color: var(--starlight); }
+  @media (max-width: 680px) {
+    .tab-list button { min-height: 58px; font-size: .86rem; }
+    li { grid-template-columns: 1fr; gap: .75rem; }
+    .stage-meta { justify-items: start; grid-template-columns: auto auto; align-items: center; }
+  }
 </style>

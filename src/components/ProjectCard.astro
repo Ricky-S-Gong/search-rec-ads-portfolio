@@ -33,8 +33,10 @@ const statusLabel = project.status === 'complete' ? t.complete : project.status 
   .project-body { display: grid; gap: .8rem; }
   h3 { overflow: hidden; font-size: clamp(1.3rem, 2.2vw, 1.8rem); white-space: nowrap; text-overflow: ellipsis; }
   h3 a { text-decoration: none; }
-  .project-meta { display: grid; gap: .8rem; color: var(--muted); font-size: .82rem; }
-  .project-meta p span { display: block; color: var(--starlight); font: .68rem 'IBM Plex Mono', monospace; text-transform: uppercase; }
-  .project-meta div { display: flex; flex-wrap: wrap; gap: .35rem; }
+  .project-meta { display: grid; align-content: start; gap: .55rem; color: var(--muted); font-size: .82rem; }
+  .project-meta p { display: grid; gap: .2rem; line-height: 1.4; }
+  .project-meta p span { display: block; color: var(--starlight); font: .68rem/1.2 'IBM Plex Mono', monospace; text-transform: uppercase; }
+  .project-meta div { display: flex; align-items: center; flex-wrap: wrap; gap: .3rem; }
+  .project-meta .tag { width: fit-content; padding: .18rem .48rem; line-height: 1.25; }
   @media (max-width: 760px) { .project { grid-template-columns: 1fr; } h3 { white-space: normal; } }
 </style>
