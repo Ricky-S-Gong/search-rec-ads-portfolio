@@ -2,20 +2,25 @@
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import SpotifyCaseStudy from '../../../components/SpotifyCaseStudy.astro';
 import { copy, domainNames, languages, projects, type Lang } from '../../../data/site';
+import spotifyMetrics from '../../../../public/artifacts/spotify/metrics.json';
 export const getStaticPaths = () => languages.flatMap((lang) => projects.filter((p) => p.status === 'complete').map((project) => ({ params: { lang, slug: project.slug }, props: { project } })));
 const lang = Astro.params.lang as Lang;
 const { project } = Astro.props;
 const t = copy[lang];
+const metrics = spotifyMetrics.evaluation;
+const starSummary = lang === 'zh'
+  ? `在缺少用户行为的音乐目录中，我们需要从 ${spotifyMetrics.dataset.deduplicatedRows.toLocaleString()} 首歌曲中找到可解释的相似曲目。我们用 9 项音频特征构建内容推荐，并比较全量余弦与 K-Means 候选召回；CPU 实验将查询延迟从 ${metrics.exactLatencyMs.toFixed(2)} ms 降至 ${metrics.clusterLatencyMs.toFixed(2)} ms，同时保留 ${(metrics.clusterRecallAt10 * 100).toFixed(1)}% 的 Exact Top-10。`
+  : `With no listener behavior, we needed explainable similar tracks from a catalog of ${spotifyMetrics.dataset.deduplicatedRows.toLocaleString()}. We built content retrieval from nine audio features and compared exact cosine with K-Means candidates; on CPU, median query latency fell from ${metrics.exactLatencyMs.toFixed(2)} ms to ${metrics.clusterLatencyMs.toFixed(2)} ms while preserving ${(metrics.clusterRecallAt10 * 100).toFixed(1)}% of the exact Top-10.`;
 ---
 <BaseLayout lang={lang} title={`${project.title[lang]} — ${t.siteName}`} description={project.summary[lang]} path={`/projects/${project.slug}/`}>
   <article>
     <header class="project-hero container">
-      <div><p class="eyebrow">{domainNames[project.domain][lang]} / Content-based / CPU</p><h1>{project.title[lang]}</h1><p class="lede">{project.summary[lang]}</p></div>
+      <div><p class="eyebrow">{domainNames[project.domain][lang]} / Content-based / CPU</p><h1>{project.title[lang]}</h1><p class="lede">{starSummary}</p></div>
       <dl><div><dt>{lang === 'en' ? 'Catalog' : '歌曲目录'}</dt><dd>170,653</dd></div><div><dt>{lang === 'en' ? 'Behavior signal' : '行为信号'}</dt><dd>{lang === 'en' ? 'None' : '无'}</dd></div><div><dt>{lang === 'en' ? 'GPU' : 'GPU'}</dt><dd>{lang === 'en' ? 'Not needed' : '不需要'}</dd></div></dl>
     </header>
     <SpotifyCaseStudy lang={lang} />
   </article>
 </BaseLayout>
 <style>
-  .project-hero{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:3rem;align-items:end;padding-block:clamp(4rem,9vw,7rem)}.project-hero>div{display:grid;gap:1.2rem}.project-hero h1{font-size:clamp(2.4rem,6vw,5rem);white-space:nowrap}.lede{max-width:760px;color:var(--muted);font-size:1.15rem}.project-hero dl{margin:0;border-left:1px solid var(--line)}.project-hero dl div{padding:.85rem 1rem;border-bottom:1px solid var(--line)}dt{color:var(--muted);font:.68rem 'IBM Plex Mono',monospace;text-transform:uppercase}dd{margin:.25rem 0 0;font-weight:600}@media(max-width:780px){.project-hero{grid-template-columns:1fr}.project-hero h1{white-space:normal}.project-hero dl{border-left:0}}
+  .project-hero{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:clamp(2rem,5vw,4rem);align-items:end;padding-block:clamp(4rem,9vw,7rem)}.project-hero>div{display:grid;gap:1.2rem}.project-hero h1{max-width:18ch;font-size:clamp(2.25rem,5vw,4.35rem);overflow-wrap:anywhere}.lede{max-width:790px;color:var(--muted);font-size:clamp(1rem,1.8vw,1.14rem)}.project-hero dl{margin:0;border-left:1px solid var(--line)}.project-hero dl div{padding:.85rem 1rem;border-bottom:1px solid var(--line)}dt{color:var(--muted);font:.68rem 'IBM Plex Mono',monospace;text-transform:uppercase}dd{margin:.25rem 0 0;font-weight:600}@media(max-width:780px){.project-hero{grid-template-columns:1fr}.project-hero h1{max-width:14ch;font-size:clamp(2.1rem,11vw,3.25rem)}.project-hero dl{border-left:0}}
 </style>

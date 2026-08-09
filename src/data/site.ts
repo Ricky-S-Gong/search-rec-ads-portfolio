@@ -33,6 +33,37 @@ export interface AlgorithmMeta {
   avoidWhen: Localized;
 }
 
+export interface ProfileMeta {
+  name: string;
+  photo: string;
+  photoAlt: Localized;
+  education: Localized;
+  experience: Localized;
+  linkedin: string;
+  email: string;
+}
+
+export interface RoadmapTrack {
+  domain: Domain;
+  introduction: Localized;
+  stages: Array<{
+    title: Localized;
+    topics: Localized;
+    project: Localized;
+    status: ProjectStatus;
+    compute: string;
+  }>;
+}
+
+export interface MetricDefinition {
+  key: string;
+  label: Localized;
+  latex?: string;
+  variables: Localized;
+  intuition: Localized;
+  businessMeaning: Localized;
+}
+
 export const languages: Lang[] = ['en', 'zh'];
 export const domains: Domain[] = ['search', 'ads', 'recommendation'];
 
@@ -44,12 +75,12 @@ export const domainNames: Record<Domain, Localized> = {
 
 export const copy = {
   en: {
-    siteName: 'Search · Ads · Recommendation Portfolio',
+    siteName: 'Search · Ads · Recommendation Cosmos Lab',
     byline: 'A joint technical portfolio by Ricky Gong & Ziqi Xu',
     nav: { home: 'Home', projects: 'Projects', compare: 'Algorithms', roadmap: 'Roadmap', about: 'About' },
     language: '中文',
     heroTitle: 'Search · Ads · Recommendation Cosmos Lab',
-    heroBody: 'Reproducible case studies that show the data, code, algorithm choices, results, limitations, and production trade-offs behind each system.',
+    heroBody: 'A case-study portfolio focused on search, ads, and recommendation algorithms, showing how different methods work, how they are implemented, how they are evaluated, and where they are applied.',
     explore: 'Read the Spotify case study',
     compare: 'Compare algorithm families',
     projectsTitle: 'Projects by domain',
@@ -59,12 +90,12 @@ export const copy = {
     complete: 'Completed', inProgress: 'In progress', planned: 'Planned', compute: 'Compute', dataset: 'Dataset',
   },
   zh: {
-    siteName: '搜索 · 广告 · 推荐技术作品集',
+    siteName: '搜广推宇宙实验室',
     byline: 'Ricky Gong 与 Ziqi Xu 的联合技术作品集',
     nav: { home: '首页', projects: '项目', compare: '算法对比', roadmap: '路线图', about: '关于我们' },
     language: 'English',
     heroTitle: '搜广推宇宙实验室',
-    heroBody: '通过可复现的 Case Study，完整展示每个系统的数据、代码、算法选择、实验结果、局限与生产化权衡。',
+    heroBody: '一个围绕搜索、广告与推荐算法的 Case Study Portfolio，展示不同算法的原理、实现、实验与应用。',
     explore: '阅读 Spotify 项目',
     compare: '比较算法类别',
     projectsTitle: '按方向查看项目',
@@ -115,6 +146,129 @@ export const projects: ProjectMeta[] = [
       en: 'The next recommendation project adds user-item interactions so personalization and ranking metrics can be evaluated correctly.',
       zh: '下一项推荐项目引入真实用户—物品交互，正确评估个性化与排序指标。',
     },
+  },
+];
+
+export const profiles: ProfileMeta[] = [
+  {
+    name: 'Ricky Gong',
+    photo: '/images/people/ricky-gong.jpg',
+    photoAlt: { en: 'Ricky Gong under cherry blossoms', zh: '樱花树下的 Ricky Gong' },
+    education: { en: 'MSE in Data Science, University of Pennsylvania', zh: '宾夕法尼亚大学数据科学硕士' },
+    experience: { en: 'Data Science Intern at Corsair', zh: 'Corsair 数据科学实习生' },
+    linkedin: 'https://www.linkedin.com/in/shangyu-ricky-gong',
+    email: 'sgong.recruiting@gmail.com',
+  },
+  {
+    name: 'Ziqi Xu',
+    photo: '/images/people/ziqi-xu.jpg',
+    photoAlt: { en: 'Ziqi Xu on an oak-lined path', zh: '林荫小路上的 Ziqi Xu' },
+    education: { en: 'Statistics and Actuarial Science, UIUC', zh: '伊利诺伊大学厄巴纳-香槟分校统计与精算科学' },
+    experience: { en: 'Former Intern at Chubb', zh: '曾任 Chubb 实习生' },
+    linkedin: 'https://www.linkedin.com/in/ziqi12/',
+    email: 'xuziqi2003@gmail.com',
+  },
+];
+
+export const roadmapTracks: RoadmapTrack[] = [
+  {
+    domain: 'search',
+    introduction: {
+      en: 'Build from transparent lexical retrieval to learned and semantic ranking.',
+      zh: '从透明的词法检索出发，逐步进入学习排序与语义搜索。',
+    },
+    stages: [
+      {
+        title: { en: 'Information retrieval foundations', zh: '信息检索基础' },
+        topics: { en: 'Inverted indexes · text processing · query analysis', zh: '倒排索引 · 文本预处理 · 查询分析' },
+        project: { en: 'Search system groundwork', zh: '搜索系统基础实验' },
+        status: 'planned', compute: 'CPU',
+      },
+      {
+        title: { en: 'Lexical retrieval and evaluation', zh: '词法检索与离线评估' },
+        topics: { en: 'TF-IDF · BM25 · relevance metrics', zh: 'TF-IDF · BM25 · 相关性指标' },
+        project: { en: 'BEIR search relevance benchmark', zh: 'BEIR 搜索相关性基准' },
+        status: 'planned', compute: 'CPU',
+      },
+      {
+        title: { en: 'Semantic and hybrid retrieval', zh: '语义与混合检索' },
+        topics: { en: 'Dense retrieval · vector search · hybrid fusion', zh: 'Dense Retrieval · 向量检索 · 混合融合' },
+        project: { en: 'Lexical vs. dense retrieval study', zh: '词法与向量检索对比实验' },
+        status: 'planned', compute: 'GPU recommended',
+      },
+      {
+        title: { en: 'Learned ranking and query understanding', zh: '学习排序与查询理解' },
+        topics: { en: 'Learning to Rank · intent · LLM search', zh: 'Learning to Rank · 意图识别 · LLM Search' },
+        project: { en: 'End-to-end search ranking case study', zh: '端到端搜索排序项目' },
+        status: 'planned', compute: 'GPU recommended',
+      },
+    ],
+  },
+  {
+    domain: 'ads',
+    introduction: {
+      en: 'Connect response prediction to calibrated value and auction decisions.',
+      zh: '把响应预估逐步连接到价值校准、竞价与预算决策。',
+    },
+    stages: [
+      {
+        title: { en: 'Ads systems and objectives', zh: '广告系统与目标' },
+        topics: { en: 'Ecosystem · auctions · CTR/CVR metrics', zh: '广告生态 · 拍卖 · CTR/CVR 指标' },
+        project: { en: 'Auction and metric walkthrough', zh: '竞价与指标基础实验' },
+        status: 'planned', compute: 'CPU',
+      },
+      {
+        title: { en: 'Response prediction baselines', zh: '响应预估基线' },
+        topics: { en: 'Feature engineering · negative sampling · logistic CTR', zh: '特征工程 · 负采样 · 逻辑回归 CTR' },
+        project: { en: 'Criteo CTR prediction', zh: 'Criteo CTR 预估' },
+        status: 'planned', compute: 'CPU',
+      },
+      {
+        title: { en: 'Deep prediction and calibration', zh: '深度预估与概率校准' },
+        topics: { en: 'DeepFM · multi-task learning · calibration', zh: 'DeepFM · 多任务学习 · 概率校准' },
+        project: { en: 'Calibrated deep CTR benchmark', zh: '深度 CTR 与校准对比' },
+        status: 'planned', compute: 'GPU recommended',
+      },
+      {
+        title: { en: 'Bidding and online optimization', zh: '竞价与在线优化' },
+        topics: { en: 'Bidding · budgets · online learning · experiments', zh: '出价 · 预算控制 · 在线学习 · 实验' },
+        project: { en: 'Budget-aware bidding simulation', zh: '预算约束竞价模拟' },
+        status: 'planned', compute: 'CPU → GPU',
+      },
+    ],
+  },
+  {
+    domain: 'recommendation',
+    introduction: {
+      en: 'Add signals in stages: item attributes, interactions, ranking, then real-time objectives.',
+      zh: '按阶段增加信号：物品属性、用户交互、排序，再到实时多目标。',
+    },
+    stages: [
+      {
+        title: { en: 'Content signals and item cold start', zh: '内容信号与新物品冷启动' },
+        topics: { en: 'Audio features · cosine · KNN · candidate retrieval', zh: '音频特征 · 余弦 · KNN · 候选召回' },
+        project: { en: 'Spotify content recommender', zh: 'Spotify 内容推荐' },
+        status: 'complete', compute: 'CPU',
+      },
+      {
+        title: { en: 'Collaborative signals', zh: '协同信号' },
+        topics: { en: 'UserCF · ItemCF · matrix factorization', zh: 'UserCF · ItemCF · 矩阵分解' },
+        project: { en: 'MovieLens collaborative filtering', zh: 'MovieLens 协同过滤' },
+        status: 'planned', compute: 'CPU',
+      },
+      {
+        title: { en: 'Implicit feedback and retrieval', zh: '隐式反馈与召回排序' },
+        topics: { en: 'Negative sampling · ranking · Two-Tower', zh: '负采样 · 排序 · Two-Tower' },
+        project: { en: 'Implicit ranking benchmark', zh: '隐式反馈排序基准' },
+        status: 'planned', compute: 'CPU → GPU',
+      },
+      {
+        title: { en: 'Sequential and multi-objective systems', zh: '序列与多目标系统' },
+        topics: { en: 'Sequences · real time · fairness · diversity', zh: '序列模型 · 实时推荐 · 公平性 · 多样性' },
+        project: { en: 'Real-time multi-objective study', zh: '实时多目标推荐实验' },
+        status: 'planned', compute: 'GPU recommended',
+      },
+    ],
   },
 ];
 
