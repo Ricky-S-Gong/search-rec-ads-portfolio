@@ -2,7 +2,7 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
-import type { Lang } from '../data/site';
+import { href, type Lang } from '../data/site';
 
 interface Props {
   lang: Lang;
@@ -21,6 +21,7 @@ const canonical = new URL(`${import.meta.env.BASE_URL}${lang}${path}`, Astro.sit
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#07111f" />
+    <link rel="icon" type="image/svg+xml" href={href('/favicon.svg')} />
     <link rel="canonical" href={canonical} />
     <link rel="alternate" hreflang="en" href={new URL(`${import.meta.env.BASE_URL}en${path}`, Astro.site)} />
     <link rel="alternate" hreflang="zh" href={new URL(`${import.meta.env.BASE_URL}zh${path}`, Astro.site)} />
