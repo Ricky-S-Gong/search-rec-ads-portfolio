@@ -1,10 +1,10 @@
-# Search · Recommendation · Ads Cosmos
+# Search · Ads · Recommendation Portfolio
 
 [中文](#中文) · [Live site](https://ricky-s-gong.github.io/search-rec-ads-portfolio/)
 
 A bilingual, interview-oriented portfolio by **Ricky Gong & Ziqi Xu**. Each
-project connects a business question, dataset boundary, algorithm choice,
-reproducible experiment, and explicit “use / avoid” decision.
+project is a code-driven case study covering the problem, data, EDA, feature
+engineering, algorithm choice, results, evaluation, and improvements.
 
 ## Local setup
 

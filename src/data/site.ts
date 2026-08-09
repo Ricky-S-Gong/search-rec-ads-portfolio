@@ -1,142 +1,223 @@
 export type Lang = 'en' | 'zh';
-export type Domain = 'search' | 'recommendation' | 'ads';
+export type Domain = 'search' | 'ads' | 'recommendation';
+export type ProjectStatus = 'complete' | 'in-progress' | 'planned';
+
+type Localized = Record<Lang, string>;
 
 export interface ProjectMeta {
   slug: string;
   domain: Domain;
-  status: 'complete' | 'planned';
+  status: ProjectStatus;
   compute: 'CPU' | 'GPU recommended' | 'GPU required';
   algorithms: string[];
   dataset: string;
   authors: string[];
-  title: Record<Lang, string>;
-  summary: Record<Lang, string>;
+  title: Localized;
+  summary: Localized;
 }
 
 export interface AlgorithmMeta {
   slug: string;
   domain: Domain;
-  family: string;
-  requiredSignals: string;
-  coldStart: string;
-  trainCost: string;
-  serveCost: string;
-  explainability: 'High' | 'Medium' | 'Low';
-  name: Record<Lang, string>;
-  intuition: Record<Lang, string>;
-  useWhen: Record<Lang, string>;
-  avoidWhen: Record<Lang, string>;
+  name: Localized;
+  family: Localized;
+  requiredSignals: Localized;
+  coldStart: Localized;
+  trainCost: Localized;
+  serveCost: Localized;
+  explainability: Localized;
+  bestFor: Localized;
+  limitation: Localized;
+  intuition: Localized;
+  useWhen: Localized;
+  avoidWhen: Localized;
 }
 
 export const languages: Lang[] = ['en', 'zh'];
+export const domains: Domain[] = ['search', 'ads', 'recommendation'];
+
+export const domainNames: Record<Domain, Localized> = {
+  search: { en: 'Search', zh: '搜索' },
+  ads: { en: 'Ads', zh: '广告' },
+  recommendation: { en: 'Recommendation', zh: '推荐' },
+};
 
 export const copy = {
   en: {
-    siteName: 'Search · Rec · Ads Cosmos',
-    byline: 'A joint systems portfolio by Ricky Gong & Ziqi Xu',
-    nav: { home: 'Mission control', projects: 'Projects', compare: 'Compare', roadmap: 'Roadmap', about: 'Crew' },
+    siteName: 'Search · Ads · Recommendation Portfolio',
+    byline: 'A joint technical portfolio by Ricky Gong & Ziqi Xu',
+    nav: { home: 'Home', projects: 'Projects', compare: 'Algorithms', roadmap: 'Roadmap', about: 'About' },
     language: '中文',
-    heroEyebrow: 'Evidence before architecture',
-    heroTitle: 'We map signals to decisions.',
-    heroBody: 'Reproducible studies of retrieval, ranking, and optimization—built to explain not only what worked, but when it should be used and where it breaks.',
-    explore: 'Open the first mission',
-    compare: 'Compare algorithms',
-    projectsTitle: 'Mission log',
-    projectsIntro: 'Each project connects a dataset, a business constraint, an algorithm choice, and an honest evaluation.',
-    decisionTitle: 'The decision surface',
-    decisionIntro: 'An algorithm is not “best” in isolation. Its value depends on the signals, latency budget, and failure mode a product can tolerate.',
-    complete: 'Complete', planned: 'Planned', compute: 'Compute', dataset: 'Dataset',
+    heroTitle: 'Search, Ads & Recommendation Projects',
+    heroBody: 'Reproducible case studies that show the data, code, algorithm choices, results, limitations, and production trade-offs behind each system.',
+    explore: 'Read the Spotify case study',
+    compare: 'Compare algorithm families',
+    projectsTitle: 'Projects by domain',
+    projectsIntro: 'Switch between Search, Ads, and Recommendation. Every completed project includes reproducible code and evidence.',
+    decisionTitle: 'Algorithm families by domain',
+    decisionIntro: 'Compare broad approaches within the same problem area. Project-specific models and implementation details stay in each case study.',
+    complete: 'Completed', inProgress: 'In progress', planned: 'Planned', compute: 'Compute', dataset: 'Dataset',
   },
   zh: {
-    siteName: '搜广推算法宇宙',
+    siteName: '搜索 · 广告 · 推荐技术作品集',
     byline: 'Ricky Gong 与 Ziqi Xu 的联合技术作品集',
-    nav: { home: '任务中心', projects: '项目', compare: '算法对比', roadmap: '学习路线', about: '成员' },
+    nav: { home: '首页', projects: '项目', compare: '算法对比', roadmap: '路线图', about: '关于我们' },
     language: 'English',
-    heroEyebrow: '先有证据，再谈架构',
-    heroTitle: '从信号出发，抵达决策。',
-    heroBody: '通过可复现实验研究召回、排序与优化：不仅说明什么有效，也明确它何时适用、何处失效。',
-    explore: '进入首个任务',
-    compare: '比较算法',
-    projectsTitle: '任务日志',
-    projectsIntro: '每个项目都连接数据、业务约束、算法选择与诚实的评估。',
-    decisionTitle: '算法决策面',
-    decisionIntro: '算法没有脱离场景的“最佳”。它的价值取决于可用信号、延迟预算和产品能够承担的失效方式。',
-    complete: '已完成', planned: '计划中', compute: '计算环境', dataset: '数据集',
+    heroTitle: '搜索、广告与推荐项目',
+    heroBody: '通过可复现的 Case Study，完整展示每个系统的数据、代码、算法选择、实验结果、局限与生产化权衡。',
+    explore: '阅读 Spotify 项目',
+    compare: '比较算法类别',
+    projectsTitle: '按方向查看项目',
+    projectsIntro: '在搜索、广告与推荐之间切换。每个已完成项目都提供可复现代码和真实实验结果。',
+    decisionTitle: '按方向比较算法类别',
+    decisionIntro: '在同一业务方向下比较不同方法论；具体模型、距离函数和工程实现放在对应的 Project Case Study 中。',
+    complete: '已完成', inProgress: '进行中', planned: '计划中', compute: '计算环境', dataset: '数据集',
   },
 } as const;
 
 export const projects: ProjectMeta[] = [
   {
-    slug: 'spotify-content-recommender',
-    domain: 'recommendation',
-    status: 'complete',
-    compute: 'CPU',
-    algorithms: ['Popularity', 'Euclidean KNN', 'Cosine', 'Weighted cosine', 'K-Means retrieval'],
-    dataset: 'Kaggle Spotify dataset · 170,653 tracks',
+    slug: 'product-search-relevance', domain: 'search', status: 'planned', compute: 'CPU',
+    algorithms: ['BM25', 'Dense retrieval', 'Hybrid ranking'], dataset: 'BEIR · query-document relevance',
     authors: ['Ricky Gong', 'Ziqi Xu'],
-    title: { en: 'Spotify content recommender', zh: 'Spotify 内容推荐系统' },
+    title: { en: 'Search relevance benchmark', zh: '搜索相关性基准' },
     summary: {
-      en: 'An honest item-to-item recommender built from audio attributes, with exact and approximate retrieval compared under cold-start and latency constraints.',
-      zh: '基于音频属性构建相似歌曲推荐，在冷启动与延迟约束下比较精确检索和近似候选召回。',
+      en: 'A planned retrieval study comparing lexical, dense, and hybrid search under relevance and latency constraints.',
+      zh: '计划对比词法、向量与混合检索，并分析相关性、延迟和失败查询。',
     },
   },
   {
-    slug: 'movielens-collaborative-filtering',
-    domain: 'recommendation',
-    status: 'planned',
-    compute: 'CPU',
-    algorithms: ['UserCF', 'ItemCF', 'Matrix factorization'],
-    dataset: 'MovieLens · user-item interactions',
+    slug: 'criteo-ctr-prediction', domain: 'ads', status: 'planned', compute: 'GPU recommended',
+    algorithms: ['Logistic regression', 'GBDT + LR', 'DeepFM'], dataset: 'Criteo · display-ad interactions',
     authors: ['Ricky Gong', 'Ziqi Xu'],
-    title: { en: 'Collaborative signals at work', zh: '协同行为信号实战' },
+    title: { en: 'CTR prediction and calibration', zh: 'CTR 预估与校准' },
     summary: {
-      en: 'The next mission adds real user-item interactions so ranking metrics and personalization become valid.',
-      zh: '下一项任务引入真实用户—物品交互，使排序指标和个性化评测真正成立。',
+      en: 'A planned ads case study covering sparse features, click prediction, probability calibration, and auction-aware evaluation.',
+      zh: '计划研究稀疏特征、点击率预估、概率校准，以及面向广告竞价的评估。',
+    },
+  },
+  {
+    slug: 'spotify-content-recommender', domain: 'recommendation', status: 'complete', compute: 'CPU',
+    algorithms: ['Popularity', 'Euclidean KNN', 'Cosine', 'Weighted cosine', 'K-Means retrieval'],
+    dataset: 'Kaggle Spotify dataset · 170,653 tracks', authors: ['Ricky Gong', 'Ziqi Xu'],
+    title: { en: 'Spotify content recommender', zh: 'Spotify 内容推荐' },
+    summary: {
+      en: 'An item-to-item recommender built from audio attributes, with exact and approximate retrieval compared under cold-start and latency constraints.',
+      zh: '基于音频属性推荐相似歌曲，并在冷启动与延迟约束下比较精确和近似召回。',
+    },
+  },
+  {
+    slug: 'movielens-collaborative-filtering', domain: 'recommendation', status: 'planned', compute: 'CPU',
+    algorithms: ['UserCF', 'ItemCF', 'Matrix factorization'], dataset: 'MovieLens · user-item interactions',
+    authors: ['Ricky Gong', 'Ziqi Xu'],
+    title: { en: 'Collaborative filtering with MovieLens', zh: 'MovieLens 协同过滤' },
+    summary: {
+      en: 'The next recommendation project adds user-item interactions so personalization and ranking metrics can be evaluated correctly.',
+      zh: '下一项推荐项目引入真实用户—物品交互，正确评估个性化与排序指标。',
     },
   },
 ];
 
+const method = (
+  slug: string, domain: Domain, name: Localized, family: Localized,
+  requiredSignals: Localized, coldStart: Localized, trainCost: Localized, serveCost: Localized,
+  explainability: Localized, bestFor: Localized, limitation: Localized, intuition: Localized,
+  useWhen: Localized, avoidWhen: Localized,
+): AlgorithmMeta => ({ slug, domain, name, family, requiredSignals, coldStart, trainCost, serveCost, explainability, bestFor, limitation, intuition, useWhen, avoidWhen });
+
 export const algorithms: AlgorithmMeta[] = [
-  {
-    slug: 'popularity', domain: 'recommendation', family: 'Non-personalized baseline',
-    requiredSignals: 'Item popularity', coldStart: 'New users: strong · New items: weak', trainCost: 'O(n)', serveCost: 'O(k)', explainability: 'High',
-    name: { en: 'Popularity baseline', zh: '流行度基线' },
-    intuition: { en: 'Recommend what works for the largest audience when no preference signal exists.', zh: '没有用户偏好信号时，推荐对最多人有效的内容。' },
-    useWhen: { en: 'Anonymous traffic, fallback paths, and a sanity-check baseline.', zh: '匿名流量、兜底策略，以及所有复杂模型必须超过的基线。' },
-    avoidWhen: { en: 'Long-tail discovery or meaningful personalization is the objective.', zh: '目标是长尾发现或真正个性化时。' },
-  },
-  {
-    slug: 'content-cosine', domain: 'recommendation', family: 'Content-based retrieval',
-    requiredSignals: 'Item feature vectors', coldStart: 'New users: weak · New items: strong', trainCost: 'O(nd)', serveCost: 'O(nd)', explainability: 'High',
-    name: { en: 'Content cosine similarity', zh: '内容余弦相似度' },
-    intuition: { en: 'Items pointing in similar directions in feature space should feel similar.', zh: '在特征空间中方向接近的物品，应具有相似内容属性。' },
-    useWhen: { en: 'Item-to-item discovery, transparent controls, and rich item metadata.', zh: '相似物品发现、可控推荐，以及物品特征丰富的场景。' },
-    avoidWhen: { en: 'Taste depends on collaborative behavior that metadata cannot express.', zh: '用户兴趣主要由内容特征无法表达的协同行为决定时。' },
-  },
-  {
-    slug: 'euclidean-knn', domain: 'recommendation', family: 'Content-based retrieval',
-    requiredSignals: 'Scaled item feature vectors', coldStart: 'New users: weak · New items: strong', trainCost: 'O(nd)', serveCost: 'O(nd)', explainability: 'High',
-    name: { en: 'Euclidean KNN', zh: '欧氏距离 KNN' },
-    intuition: { en: 'Retrieve the closest items after putting every feature on a comparable scale.', zh: '统一特征尺度后，直接检索距离最近的物品。' },
-    useWhen: { en: 'Magnitude differences are meaningful and the catalog is moderate.', zh: '特征差值有明确意义且目录规模适中时。' },
-    avoidWhen: { en: 'Unscaled dimensions dominate distance or exact scans miss the latency budget.', zh: '特征未缩放，或精确扫描无法满足延迟预算时。' },
-  },
-  {
-    slug: 'kmeans-retrieval', domain: 'recommendation', family: 'Approximate candidate retrieval',
-    requiredSignals: 'Dense item vectors', coldStart: 'New users: weak · New items: medium', trainCost: 'O(nkdi)', serveCost: 'O(nd/k)', explainability: 'Medium',
-    name: { en: 'K-Means candidate retrieval', zh: 'K-Means 候选召回' },
-    intuition: { en: 'Search a relevant region before applying a more precise similarity function.', zh: '先定位相似区域，再在小候选集内执行精确相似度计算。' },
-    useWhen: { en: 'A simple latency-quality trade-off is more valuable than perfect recall.', zh: '需要简单、可解释的延迟—效果权衡时。' },
-    avoidWhen: { en: 'Cluster boundaries are unstable or approximate nearest-neighbor indexes are available.', zh: '聚类边界不稳定，或已有成熟 ANN 索引时。' },
-  },
-  {
-    slug: 'matrix-factorization', domain: 'recommendation', family: 'Collaborative filtering',
-    requiredSignals: 'User-item interactions', coldStart: 'New users: weak · New items: weak', trainCost: 'O(|R|df)', serveCost: 'O(nd)', explainability: 'Low',
-    name: { en: 'Matrix factorization', zh: '矩阵分解' },
-    intuition: { en: 'Learn latent user and item factors whose dot product predicts preference.', zh: '学习用户与物品的隐向量，用点积预测偏好。' },
-    useWhen: { en: 'Interaction history is dense enough and collaborative taste matters.', zh: '交互数据足够、协同兴趣模式重要时。' },
-    avoidWhen: { en: 'Only item metadata exists—the Spotify project intentionally does not fake this signal.', zh: '只有物品属性时；Spotify 项目不会伪造这类信号。' },
-  },
+  method('tf-idf', 'search', { en: 'TF-IDF retrieval', zh: 'TF-IDF 检索' }, { en: 'Lexical retrieval', zh: '词法检索' },
+    { en: 'Query and document text', zh: '查询词与文档文本' }, { en: 'Works immediately for new text', zh: '新文本可立即检索' },
+    { en: 'Low', zh: '低' }, { en: 'Low', zh: '低' }, { en: 'High', zh: '高' },
+    { en: 'Small, explainable text search', zh: '小规模、可解释的文本搜索' }, { en: 'Ignores word order and meaning beyond exact terms', zh: '忽略词序，也难以理解同义表达' },
+    { en: 'Terms that are frequent in one document but rare across the collection receive more weight.', zh: '某篇文档中常见、但全库少见的词获得更高权重。' },
+    { en: 'You need a transparent baseline with no labels.', zh: '没有标注数据，需要透明基线时。' }, { en: 'Users express the same intent with different vocabulary.', zh: '用户经常用不同词表达同一意图时。' }),
+  method('bm25', 'search', { en: 'BM25', zh: 'BM25' }, { en: 'Lexical retrieval', zh: '词法检索' },
+    { en: 'Query and document text', zh: '查询词与文档文本' }, { en: 'Works immediately for new text', zh: '新文本可立即检索' },
+    { en: 'Low', zh: '低' }, { en: 'Low', zh: '低' }, { en: 'High', zh: '高' },
+    { en: 'Strong general-purpose keyword retrieval', zh: '通用关键词检索' }, { en: 'Cannot match concepts that share no terms', zh: '无法匹配没有共同词的相似概念' },
+    { en: 'BM25 improves lexical scoring by limiting repeated-term gains and normalizing document length.', zh: 'BM25 限制重复词带来的收益，并校正文档长度，让词法匹配更稳健。' },
+    { en: 'Exact terms, product attributes, and rare entities matter.', zh: '关键词、商品属性和稀有实体很重要时。' }, { en: 'Semantic matching dominates exact wording.', zh: '语义匹配远比精确用词重要时。' }),
+  method('dense-retrieval', 'search', { en: 'Dense retrieval', zh: '向量语义检索' }, { en: 'Semantic retrieval', zh: '语义检索' },
+    { en: 'Text plus a pretrained or trained encoder', zh: '文本与预训练或训练后的编码器' }, { en: 'New text can be encoded; new intents may fail', zh: '新文本可编码，但新意图可能失效' },
+    { en: 'Medium–high', zh: '中到高' }, { en: 'Medium', zh: '中' }, { en: 'Medium', zh: '中' },
+    { en: 'Matching meaning across different wording', zh: '匹配用词不同但含义相近的内容' }, { en: 'Harder debugging and possible exact-term misses', zh: '更难调试，也可能漏掉必须精确匹配的词' },
+    { en: 'An encoder turns text into vectors, so nearby vectors represent similar meaning.', zh: '编码器把文本变成向量；向量接近表示语义接近。' },
+    { en: 'Synonyms and natural-language questions are common.', zh: '查询包含同义词和自然语言问题时。' }, { en: 'The domain changes faster than the encoder can be updated.', zh: '领域变化快于编码器更新速度时。' }),
+  method('learning-to-rank', 'search', { en: 'Learning to Rank', zh: 'Learning to Rank' }, { en: 'Supervised ranking', zh: '监督排序' },
+    { en: 'Relevance labels or interaction logs', zh: '相关性标注或交互日志' }, { en: 'Weak for unseen query patterns', zh: '未见查询模式较弱' },
+    { en: 'Medium', zh: '中' }, { en: 'Low–medium', zh: '低到中' }, { en: 'Medium', zh: '中' },
+    { en: 'Combining many relevance and business signals', zh: '融合多种相关性与业务信号' }, { en: 'Biased labels can teach biased rankings', zh: '有偏标注会训练出有偏排序' },
+    { en: 'A ranking model learns how much each signal should affect document order.', zh: '排序模型从数据中学习每种信号应如何影响结果顺序。' },
+    { en: 'You have reliable judgments and multiple candidate features.', zh: '有可靠标注和多种候选特征时。' }, { en: 'Only a small or strongly biased click log exists.', zh: '只有少量或严重偏置的点击日志时。' }),
+  method('hybrid-search', 'search', { en: 'Hybrid search', zh: '混合搜索' }, { en: 'Multi-channel retrieval', zh: '多路召回' },
+    { en: 'Text, lexical index, and vector encoder', zh: '文本、词法索引与向量编码器' }, { en: 'Stronger than either channel alone', zh: '通常比单路冷启动更稳健' },
+    { en: 'Medium–high', zh: '中到高' }, { en: 'Medium–high', zh: '中到高' }, { en: 'Medium', zh: '中' },
+    { en: 'Balancing exact terms and semantic intent', zh: '兼顾精确词与语义意图' }, { en: 'More infrastructure and score calibration', zh: '基础设施更多，分数也需要校准' },
+    { en: 'Lexical and dense candidates are merged, then reranked with a shared scoring rule.', zh: '合并词法与向量候选，再用统一规则重排。' },
+    { en: 'Neither lexical nor semantic retrieval is reliable alone.', zh: '词法或语义单独使用都不够稳定时。' }, { en: 'Latency and operational simplicity are strict constraints.', zh: '延迟与运维简单性是硬约束时。' }),
+
+  method('content-based-filtering', 'recommendation', { en: 'Content-Based Filtering', zh: '基于内容的推荐' }, { en: 'Item-feature recommendation', zh: '物品特征推荐' },
+    { en: 'Item attributes; optional user profile', zh: '物品属性；可选用户画像' }, { en: 'New items: strong · New users: limited', zh: '新物品强 · 新用户有限' },
+    { en: 'Low–medium', zh: '低到中' }, { en: 'Low–medium', zh: '低到中' }, { en: 'High', zh: '高' },
+    { en: 'Explainable similarity and new-item discovery', zh: '可解释的相似推荐与新物品发现' }, { en: 'Similarity does not prove user preference', zh: '内容相似不能证明用户喜欢' },
+    { en: 'Recommend items whose measurable attributes resemble an item or profile the user already chose.', zh: '推荐在可测属性上接近用户已选择物品或用户画像的内容。' },
+    { en: 'Item metadata is rich and interactions are sparse.', zh: '物品属性丰富、交互稀疏时。' }, { en: 'Taste depends on social or collaborative behavior.', zh: '偏好主要来自社交或协同行为时。' }),
+  method('user-based-cf', 'recommendation', { en: 'User-Based Collaborative Filtering', zh: '基于用户的协同过滤' }, { en: 'Neighborhood recommendation', zh: '邻域协同推荐' },
+    { en: 'User–item interactions', zh: '用户—物品交互' }, { en: 'Weak for new users and new items', zh: '新用户与新物品都较弱' },
+    { en: 'Low', zh: '低' }, { en: 'Medium–high', zh: '中到高' }, { en: 'Medium', zh: '中' },
+    { en: 'Small communities with stable user overlap', zh: '用户重叠稳定的小型社区' }, { en: 'User neighborhoods become unstable at scale', zh: '规模扩大后用户邻域不稳定' },
+    { en: 'Find people with similar histories, then recommend what those neighbors liked.', zh: '先找到历史行为相似的用户，再推荐邻居喜欢的物品。' },
+    { en: 'The user base is moderate and tastes overlap.', zh: '用户规模适中且兴趣有明显重叠时。' }, { en: 'Interactions are extremely sparse or users change quickly.', zh: '交互极稀疏或用户兴趣变化很快时。' }),
+  method('item-based-cf', 'recommendation', { en: 'Item-Based Collaborative Filtering', zh: '基于物品的协同过滤' }, { en: 'Neighborhood recommendation', zh: '邻域协同推荐' },
+    { en: 'User–item interactions', zh: '用户—物品交互' }, { en: 'New items: weak · New users need initial actions', zh: '新物品弱 · 新用户需要初始行为' },
+    { en: 'Medium', zh: '中' }, { en: 'Low', zh: '低' }, { en: 'Medium–high', zh: '中到高' },
+    { en: 'Stable catalogs and fast item-to-item serving', zh: '稳定目录与快速物品到物品推荐' }, { en: 'Popular items dominate co-occurrence', zh: '热门物品容易主导共现关系' },
+    { en: 'Items are similar when many of the same users interact with both.', zh: '如果大量相同用户与两个物品互动，它们就被视为相似。' },
+    { en: 'Item relationships change more slowly than user tastes.', zh: '物品关系比用户兴趣变化更慢时。' }, { en: 'New inventory arrives constantly without interactions.', zh: '新物品持续进入且缺少交互时。' }),
+  method('matrix-factorization', 'recommendation', { en: 'Matrix Factorization', zh: '矩阵分解' }, { en: 'Latent-factor recommendation', zh: '隐因子推荐' },
+    { en: 'User–item interactions', zh: '用户—物品交互' }, { en: 'Weak for new users and new items', zh: '新用户与新物品都较弱' },
+    { en: 'Medium', zh: '中' }, { en: 'Low–medium', zh: '低到中' }, { en: 'Low', zh: '低' },
+    { en: 'Learning compact preference patterns from sparse data', zh: '从稀疏数据中学习紧凑偏好模式' }, { en: 'Latent factors are difficult to explain', zh: '隐因子难以直接解释' },
+    { en: 'Represent each user and item with learned vectors whose dot product predicts preference.', zh: '把用户和物品表示为学习得到的向量，用点积预测偏好。' },
+    { en: 'Interaction data is large enough to reveal shared taste.', zh: '交互量足以体现共同兴趣时。' }, { en: 'Cold start and attribute-level explanations are central.', zh: '冷启动和属性级解释是核心需求时。' }),
+  method('two-tower', 'recommendation', { en: 'Two-Tower Model', zh: '双塔模型' }, { en: 'Neural candidate retrieval', zh: '神经网络候选召回' },
+    { en: 'Interactions plus user and item features', zh: '交互数据及用户、物品特征' }, { en: 'Medium with usable side features', zh: '有侧信息时冷启动能力中等' },
+    { en: 'High', zh: '高' }, { en: 'Low with vector index', zh: '配合向量索引后较低' }, { en: 'Low', zh: '低' },
+    { en: 'Large-scale personalized candidate retrieval', zh: '大规模个性化候选召回' }, { en: 'Needs substantial data, tuning, and retrieval infrastructure', zh: '需要大量数据、调参与向量检索设施' },
+    { en: 'Separate networks encode users and items into a shared vector space for fast matching.', zh: '两个网络分别把用户和物品编码到同一向量空间，再快速匹配。' },
+    { en: 'The catalog and traffic justify neural training and ANN serving.', zh: '目录和流量足以支撑神经网络训练与 ANN 服务时。' }, { en: 'A simpler collaborative or content method already meets the goal.', zh: '更简单的协同或内容方法已满足目标时。' }),
+
+  method('logistic-ctr', 'ads', { en: 'Logistic Regression CTR', zh: '逻辑回归 CTR' }, { en: 'Linear response prediction', zh: '线性响应预估' },
+    { en: 'Impressions, clicks, and encoded features', zh: '曝光、点击与编码特征' }, { en: 'New entities depend on shared features', zh: '新实体依赖共享特征' },
+    { en: 'Low', zh: '低' }, { en: 'Low', zh: '低' }, { en: 'High', zh: '高' },
+    { en: 'Fast, calibrated CTR baseline', zh: '快速且便于校准的 CTR 基线' }, { en: 'Cannot learn complex feature interactions directly', zh: '无法直接学习复杂特征交互' },
+    { en: 'A weighted sum of features is converted into a click probability.', zh: '对特征加权求和，再转换为点击概率。' },
+    { en: 'Latency, stability, and probability calibration matter.', zh: '延迟、稳定性与概率校准重要时。' }, { en: 'Most signal lies in nonlinear feature interactions.', zh: '主要信号来自非线性特征组合时。' }),
+  method('gbdt-lr', 'ads', { en: 'GBDT + LR', zh: 'GBDT + LR' }, { en: 'Tree-assisted CTR prediction', zh: '树模型辅助 CTR 预估' },
+    { en: 'Impressions, clicks, dense and categorical features', zh: '曝光、点击、数值与类别特征' }, { en: 'Medium through shared tree paths', zh: '通过共享树路径获得中等能力' },
+    { en: 'Medium', zh: '中' }, { en: 'Low–medium', zh: '低到中' }, { en: 'Medium', zh: '中' },
+    { en: 'Tabular CTR data with nonlinear interactions', zh: '包含非线性交互的表格 CTR 数据' }, { en: 'Two-stage training and feature staleness', zh: '两阶段训练且树特征可能过时' },
+    { en: 'Trees discover useful feature combinations; logistic regression turns them into probabilities.', zh: '树模型发现有效特征组合，逻辑回归再把它们转换为概率。' },
+    { en: 'A linear model underfits but deep training is unnecessary.', zh: '线性模型欠拟合，但暂不需要深度模型时。' }, { en: 'Features and traffic patterns change extremely quickly.', zh: '特征与流量模式变化极快时。' }),
+  method('deepfm', 'ads', { en: 'DeepFM', zh: 'DeepFM' }, { en: 'Deep CTR prediction', zh: '深度 CTR 预估' },
+    { en: 'Large impression logs and categorical features', zh: '大规模曝光日志与类别特征' }, { en: 'Weak for unseen IDs; better with side features', zh: '未知 ID 较弱；侧信息可改善' },
+    { en: 'High', zh: '高' }, { en: 'Medium', zh: '中' }, { en: 'Low', zh: '低' },
+    { en: 'Automatic low- and high-order feature interactions', zh: '自动学习低阶与高阶特征交互' }, { en: 'More tuning and harder probability diagnosis', zh: '调参更多，概率问题更难诊断' },
+    { en: 'A factorization component learns pairwise interactions while a neural network learns higher-order patterns.', zh: '因子分解部分学习两两交互，神经网络学习更高阶模式。' },
+    { en: 'Traffic and feature cardinality justify a deep model.', zh: '流量和特征规模足以支撑深度模型时。' }, { en: 'A linear or tree model already meets business goals.', zh: '线性或树模型已满足业务目标时。' }),
+  method('multi-task-ads', 'ads', { en: 'Multi-Task Prediction', zh: '多任务预估' }, { en: 'Multi-objective response prediction', zh: '多目标响应预估' },
+    { en: 'Clicks plus conversion or value labels', zh: '点击及转化或价值标签' }, { en: 'Depends on shared features and task transfer', zh: '依赖共享特征与任务迁移' },
+    { en: 'High', zh: '高' }, { en: 'Medium', zh: '中' }, { en: 'Low', zh: '低' },
+    { en: 'Joint click, conversion, and value prediction', zh: '联合预估点击、转化与价值' }, { en: 'Task conflict can harm one objective', zh: '任务冲突可能损害某个目标' },
+    { en: 'Related outcomes share representations while retaining separate prediction heads.', zh: '相关目标共享底层表示，同时保留各自预测头。' },
+    { en: 'Clicks are abundant but downstream conversions are sparse.', zh: '点击丰富、下游转化稀疏时。' }, { en: 'Tasks are weakly related or labels have different delays.', zh: '任务关联弱或标签延迟差异很大时。' }),
+  method('bid-optimization', 'ads', { en: 'Bid Optimization', zh: '出价优化' }, { en: 'Auction decision policy', zh: '竞价决策策略' },
+    { en: 'Response predictions, value, cost, and budget', zh: '响应预估、价值、成本与预算' }, { en: 'Requires fallback rules for new campaigns', zh: '新广告活动需要规则兜底' },
+    { en: 'Medium–high', zh: '中到高' }, { en: 'Low under strict latency', zh: '严格延迟下较低' }, { en: 'Medium', zh: '中' },
+    { en: 'Converting predictions into budget-aware auction actions', zh: '把预估转化为受预算约束的竞价动作' }, { en: 'Sensitive to calibration and market feedback loops', zh: '对概率校准和市场反馈循环敏感' },
+    { en: 'Choose bids that maximize expected value while respecting cost and delivery constraints.', zh: '在成本与投放约束下选择能最大化期望价值的出价。' },
+    { en: 'Prediction quality is reliable and the business objective is explicit.', zh: '预估可靠且业务目标明确时。' }, { en: 'CTR is uncalibrated or budget constraints are not modeled.', zh: 'CTR 未校准或预算约束没有建模时。' }),
 ];
 
 export const oppositeLang = (lang: Lang): Lang => (lang === 'en' ? 'zh' : 'en');

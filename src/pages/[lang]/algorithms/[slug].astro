@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { algorithms, copy, href, languages, type Lang } from '../../../data/site';
+import { algorithms, copy, domainNames, href, languages, type Lang } from '../../../data/site';
 export const getStaticPaths = () => languages.flatMap((lang) => algorithms.map((algorithm) => ({ params: { lang, slug: algorithm.slug }, props: { algorithm } })));
 const lang = Astro.params.lang as Lang;
 const { algorithm } = Astro.props;
@@ -11,12 +11,12 @@ const labels = lang === 'en'
 ---
 <BaseLayout lang={lang} title={`${algorithm.name[lang]} — ${t.siteName}`} description={algorithm.intuition[lang]} path={`/algorithms/${algorithm.slug}/`}>
   <article class="section container algorithm-page">
-    <header><p class="eyebrow">{algorithm.family}</p><h1>{algorithm.name[lang]}</h1><p>{algorithm.intuition[lang]}</p></header>
+    <header><p class="eyebrow">{domainNames[algorithm.domain][lang]} · {algorithm.family[lang]}</p><h1>{algorithm.name[lang]}</h1><p>{algorithm.intuition[lang]}</p></header>
     <div class="specs">
-      <dl><dt>{labels.signals}</dt><dd>{algorithm.requiredSignals}</dd></dl><dl><dt>{labels.cold}</dt><dd>{algorithm.coldStart}</dd></dl><dl><dt>{labels.train}</dt><dd>{algorithm.trainCost}</dd></dl><dl><dt>{labels.serve}</dt><dd>{algorithm.serveCost}</dd></dl><dl><dt>{labels.explain}</dt><dd>{algorithm.explainability}</dd></dl>
+      <dl><dt>{labels.signals}</dt><dd>{algorithm.requiredSignals[lang]}</dd></dl><dl><dt>{labels.cold}</dt><dd>{algorithm.coldStart[lang]}</dd></dl><dl><dt>{labels.train}</dt><dd>{algorithm.trainCost[lang]}</dd></dl><dl><dt>{labels.serve}</dt><dd>{algorithm.serveCost[lang]}</dd></dl><dl><dt>{labels.explain}</dt><dd>{algorithm.explainability[lang]}</dd></dl>
     </div>
     <div class="guidance"><section><p class="eyebrow">{labels.use}</p><h2>{algorithm.useWhen[lang]}</h2></section><section><p class="eyebrow avoid">{labels.avoid}</p><h2>{algorithm.avoidWhen[lang]}</h2></section></div>
-    <a class="button" href={href(`/${lang}/projects/spotify-content-recommender/`)}>{labels.related}</a>
+    <a class="button" href={href(`/${lang}/projects/`)}>{labels.related}</a>
   </article>
 </BaseLayout>
 <style>

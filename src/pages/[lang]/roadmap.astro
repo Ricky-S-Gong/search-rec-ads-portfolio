@@ -18,8 +18,8 @@ const stages = lang === 'en' ? [
 ];
 ---
 <BaseLayout lang={lang} title={`${t.nav.roadmap} — ${t.siteName}`} description="Learning roadmap" path="/roadmap/">
-  <section class="section container"><div class="section-heading"><p class="eyebrow">Learning route</p><h1>{t.nav.roadmap}</h1><p class="muted">{lang === 'en' ? 'Each mission unlocks a signal the previous dataset could not provide.' : '每项任务都补充上一份数据无法提供的关键信号。'}</p></div>
-    <ol>{stages.map(([state,title,body,compute],i)=><li><span>{state}</span><div><small>MISSION 0{i+1}</small><h2>{title}</h2><p>{body}</p></div><strong>{compute}</strong></li>)}</ol>
+  <section class="section container"><div class="section-heading"><h1>{t.nav.roadmap}</h1><p class="muted">{lang === 'en' ? 'Planned projects and the data signals each one adds.' : '后续项目计划，以及每个项目新增的数据与信号。'}</p></div>
+    <ol>{stages.map(([state,title,body,compute],i)=><li><span>{state}</span><div><small>{lang === 'en' ? 'Stage' : '阶段'} 0{i+1}</small><h2>{title}</h2><p>{body}</p></div><strong>{compute}</strong></li>)}</ol>
   </section>
 </BaseLayout>
 <style>

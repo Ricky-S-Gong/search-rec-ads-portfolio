@@ -4,7 +4,7 @@ const { lang } = Astro.props as { lang: Lang };
 ---
 <footer>
   <div class="container footer-grid">
-    <p>{lang === 'en' ? 'Built as evidence, not decoration.' : '以证据构建，而不是以装饰包装。'}</p>
+    <p>{lang === 'en' ? 'Search · Ads · Recommendation' : '搜索 · 广告 · 推荐'}</p>
     <p>Ricky Gong · Ziqi Xu · 2026</p>
     <a href="https://github.com/Ricky-S-Gong/search-rec-ads-portfolio">GitHub ↗</a>
     <a href={href(`/${lang}/about/`)}>{lang === 'en' ? 'Credits & licenses' : '署名与许可'}</a>

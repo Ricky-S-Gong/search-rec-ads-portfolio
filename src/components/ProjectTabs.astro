@@ -1,0 +1,106 @@
+---
+import ProjectCard from './ProjectCard.astro';
+import { domainNames, domains, projects, type Domain, type Lang } from '../data/site';
+
+const { lang } = Astro.props as { lang: Lang };
+const descriptions: Record<Domain, Record<Lang, string>> = {
+  search: {
+    en: 'Retrieval and ranking systems that connect a query with relevant information.',
+    zh: '研究如何从查询出发，召回信息并按照相关性排序。',
+  },
+  ads: {
+    en: 'Prediction and optimization systems for relevance, value, cost, and budget.',
+    zh: '研究广告相关性、响应预估、价值、成本与预算优化。',
+  },
+  recommendation: {
+    en: 'Personalized and item-to-item systems that help users discover relevant content.',
+    zh: '研究个性化与物品到物品推荐，帮助用户发现相关内容。',
+  },
+};
+const initialDomain: Domain = 'recommendation';
+---
+
+<div class="project-tabs" data-project-tabs>
+  <div class="tab-list" role="tablist" aria-label={lang === 'en' ? 'Project domains' : '项目方向'}>
+    {domains.map((domain) => {
+      const count = projects.filter((project) => project.domain === domain).length;
+      return (
+        <button
+          type="button"
+          role="tab"
+          id={`project-tab-${domain}`}
+          aria-controls={`project-panel-${domain}`}
+          aria-selected={domain === initialDomain ? 'true' : 'false'}
+          tabindex={domain === initialDomain ? 0 : -1}
+          data-domain={domain}
+        >
+          <span>{domainNames[domain][lang]}</span><small>{count}</small>
+        </button>
+      );
+    })}
+  </div>
+
+  {domains.map((domain) => (
+    <section
+      class={`tab-panel domain-${domain}`}
+      role="tabpanel"
+      id={`project-panel-${domain}`}
+      aria-labelledby={`project-tab-${domain}`}
+      hidden={domain !== initialDomain}
+    >
+      <p class="domain-description">{descriptions[domain][lang]}</p>
+      <div class="project-list">
+        {projects.filter((project) => project.domain === domain).map((project) => <ProjectCard project={project} lang={lang} />)}
+      </div>
+    </section>
+  ))}
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-project-tabs]').forEach((tabs) => {
+    const buttons = [...tabs.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const panels = [...tabs.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
+    const select = (button: HTMLButtonElement) => {
+      buttons.forEach((item) => {
+        const selected = item === button;
+        item.setAttribute('aria-selected', String(selected));
+        item.tabIndex = selected ? 0 : -1;
+      });
+      panels.forEach((panel) => { panel.hidden = panel.id !== button.getAttribute('aria-controls'); });
+    };
+    buttons.forEach((button, index) => {
+      button.addEventListener('click', () => select(button));
+      button.addEventListener('keydown', (event) => {
+        if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+        event.preventDefault();
+        const offset = event.key === 'ArrowRight' ? 1 : -1;
+        const next = buttons[(index + offset + buttons.length) % buttons.length];
+        select(next);
+        next.focus();
+      });
+    });
+  });
+</script>
+
+<style>
+  .project-tabs { border-top: 1px solid var(--line); }
+  .tab-list { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
+  .tab-list button {
+    display: flex; align-items: center; justify-content: space-between; min-height: 68px; padding: 0 1.15rem;
+    color: var(--muted); background: transparent; border: 0; border-right: 1px solid var(--line); cursor: pointer;
+    font-weight: 600; text-align: left;
+  }
+  .tab-list button:last-child { border-right: 0; }
+  .tab-list button[aria-selected="true"] { color: var(--starlight); background: color-mix(in srgb, var(--domain-color) 10%, transparent); box-shadow: inset 0 -3px var(--domain-color); }
+  .tab-list button[data-domain="search"] { --domain-color: var(--search); }
+  .tab-list button[data-domain="ads"] { --domain-color: var(--ads); }
+  .tab-list button[data-domain="recommendation"] { --domain-color: var(--rec); }
+  .tab-list small { color: var(--domain-color, var(--muted)); font: .72rem 'IBM Plex Mono', monospace; }
+  .tab-panel { padding-top: 1.2rem; }
+  .domain-description { max-width: 720px; margin-bottom: 1rem; color: var(--muted); }
+  .project-list { border-bottom: 1px solid var(--line); }
+  @media (max-width: 600px) {
+    .tab-list button { min-height: 58px; padding-inline: .7rem; font-size: .86rem; }
+    .tab-list small { display: none; }
+  }
+</style>
