@@ -1,0 +1,179 @@
+<canvas class="star-field" data-star-field></canvas>
+
+<script>
+  document.querySelectorAll<HTMLCanvasElement>('[data-star-field]').forEach((canvas) => {
+    if (canvas.dataset.ready) return;
+    canvas.dataset.ready = 'true';
+    const root = canvas.closest<HTMLElement>('[data-space-scene]');
+    const context = canvas.getContext('2d');
+    if (!root || !context) return;
+
+    type AmbientStar = { x: number; y: number; radius: number; alpha: number; phase: number; color: string };
+    type OrbitStar = { orbit: number; angle: number; speed: number; size: number; alpha: number; color: string; trail: number; streak: boolean };
+    type Meteor = { born: number; life: number; x: number; y: number; length: number; speed: number };
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const colors = ['237,245,255', '160,210,255', '167,139,250', '247,185,85'];
+    let width = 1;
+    let height = 1;
+    let ambientStars: AmbientStar[] = [];
+    let orbitStars: OrbitStar[] = [];
+    let meteors: Meteor[] = [];
+    let nextMeteor = performance.now() + 6200;
+    let frame = 0;
+    let visible = true;
+    const random = (min: number, max: number) => min + Math.random() * (max - min);
+
+    const rebuild = () => {
+      const bounds = root.getBoundingClientRect();
+      width = Math.max(1, Math.round(bounds.width));
+      height = Math.max(1, Math.round(bounds.height));
+      const dpr = Math.min(devicePixelRatio || 1, 1.5);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const ambientCount = Math.min(430, Math.max(180, Math.round(width * height / 3600)));
+      ambientStars = Array.from({ length: ambientCount }, (_, index) => ({
+        x: Math.random() * width,
+        y: Math.pow(Math.random(), 1.08) * height,
+        radius: index % 19 === 0 ? random(1.3, 2.1) : random(.28, 1.15),
+        alpha: random(.18, .88),
+        phase: random(0, Math.PI * 2),
+        color: colors[index % colors.length],
+      }));
+      const mobile = width < 768;
+      const orbitCount = Math.min(mobile ? 920 : 2200, Math.max(mobile ? 640 : 1500, Math.round(width * height / (mobile ? 980 : 690))));
+      const maxOrbit = Math.max(width, height) * (mobile ? .68 : .61);
+      const bands = [.2, .28, .39, .52, .68, .86];
+      orbitStars = Array.from({ length: orbitCount }, (_, index) => {
+        const streak = index % 13 === 0;
+        const band = bands[index % bands.length];
+        return {
+          orbit: maxOrbit * Math.max(.12, band + random(-.028, .028)),
+          angle: random(0, Math.PI * 2) + index * .021,
+          speed: random(.00015, .00048),
+          size: streak ? random(1.15, 2.05) : index % 41 === 0 ? random(1.5, 2.35) : random(.36, 1.5),
+          alpha: random(.28, .98),
+          color: colors[index % colors.length],
+          trail: streak ? random(18, 38) : random(5, 13),
+          streak,
+        };
+      });
+      draw(0);
+    };
+
+    const drawMeteors = (time: number) => {
+      if (!reduceMotion.matches && time >= nextMeteor && meteors.length < 5) {
+        const burst = Math.random() > .68 ? 3 : Math.random() > .42 ? 2 : 1;
+        for (let index = 0; index < burst; index += 1) {
+          meteors.push({ born: time + index * 170, life: random(760, 1050), x: random(width * .62, width * .96), y: random(height * .08, height * .34), length: random(82, 150), speed: random(.2, .29) });
+        }
+        nextMeteor = time + random(6000, 12000);
+      }
+      meteors = meteors.filter((meteor) => time - meteor.born < meteor.life);
+      for (const meteor of meteors) {
+        const age = time - meteor.born;
+        if (age < 0) continue;
+        const x = meteor.x - age * meteor.speed;
+        const y = meteor.y + age * meteor.speed * .42;
+        const fade = Math.sin(Math.min(1, age / meteor.life) * Math.PI);
+        const gradient = context.createLinearGradient(x, y, x + meteor.length, y - meteor.length * .42);
+        gradient.addColorStop(0, `rgba(237,245,255,${.88 * fade})`);
+        gradient.addColorStop(.28, `rgba(120,202,245,${.45 * fade})`);
+        gradient.addColorStop(1, 'rgba(53,208,226,0)');
+        context.beginPath();
+        context.moveTo(x, y);
+        context.lineTo(x + meteor.length, y - meteor.length * .42);
+        context.strokeStyle = gradient;
+        context.lineWidth = 1.35;
+        context.stroke();
+      }
+    };
+
+    const draw = (time: number) => {
+      context.clearRect(0, 0, width, height);
+      const mobile = width < 768;
+      const centerX = width * (mobile ? .82 : .77);
+      const centerY = height * (mobile ? .23 : .5);
+      const flatten = mobile ? .3 : .355;
+      const glowRadius = Math.min(width, height) * (mobile ? .7 : .62);
+      const glow = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, glowRadius);
+      glow.addColorStop(0, 'rgba(200,226,255,.16)');
+      glow.addColorStop(.12, 'rgba(116,130,246,.11)');
+      glow.addColorStop(.4, 'rgba(53,208,226,.045)');
+      glow.addColorStop(1, 'rgba(3,9,20,0)');
+      context.fillStyle = glow;
+      context.fillRect(0, 0, width, height);
+
+      for (const star of ambientStars) {
+        const twinkle = reduceMotion.matches ? 1 : .78 + Math.sin(time * .0007 + star.phase) * .22;
+        context.beginPath();
+        context.fillStyle = `rgba(${star.color},${star.alpha * twinkle})`;
+        context.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+        context.fill();
+      }
+
+      for (const star of orbitStars) {
+        const angle = star.angle + time * star.speed;
+        const x = centerX + Math.sin(angle) * star.orbit;
+        const y = centerY + Math.cos(angle) * star.orbit * flatten;
+        const twinkle = reduceMotion.matches ? 1 : .72 + Math.sin(time * .0012 + star.angle * 2.7) * .28;
+        const depthFade = .58 + Math.cos(angle) * .22;
+        if (star.orbit > width * .16 && star.size < 1.18) {
+          context.beginPath();
+          context.moveTo(x, y);
+          context.lineTo(x + Math.cos(angle) * star.trail, y - Math.sin(angle) * star.trail * flatten);
+          context.strokeStyle = `rgba(${star.color},${star.alpha * (star.streak ? .42 : .24) * twinkle})`;
+          context.lineWidth = star.streak ? .9 : .62;
+          context.stroke();
+        }
+        context.beginPath();
+        context.fillStyle = `rgba(${star.color},${star.alpha * twinkle * depthFade})`;
+        context.arc(x, y, star.size, 0, Math.PI * 2);
+        context.fill();
+        if (star.size > 1.65 || star.streak) {
+          context.beginPath();
+          context.strokeStyle = `rgba(${star.color},${star.alpha * .18 * twinkle})`;
+          context.moveTo(x - star.size * 2.2, y);
+          context.lineTo(x + star.size * 2.2, y);
+          context.stroke();
+        }
+      }
+      drawMeteors(time);
+    };
+
+    const animate = (time: number) => {
+      draw(time);
+      frame = !reduceMotion.matches && visible && !document.hidden ? requestAnimationFrame(animate) : 0;
+    };
+    const sync = () => {
+      if (frame) cancelAnimationFrame(frame);
+      frame = 0;
+      meteors = [];
+      draw(0);
+      if (!reduceMotion.matches && visible && !document.hidden) frame = requestAnimationFrame(animate);
+    };
+    const resizeObserver = new ResizeObserver(rebuild);
+    const intersectionObserver = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; sync(); }, { rootMargin: '120px' });
+    const cleanup = () => {
+      if (frame) cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+      intersectionObserver.disconnect();
+      reduceMotion.removeEventListener('change', sync);
+      document.removeEventListener('visibilitychange', sync);
+    };
+    resizeObserver.observe(root);
+    intersectionObserver.observe(root);
+    reduceMotion.addEventListener('change', sync);
+    document.addEventListener('visibilitychange', sync);
+    document.addEventListener('astro:before-swap', cleanup, { once: true });
+    rebuild();
+    sync();
+  });
+</script>
+
+<style>
+  .star-field { position:absolute; inset:0; display:block; width:100%; height:100%; opacity:1; }
+  @media(max-width:767px){.star-field{opacity:.88}}
+</style>

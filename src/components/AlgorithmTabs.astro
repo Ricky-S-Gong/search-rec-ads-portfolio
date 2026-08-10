@@ -27,17 +27,27 @@ const initialDomain: Domain = 'recommendation';
 </div>
 
 <script>
+  import { parseAlgorithmDomain } from '../lib/domain';
+
   document.querySelectorAll<HTMLElement>('[data-algorithm-tabs]').forEach((tabs) => {
     const buttons = [...tabs.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
     const panels = [...tabs.querySelectorAll<HTMLElement>('[role="tabpanel"]')];
-    const select = (button: HTMLButtonElement) => {
+    const select = (button: HTMLButtonElement, updateUrl = true) => {
       buttons.forEach((item) => {
         const selected = item === button;
         item.setAttribute('aria-selected', String(selected));
         item.tabIndex = selected ? 0 : -1;
       });
       panels.forEach((panel) => { panel.hidden = panel.id !== button.getAttribute('aria-controls'); });
+      if (updateUrl) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('domain', parseAlgorithmDomain(button.dataset.domain));
+        history.replaceState({}, '', url);
+      }
     };
+    const requestedDomain = parseAlgorithmDomain(new URLSearchParams(window.location.search).get('domain'));
+    const requestedButton = buttons.find((button) => button.dataset.domain === requestedDomain);
+    if (requestedButton) select(requestedButton, false);
     buttons.forEach((button, index) => {
       button.addEventListener('click', () => select(button));
       button.addEventListener('keydown', (event) => {

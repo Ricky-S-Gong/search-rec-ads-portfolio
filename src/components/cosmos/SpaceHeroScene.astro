@@ -1,0 +1,25 @@
+---
+import StarField from './StarField.astro';
+import OrbitLayer from './OrbitLayer.astro';
+import PlanetLayer from './PlanetLayer.astro';
+import OrbitalParticleLayer from './OrbitalParticleLayer.astro';
+import AsteroidLayer from './AsteroidLayer.astro';
+---
+<div class="space-scene" data-space-scene aria-hidden="true">
+  <div class="nebula"></div>
+  <StarField />
+  <div class="depth depth-one" data-depth="1"><OrbitLayer /></div>
+  <PlanetLayer />
+  <OrbitalParticleLayer />
+  <AsteroidLayer />
+  <span class="credit">Planet imagery: NASA / JPL / GSFC</span>
+</div>
+
+<style>
+  .space-scene{position:absolute;inset:0;overflow:hidden;background:#030914;isolation:isolate}
+  .space-scene::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 78% 49%,rgba(43,82,132,.54) 0%,rgba(19,39,70,.26) 28%,transparent 60%),radial-gradient(ellipse at 88% 18%,rgba(89,76,151,.14),transparent 34%),linear-gradient(128deg,#030914 7%,#07111f 48%,#0b1a31 100%)}
+  .space-scene::after{content:'';position:absolute;inset:0;z-index:8;background:linear-gradient(90deg,rgba(3,9,20,.86) 0%,rgba(3,9,20,.48) 43%,transparent 68%),linear-gradient(0deg,rgba(3,9,20,.72),transparent 34%);pointer-events:none}
+  .nebula{position:absolute;inset:-18%;opacity:.42;background:radial-gradient(ellipse at 70% 36%,rgba(69,101,159,.34),transparent 32%),radial-gradient(ellipse at 86% 72%,rgba(90,62,136,.22),transparent 27%),radial-gradient(ellipse at 52% 80%,rgba(24,112,130,.13),transparent 34%);filter:blur(28px);transform:translate3d(var(--px,0),var(--py,0),0)}
+  .depth{position:absolute;inset:0}.credit{position:absolute;z-index:9;right:var(--page-gutter);bottom:.65rem;color:rgba(237,245,255,.42);font:.56rem 'IBM Plex Mono',monospace}
+  @media(max-width:767px){.space-scene::after{background:linear-gradient(0deg,rgba(3,9,20,.96) 0%,rgba(3,9,20,.72) 53%,rgba(3,9,20,.18) 86%),linear-gradient(90deg,rgba(3,9,20,.32),transparent)}.credit{font-size:.5rem}}
+</style>

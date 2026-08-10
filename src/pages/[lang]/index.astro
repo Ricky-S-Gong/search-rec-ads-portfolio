@@ -29,7 +29,11 @@ const t = copy[lang];
   <section class="section algorithm-link">
     <div class="container algorithm-link-inner">
       <div><h2>{t.decisionTitle}</h2><p class="muted">{t.decisionIntro}</p></div>
-      <a class="button secondary" href={href(`/${lang}/compare/`)}>{t.compare}</a>
+      <div class="algorithm-buttons" aria-label={lang === 'en' ? 'Browse algorithms by domain' : '按方向查看算法'}>
+        <a class="algorithm-button search" href={href(`/${lang}/compare/?domain=search`)}>{t.algorithmCtas.search}</a>
+        <a class="algorithm-button ads" href={href(`/${lang}/compare/?domain=ads`)}>{t.algorithmCtas.ads}</a>
+        <a class="algorithm-button recommendation" href={href(`/${lang}/compare/?domain=recommendation`)}>{t.algorithmCtas.recommendation}</a>
+      </div>
     </div>
   </section>
 </BaseLayout>
@@ -63,13 +67,20 @@ const t = copy[lang];
   .projects-section { padding-bottom: clamp(4rem, 9vw, 8rem); }
   #projects { scroll-margin-top: 92px; }
   .algorithm-link { border-top: 1px solid var(--line); background: rgba(12,27,48,.38); }
+  .algorithm-link { padding-block: clamp(2.8rem,5vw,4.6rem); }
   .algorithm-link-inner { display: flex; align-items: end; justify-content: space-between; gap: 2rem; }
   .algorithm-link-inner > div { display: grid; gap: 1rem; max-width: 760px; }
+  .algorithm-buttons { display:flex!important;flex-wrap:wrap;justify-content:flex-end;gap:.65rem;max-width:560px!important; }
+  .algorithm-button { --algorithm-color:var(--search);display:inline-flex;align-items:center;min-height:48px;padding:.7rem 1rem;border:1px solid color-mix(in srgb,var(--algorithm-color) 58%,var(--line));border-radius:999px;color:var(--starlight);background:color-mix(in srgb,var(--algorithm-color) 10%,rgba(7,17,31,.82));font-size:.9rem;font-weight:600;text-decoration:none;white-space:nowrap; }
+  .algorithm-button::after { content:'→';margin-left:.55rem;color:var(--algorithm-color); }
+  .algorithm-button.ads{--algorithm-color:var(--ads)}.algorithm-button.recommendation{--algorithm-color:var(--rec)}
+  .algorithm-button:hover,.algorithm-button:focus-visible{background:color-mix(in srgb,var(--algorithm-color) 19%,rgba(7,17,31,.8));translate:0 -2px}
   @media (max-width: 700px) {
     .hero { min-height: 700px; }
     .hero h1, :global(html[lang='en']) .hero h1 { max-width: 16ch; font-size: clamp(2.3rem, 11vw, 3.25rem); white-space: normal; }
     .hero::after { background: linear-gradient(0deg, rgba(7,17,31,.98) 0%, rgba(7,17,31,.82) 46%, rgba(7,17,31,.24) 82%, rgba(7,17,31,.55) 100%); }
     .domain-buttons { display: grid; align-items: start; justify-items: start; }
     .algorithm-link-inner { align-items: start; flex-direction: column; }
+    .algorithm-buttons { justify-content:flex-start; }
   }
 </style>

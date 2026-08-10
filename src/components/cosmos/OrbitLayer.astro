@@ -1,0 +1,15 @@
+<svg class="orbit-layer" viewBox="0 0 1440 820" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <g fill="none">
+    <ellipse class="orbit major" cx="830" cy="438" rx="930" ry="274" transform="rotate(-19 830 438)" />
+    <ellipse class="orbit" cx="1030" cy="390" rx="520" ry="196" transform="rotate(13 1030 390)" />
+    <ellipse class="orbit faint" cx="885" cy="470" rx="710" ry="118" transform="rotate(-7 885 470)" />
+    <ellipse class="orbit tight" cx="1105" cy="440" rx="315" ry="255" transform="rotate(27 1105 440)" />
+    <path class="orbit trace" d="M-160 790C390 458 785 252 1605-70" />
+  </g>
+</svg>
+
+<style>
+  .orbit-layer{position:absolute;inset:-4%;width:108%;height:108%;overflow:visible;opacity:.84;transform:translate3d(var(--px,0),var(--py,0),0)}
+  .orbit{stroke:rgba(149,195,229,.2);stroke-width:1}.major{stroke:rgba(183,212,235,.27);stroke-width:1.15}.faint{stroke:rgba(167,139,250,.12)}.tight{stroke:rgba(53,208,226,.13)}.trace{stroke:rgba(221,235,247,.09);stroke-width:2}
+  @media(max-width:767px){.orbit-layer{inset:-12%;width:124%;height:124%;opacity:.44}.faint,.tight{display:none}}
+</style>
