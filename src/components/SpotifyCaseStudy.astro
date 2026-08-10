@@ -79,6 +79,11 @@ const evaluateCode = `for query_index in sampled_queries:
 
 const exactCosineLatex = String.raw`\cos(x,y)=\frac{x^\top y}{\lVert x\rVert_2\lVert y\rVert_2}`;
 const weightedCosineLatex = String.raw`\cos_w(x,y)=\frac{(Wx)^\top(Wy)}{\lVert Wx\rVert_2\lVert Wy\rVert_2},\qquad W=\operatorname{diag}(w_1,\ldots,w_d)`;
+const standardScalerLatex = String.raw`z_{ij}=\frac{x_{ij}-\mu_j}{\sigma_j}`;
+const minMaxLatex = String.raw`m_{ij}=\frac{x_{ij}-x_j^{\min}}{x_j^{\max}-x_j^{\min}}`;
+const l2Latex = String.raw`\widehat{x}_i=\frac{m_i}{\lVert m_i\rVert_2},\qquad \lVert m_i\rVert_2=\sqrt{\sum_{j=1}^{d}m_{ij}^2}`;
+const euclideanLatex = String.raw`d(x,y)=\sqrt{\sum_{j=1}^{d}(x_j-y_j)^2}`;
+const knnLatex = String.raw`N_K(q)=\operatorname{arg\,sort}_{i\ne q}\ d(q,x_i)\ [1{:}K]`;
 
 const copy = zh ? {
   nav: ['问题', '数据', 'EDA', '特征工程', '算法', '候选召回', '结果', '评估', '改进'],
@@ -103,6 +108,10 @@ const copy = zh ? {
   vectorBody: '向量只是按固定顺序排列的一组数字。例如一首歌可以写成 [danceability, energy, …, valence]。缩放不改变歌曲顺序，只让九个维度拥有可比较的数值范围。',
   normalizeTitle: 'L2 normalization 做什么？',
   normalizeBody: 'MinMaxScaler 先统一每个特征的范围；L2 normalization 再把每首歌的向量长度缩放为 1。完成后，两个向量的点积就等于余弦相似度，因此可以用一次矩阵乘法搜索全部歌曲。',
+  scaleSymbols: 'xᵢⱼ 表示第 i 首歌的第 j 个特征；μⱼ、σⱼ 是第 j 列的均值和标准差；xⱼᵐⁱⁿ、xⱼᵐᵃˣ 是该列最小值和最大值；d=9。StandardScaler 让每列以 0 为中心、标准差为 1，因此高方差特征不会只因单位较大而支配欧氏距离。MinMaxScaler 保留列内顺序并映射到 0–1，但会受极端值影响。',
+  l2Symbols: 'mᵢ 是 MinMax 缩放后的第 i 首歌向量，‖mᵢ‖₂ 是它的欧氏长度，x̂ᵢ 是长度为 1 的向量。L2 normalization 不再逐列缩放，而是逐首歌曲消除向量总长度，让点积可以直接表示余弦相似度。',
+  knnFormulaTitle: '欧氏距离与 KNN 如何选邻居',
+  knnFormulaBody: 'x 和 y 是两首歌经过 StandardScaler 的九维向量，xⱼ、yⱼ 是第 j 个特征，d=9。欧氏距离把每一维差值的平方相加再开方；KNN 对种子 q 与所有其他歌曲的距离排序，取距离最小的 K 首。本项目令 K=10，并明确排除 q 自身。',
   algorithmTitle: '5. 算法：为什么选择余弦相似度',
   algorithmBody: '余弦相似度比较两个向量的方向，而不是原始长度。两首歌的九个特征比例越接近，夹角越小，相似度越接近 1。对于已经缩放的音频属性，它提供了直观、可解释的相似歌曲基线。',
   exactFormulaTitle: '精确余弦相似度',
@@ -152,6 +161,10 @@ const copy = zh ? {
   vectorBody: 'A vector is just an ordered list of numbers. A track might be [danceability, energy, …, valence]. Scaling does not reorder tracks; it gives the nine dimensions comparable numerical ranges.',
   normalizeTitle: 'What does L2 normalization do?',
   normalizeBody: 'MinMaxScaler first makes feature ranges comparable. L2 normalization then rescales each track vector to length one. After that step, a dot product equals cosine similarity, so one matrix multiplication can search the full catalog.',
+  scaleSymbols: 'xᵢⱼ is feature j for track i; μⱼ and σⱼ are that column’s mean and standard deviation; xⱼᵐⁱⁿ and xⱼᵐᵃˣ are its extrema; d=9. StandardScaler centers each feature at zero with unit variance, so a large unit alone cannot dominate Euclidean distance. MinMaxScaler preserves within-column order and maps values to 0–1, although it remains sensitive to extrema.',
+  l2Symbols: 'mᵢ is track i after MinMax scaling, ‖mᵢ‖₂ is its Euclidean length, and x̂ᵢ has length one. L2 normalization acts per track rather than per column: it removes total vector magnitude so a dot product can represent cosine similarity.',
+  knnFormulaTitle: 'How Euclidean distance and KNN choose neighbors',
+  knnFormulaBody: 'x and y are two nine-dimensional StandardScaler vectors; xⱼ and yⱼ are feature j and d=9. Euclidean distance squares each feature gap, sums the gaps, and takes the square root. KNN sorts every other track by its distance from seed q and keeps the K smallest. Here K=10 and q itself is explicitly excluded.',
   algorithmTitle: '5. Algorithm: why cosine similarity',
   algorithmBody: 'Cosine similarity compares vector direction rather than raw length. When two tracks have similar proportions across the nine features, the angle is small and similarity approaches 1. On scaled audio attributes, it is an intuitive and explainable baseline.',
   exactFormulaTitle: 'Exact cosine similarity',
@@ -280,28 +293,10 @@ const metricDefinitions: MetricDefinition[] = [
     businessMeaning: { en: 'Flags overly narrow lists, but more diversity is not automatically more relevant.', zh: '用于发现过窄列表，但多样性更高并不自动代表更相关。' },
   },
   {
-    key: 'coverage', label: { en: 'Catalog Coverage@10', zh: 'Catalog Coverage@10' }, latex: String.raw`\operatorname{Coverage@10}=\frac{|\bigcup_q R_q^{10}|}{|\mathcal I|}`,
-    variables: { en: 'R is each query’s Top-10 and 𝓘 is the full catalog.', zh: 'R 是每个查询的 Top-10，𝓘 是完整歌曲目录。' },
-    intuition: { en: 'Measures how much of the catalog receives any recommendation exposure.', zh: '衡量目录中有多少歌曲至少获得一次推荐曝光。' },
-    businessMeaning: { en: 'Helpful for discovery and long-tail monitoring; strongly depends on how many queries were sampled.', zh: '适合监控发现能力与长尾曝光，但会受到抽样查询数量强烈影响。' },
-  },
-  {
     key: 'popularity', label: { en: 'Popularity bias', zh: '热门度偏差' }, latex: String.raw`\Delta_{pop}=\overline{p}_{recommended}-\overline{p}_{catalog}`,
     variables: { en: 'p is Spotify popularity; the two means cover recommended tracks and the catalog.', zh: 'p 是 Spotify popularity，两项均值分别来自推荐结果与全目录。' },
     intuition: { en: 'A positive difference favors popular tracks; a negative one leans toward less-popular tracks.', zh: '差值为正表示偏热门，为负表示结果更偏向非热门歌曲。' },
     businessMeaning: { en: 'A directional exposure audit, not proof of fairness or satisfaction.', zh: '它只做曝光方向审计，不能证明公平性或满意度。' },
-  },
-  {
-    key: 'distance', label: { en: 'Neighborhood audio distance', zh: '近邻音频距离' }, latex: String.raw`D@10=\frac{1}{10}\sum_{i\in R^{10}}\left(1-\cos(v_q,v_i)\right)`,
-    variables: { en: 'v_q is the seed vector and vᵢ is one recommended track.', zh: 'v_q 是种子歌曲向量，vᵢ 是一首推荐歌曲。' },
-    intuition: { en: 'Smaller values mean retrieved tracks are closer to the seed in audio-feature space.', zh: '数值越小，表示推荐歌曲在音频特征空间中越接近种子。' },
-    businessMeaning: { en: 'Checks content consistency only; similar audio still does not prove preference.', zh: '只检查内容一致性；音频相似仍不能证明用户会喜欢。' },
-  },
-  {
-    key: 'silhouette', label: { en: 'Silhouette score', zh: 'Silhouette score' }, latex: String.raw`s(i)=\frac{b(i)-a(i)}{\max\{a(i),b(i)\}}`,
-    variables: { en: 'a is within-cluster distance; b is distance to the nearest other cluster.', zh: 'a 是样本与同 cluster 的距离，b 是它与最近其他 cluster 的距离。' },
-    intuition: { en: 'Higher values mean points are more compact within clusters and better separated.', zh: '越高表示 cluster 内更紧密、cluster 之间更分离。' },
-    businessMeaning: { en: 'Diagnoses K-Means structure only. It is not a recommendation-quality metric.', zh: '它只诊断 K-Means 结构，不是推荐质量指标。' },
   },
 ];
 
@@ -345,8 +340,14 @@ const fields = zh ? [
   <section id="step-4" class="case-step">
     <p class="step-label">Step 4</p><h2>{copy.featureTitle}</h2><p>{copy.featureBody}</p>
     <aside><h3>{copy.vectorTitle}</h3><p>{copy.vectorBody}</p></aside>
+    <div class="scaling-formulas">
+      <div class="formula-explanation"><h3>StandardScaler</h3><div class="formula" aria-label="StandardScaler formula" set:html={math(standardScalerLatex)}></div></div>
+      <div class="formula-explanation"><h3>MinMaxScaler</h3><div class="formula" aria-label="MinMaxScaler formula" set:html={math(minMaxLatex)}></div></div>
+    </div>
+    <p class="symbol-guide">{copy.scaleSymbols}</p>
     <div class="code-block"><Code code={featureCode} lang="python" theme="github-dark" /></div>
     <aside><h3>{copy.normalizeTitle}</h3><p>{copy.normalizeBody}</p></aside>
+    <div class="formula-explanation"><div class="formula" aria-label="L2 normalization formula" set:html={math(l2Latex)}></div><p>{copy.l2Symbols}</p></div>
   </section>
 
   <section id="step-5" class="case-step">
@@ -359,6 +360,7 @@ const fields = zh ? [
 
   <section id="step-6" class="case-step">
     <p class="step-label">Step 6</p><h2>{copy.candidatesTitle}</h2><p>{copy.candidatesBody}</p>
+    <div class="formula-explanation"><h3>{copy.knnFormulaTitle}</h3><div class="formula-stack"><div class="formula" aria-label="Euclidean distance formula" set:html={math(euclideanLatex)}></div><div class="formula" aria-label="K nearest neighbors selection formula" set:html={math(knnLatex)}></div></div><p>{copy.knnFormulaBody}</p></div>
     <div class="method-cards">
       {methodCards.map((method) => (
         <article class="method-card">
@@ -440,6 +442,8 @@ const fields = zh ? [
   .formula :global(.katex-display) { margin: .25rem 0; }
   .formula-explanation { display: grid; gap: .75rem; }
   .formula-explanation > p { color: var(--muted); }
+  .scaling-formulas, .formula-stack { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .symbol-guide { color: var(--muted); font-size: .92rem; }
   .field-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin: 0; border: 1px solid var(--line); background: var(--line); }
   .field-grid div { padding: .85rem; background: var(--deep); }
   .field-grid dt { color: var(--starlight); font: .76rem 'IBM Plex Mono', monospace; }
@@ -449,7 +453,8 @@ const fields = zh ? [
   figcaption { padding: .9rem 1rem; color: var(--muted); border-top: 1px solid var(--line); font-size: .88rem; }
   .method-table { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; }
   .method-cards { display: grid; gap: 1rem; }
-  .method-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, .9fr); gap: 1rem; padding: 1rem; border: 1px solid var(--line); border-radius: 16px; background: rgba(12,27,48,.6); }
+  .method-card { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; padding: 1rem; border: 1px solid var(--line); border-radius: 16px; background: rgba(12,27,48,.6); }
+  .method-card .code-block { width: 100%; min-width: 0; }
   .method-copy { display: grid; align-content: start; gap: .75rem; }
   .method-copy h3 { margin: 0; }
   .method-copy p { color: var(--muted); font-size: .94rem; }
@@ -473,7 +478,7 @@ const fields = zh ? [
   tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
   ul { margin: 0; padding-left: 1.2rem; }
   li + li { margin-top: .45rem; }
-  @media (max-width: 760px) { .method-card, .metric-definitions { grid-template-columns: 1fr; } }
+  @media (max-width: 760px) { .metric-definitions, .scaling-formulas, .formula-stack { grid-template-columns: 1fr; } }
   @media (max-width: 650px) { .field-grid { grid-template-columns: 1fr 1fr; } .case-step { padding-block: 3.5rem; } .formula { text-align: left; } }
   @media (max-width: 430px) { .field-grid { grid-template-columns: 1fr; } }
 </style>

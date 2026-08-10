@@ -28,6 +28,7 @@ jobs:
           enable-cache: true
       - run: npm ci
       - run: npm run build
+      - run: npm test
       - run: uv sync --locked
       - run: uv run pytest
       - if: github.event_name == 'push'

@@ -12,10 +12,14 @@ const t = copy[lang];
     <div class="hero-copy">
       <h1>{t.heroTitle}</h1>
       <p class="lede">{t.heroBody}</p>
-      <div class="button-row"><a class="button" href={href(`/${lang}/projects/spotify-content-recommender/`)}>{t.explore}</a><a class="button secondary" href={href(`/${lang}/compare/`)}>{t.compare}</a></div>
+      <div class="domain-buttons" aria-label={lang === 'en' ? 'Browse projects by domain' : '按方向浏览项目'}>
+        <a class="domain-button search" href="#projects" data-home-domain="search">{t.domainCtas.search}</a>
+        <a class="domain-button ads" href="#projects" data-home-domain="ads">{t.domainCtas.ads}</a>
+        <a class="domain-button recommendation" href="#projects" data-home-domain="recommendation">{t.domainCtas.recommendation}</a>
+      </div>
     </div>
   </section>
-  <section class="projects-section container">
+  <section id="projects" class="projects-section container">
     <div class="section-heading"><h2>{t.projectsTitle}</h2><p class="muted">{t.projectsIntro}</p></div>
     <ProjectTabs lang={lang} />
   </section>
@@ -26,8 +30,22 @@ const t = copy[lang];
     </div>
   </section>
 </BaseLayout>
+<script>
+  document.querySelectorAll<HTMLAnchorElement>('[data-home-domain]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      const domain = link.dataset.homeDomain;
+      const tab = document.querySelector<HTMLButtonElement>(`[data-project-tabs] [data-domain="${domain}"]`);
+      const projects = document.querySelector<HTMLElement>('#projects');
+      if (!tab || !projects) return;
+      event.preventDefault();
+      tab.click();
+      projects.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+      tab.focus({ preventScroll: true });
+    });
+  });
+</script>
 <style>
-  .hero { position: relative; isolation: isolate; display: grid; align-content: center; min-height: min(780px, calc(100vh - 68px)); padding-block: clamp(5rem, 11vw, 8.5rem); }
+  .hero { position: relative; isolation: isolate; display: grid; align-content: center; min-height: min(780px, calc(100vh - 68px)); padding-block: clamp(5rem, 11vw, 8.5rem); overflow: clip; }
   .hero::before { content: ''; position: absolute; z-index: -2; inset: 0 calc(50% - 50vw); background:
     radial-gradient(circle at 72% 35%, rgba(167,139,250,.3) 0 1px, transparent 2px),
     radial-gradient(circle at 16% 22%, rgba(237,245,255,.8) 0 1px, transparent 1.5px),
@@ -36,10 +54,19 @@ const t = copy[lang];
     background-size: 73px 79px, 113px 127px, 149px 139px, 191px 173px;
     mask-image: linear-gradient(to bottom, black 70%, transparent); opacity: .72; animation: star-drift 28s linear infinite;
   }
-  .hero-copy { position: relative; z-index: 2; display: grid; gap: 1.35rem; max-width: 900px; }
+  .hero::after { content: ''; position: absolute; z-index: -2; top: 3%; right: -20%; width: 82%; height: 88%; border-radius: 50%; background:
+    conic-gradient(from 24deg, transparent 0 12%, rgba(53,208,226,.16) 17%, rgba(167,139,250,.3) 24%, rgba(247,185,85,.12) 31%, transparent 40% 100%);
+    filter: blur(28px); rotate: -18deg; opacity: .9; animation: galaxy-breathe 9s ease-in-out infinite alternate;
+  }
+  .hero-copy { position: relative; z-index: 2; display: grid; gap: 1.35rem; max-width: 900px; text-shadow: 0 2px 28px rgba(7,17,31,.9); }
   .hero h1 { max-width: 980px; font-size: clamp(3rem, 7vw, 6rem); }
-  :global(html[lang='en']) .hero h1 { max-width: 18ch; font-size: clamp(2.75rem, 5.8vw, 5rem); line-height: .98; }
+  :global(html[lang='en']) .hero h1 { max-width: none; font-size: clamp(3rem, 6.2vw, 5.5rem); line-height: .98; white-space: nowrap; }
   .lede { max-width: 760px; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.35rem); }
+  .domain-buttons { display: flex; flex-wrap: wrap; gap: .65rem; }
+  .domain-button { --button-domain: var(--search); display: inline-flex; align-items: center; gap: .55rem; min-height: 46px; padding: .7rem 1rem; border: 1px solid color-mix(in srgb, var(--button-domain) 55%, var(--line)); border-radius: 999px; color: var(--starlight); background: color-mix(in srgb, var(--button-domain) 11%, rgba(7,17,31,.78)); box-shadow: inset 0 0 22px color-mix(in srgb, var(--button-domain) 6%, transparent); font-weight: 600; text-decoration: none; }
+  .domain-button::before { content: ''; width: 7px; aspect-ratio: 1; border-radius: 50%; background: var(--button-domain); box-shadow: 0 0 12px var(--button-domain); }
+  .domain-button:hover, .domain-button:focus-visible { color: white; background: color-mix(in srgb, var(--button-domain) 20%, rgba(7,17,31,.72)); translate: 0 -2px; }
+  .domain-button.ads { --button-domain: var(--ads); }.domain-button.recommendation { --button-domain: var(--rec); }
   .orbit-map { position: absolute; z-index: -1; top: 50%; right: -10%; width: min(48vw, 590px); aspect-ratio: 1; translate: 0 -50%; opacity: .82; filter: drop-shadow(0 0 42px rgba(167,139,250,.18)); }
   .orbit-map::before { content: ''; position: absolute; inset: 18%; border-radius: 50%; background: radial-gradient(circle, rgba(237,245,255,.92) 0 1.5%, rgba(167,139,250,.42) 2%, rgba(167,139,250,.08) 18%, transparent 52%); box-shadow: 0 0 90px rgba(167,139,250,.28); }
   .orbit-map i { position: absolute; inset: 14%; border: 1px solid rgba(53,208,226,.45); border-radius: 50%; rotate: -18deg; }
@@ -49,14 +76,18 @@ const t = copy[lang];
   .orbit-map i:first-child { color: var(--search); }.orbit-map i:nth-child(2) { color: var(--rec); }.orbit-map i:nth-child(3) { color: var(--ads); }
   .orbit-map span { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(ellipse at 60% 45%, rgba(53,208,226,.11), transparent 50%), radial-gradient(ellipse at 35% 60%, rgba(247,185,85,.08), transparent 48%); filter: blur(14px); }
   .projects-section { padding-bottom: clamp(4rem, 9vw, 8rem); }
+  #projects { scroll-margin-top: 92px; }
   .algorithm-link { border-top: 1px solid var(--line); background: rgba(12,27,48,.38); }
   .algorithm-link-inner { display: flex; align-items: end; justify-content: space-between; gap: 2rem; }
   .algorithm-link-inner > div { display: grid; gap: 1rem; max-width: 760px; }
   @keyframes star-drift { to { background-position: 73px 79px, -113px 127px, 149px -139px, -191px -173px; } }
+  @keyframes galaxy-breathe { to { opacity: .62; scale: 1.06; rotate: -13deg; } }
   @media (max-width: 700px) {
     .hero { min-height: 650px; overflow: hidden; }
-    .hero h1, :global(html[lang='en']) .hero h1 { max-width: 16ch; font-size: clamp(2.3rem, 11vw, 3.25rem); }
+    .hero h1, :global(html[lang='en']) .hero h1 { max-width: 16ch; font-size: clamp(2.3rem, 11vw, 3.25rem); white-space: normal; }
     .orbit-map { top: 32%; right: -45%; width: 92vw; opacity: .48; }
+    .hero::after { right: -48%; width: 130%; }
+    .domain-buttons { display: grid; align-items: start; justify-items: start; }
     .algorithm-link-inner { align-items: start; flex-direction: column; }
   }
 </style>

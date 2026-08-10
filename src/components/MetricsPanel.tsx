@@ -25,28 +25,20 @@ export default function MetricsPanel({ lang }: { lang: 'en' | 'zh' }) {
   if (!metrics) return <p className="muted">{lang === 'en' ? 'Loading reproduced results…' : '正在加载复现实验结果…'}</p>;
   const items = lang === 'en'
     ? [
-        ['Deduplicated catalog', metrics.dataset.deduplicatedRows.toLocaleString()],
         ['Exact query', `${metrics.evaluation.exactLatencyMs.toFixed(2)} ms`],
         ['Cluster query', `${metrics.evaluation.clusterLatencyMs.toFixed(2)} ms`],
         ['Cluster recall@10', `${(metrics.evaluation.clusterRecallAt10 * 100).toFixed(1)}%`],
         ['KNN overlap with cosine', `${(metrics.evaluation.euclideanOverlapWithCosineAt10 * 100).toFixed(1)}%`],
         ['Diversity@10', metrics.evaluation.diversityAt10.toFixed(3)],
-        ['Catalog coverage@10', `${(metrics.evaluation.coverageAt10 * 100).toFixed(2)}%`],
         ['Popularity delta', (metrics.evaluation.recommendedPopularityMean - metrics.evaluation.catalogPopularityMean).toFixed(2)],
-        ['Neighborhood distance', metrics.evaluation.neighborhoodDistanceAt10.toFixed(4)],
-        ['Cluster silhouette', metrics.evaluation.clusterSilhouette.toFixed(3)],
       ]
     : [
-        ['去重后的歌曲目录', metrics.dataset.deduplicatedRows.toLocaleString()],
         ['精确查询耗时', `${metrics.evaluation.exactLatencyMs.toFixed(2)} ms`],
         ['聚类查询耗时', `${metrics.evaluation.clusterLatencyMs.toFixed(2)} ms`],
         ['聚类召回 Recall@10', `${(metrics.evaluation.clusterRecallAt10 * 100).toFixed(1)}%`],
         ['KNN 与余弦重合率', `${(metrics.evaluation.euclideanOverlapWithCosineAt10 * 100).toFixed(1)}%`],
         ['多样性@10', metrics.evaluation.diversityAt10.toFixed(3)],
-        ['目录覆盖率@10', `${(metrics.evaluation.coverageAt10 * 100).toFixed(2)}%`],
         ['热门度差值', (metrics.evaluation.recommendedPopularityMean - metrics.evaluation.catalogPopularityMean).toFixed(2)],
-        ['近邻音频距离', metrics.evaluation.neighborhoodDistanceAt10.toFixed(4)],
-        ['聚类 Silhouette', metrics.evaluation.clusterSilhouette.toFixed(3)],
       ];
   return <div className="metric-grid">{items.map(([label, value]) => <div className="metric" key={label}><span className="eyebrow">{label}</span><strong>{value}</strong></div>)}</div>;
 }

@@ -72,6 +72,7 @@ p { margin: 0; }
 .prose table { width: 100%; border-collapse: collapse; }
 .prose th, .prose td { padding: .7rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
 .metric-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.metric-grid .metric { min-height: 112px; }
 .metric { min-height: 145px; padding: 1.1rem; background: var(--deep); }
 .metric strong { display: block; margin-top: 1.2rem; font: 600 clamp(1.5rem, 4vw, 2.6rem) 'Unbounded', sans-serif; font-variant-numeric: tabular-nums; }
 .domain-search { --domain: var(--search); }
