@@ -12,9 +12,3 @@ export function weightedCosine(a: number[], b: number[], weights: number[]): num
   }
   return normA && normB ? product / Math.sqrt(normA * normB) : 0;
 }
-
-export function cosineToAngularPercent(cosine: number): number {
-  const clamped = Math.max(-1, Math.min(1, cosine));
-  const percent = (1 - Math.acos(clamped) / (Math.PI / 2)) * 100;
-  return Math.max(0, Math.min(100, percent));
-}

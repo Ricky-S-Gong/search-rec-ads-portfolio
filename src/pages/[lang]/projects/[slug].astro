@@ -15,12 +15,16 @@ const starSummary = lang === 'zh'
 <BaseLayout lang={lang} title={`${project.title[lang]} — ${t.siteName}`} description={project.summary[lang]} path={`/projects/${project.slug}/`}>
   <article>
     <header class="project-hero container">
-      <div><p class="eyebrow">{domainNames[project.domain][lang]} / Content-based / CPU</p><h1>{project.title[lang]}</h1><p class="lede">{starSummary}</p></div>
-      <dl><div><dt>{lang === 'en' ? 'Catalog' : '歌曲目录'}</dt><dd>170,653</dd></div><div><dt>{lang === 'en' ? 'Behavior signal' : '行为信号'}</dt><dd>{lang === 'en' ? 'None' : '无'}</dd></div><div><dt>{lang === 'en' ? 'GPU' : 'GPU'}</dt><dd>{lang === 'en' ? 'Not needed' : '不需要'}</dd></div></dl>
+      <div class="hero-copy"><p class="eyebrow">{domainNames[project.domain][lang]} / Content-based / CPU</p><h1>{project.title[lang]}</h1><p class="lede">{starSummary}</p></div>
+      <div class="hero-facts">
+        <article><span>{lang === 'en' ? 'Dataset' : '数据集'}</span><strong>{spotifyMetrics.dataset.deduplicatedRows.toLocaleString()} {lang === 'en' ? 'tracks' : '首歌曲'}</strong><p>{spotifyMetrics.dataset.yearRange.join('–')} · {Object.keys(spotifyMetrics.dataset.featureProfile).length} {lang === 'en' ? 'audio features' : '项音频特征'}</p></article>
+        <article><span>{lang === 'en' ? 'Data source' : '数据来源'}</span><strong>Kaggle Spotify Dataset</strong>{project.sourceUrl && <a class="source-link" href={project.sourceUrl} target="_blank" rel="noreferrer">Kaggle Source <span aria-hidden="true">↗</span></a>}</article>
+        <article><span>{lang === 'en' ? 'Core algorithm' : '核心算法'}</span><strong>{lang === 'en' ? 'Exact cosine Top-10' : '精确余弦 Top-10'}</strong><p>{lang === 'en' ? 'Median fill → MinMax → L2. KNN and K-Means are comparisons.' : '中位数填补 → MinMax → L2；KNN 与 K-Means 仅作对照。'}</p></article>
+      </div>
     </header>
     <SpotifyCaseStudy lang={lang} />
   </article>
 </BaseLayout>
 <style>
-  .project-hero{display:grid;grid-template-columns:minmax(0,1fr) 240px;gap:clamp(2rem,5vw,4rem);align-items:end;padding-block:clamp(4rem,9vw,7rem)}.project-hero>div{display:grid;gap:1.2rem}.project-hero h1{max-width:18ch;font-size:clamp(2.25rem,5vw,4.35rem);overflow-wrap:anywhere}.lede{max-width:790px;color:var(--muted);font-size:clamp(1rem,1.8vw,1.14rem)}.project-hero dl{margin:0;border-left:1px solid var(--line)}.project-hero dl div{padding:.85rem 1rem;border-bottom:1px solid var(--line)}dt{color:var(--muted);font:.68rem 'IBM Plex Mono',monospace;text-transform:uppercase}dd{margin:.25rem 0 0;font-weight:600}@media(max-width:780px){.project-hero{grid-template-columns:1fr}.project-hero h1{max-width:14ch;font-size:clamp(2.1rem,11vw,3.25rem)}.project-hero dl{border-left:0}}
+  .project-hero{display:grid;gap:clamp(2rem,5vw,3.5rem);padding-block:clamp(4rem,9vw,7rem)}.hero-copy{display:grid;gap:1.2rem}.project-hero h1{max-width:18ch;font-size:clamp(2.25rem,5vw,4.35rem);overflow-wrap:anywhere}.lede{max-width:900px;color:var(--muted);font-size:clamp(1rem,1.8vw,1.14rem)}.hero-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.hero-facts article{display:grid;align-content:start;gap:.55rem;min-height:180px;padding:1.2rem;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,rgba(16,36,61,.88),rgba(7,17,31,.94))}.hero-facts span{color:var(--rec);font:.68rem 'IBM Plex Mono',monospace;text-transform:uppercase}.hero-facts strong{font-size:1.05rem}.hero-facts p{color:var(--muted);font-size:.9rem}.source-link{justify-self:start;margin-top:.25rem;padding:.55rem .8rem;border:1px solid var(--line);border-radius:999px;color:var(--starlight);font:.72rem 'IBM Plex Mono',monospace;text-decoration:none}.source-link:hover,.source-link:focus-visible{border-color:var(--search);color:var(--search)}@media(max-width:780px){.project-hero h1{max-width:14ch;font-size:clamp(2.1rem,11vw,3.25rem)}.hero-facts{grid-template-columns:1fr}.hero-facts article{min-height:0}}
 </style>
