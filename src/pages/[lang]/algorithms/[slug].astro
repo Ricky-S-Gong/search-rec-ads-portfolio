@@ -1,27 +1,101 @@
 ---
+import { Code } from 'astro:components';
+import katex from 'katex';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { algorithms, copy, domainNames, href, languages, type Lang } from '../../../data/site';
-export const getStaticPaths = () => languages.flatMap((lang) => algorithms.map((algorithm) => ({ params: { lang, slug: algorithm.slug }, props: { algorithm } })));
+
+export const getStaticPaths = () => {
+  const algorithm = algorithms.find((item) => item.slug === 'content-based-filtering')!;
+  return languages.map((lang) => ({ params: { lang, slug: algorithm.slug }, props: { algorithm } }));
+};
+
 const lang = Astro.params.lang as Lang;
 const { algorithm } = Astro.props;
+const zh = lang === 'zh';
 const t = copy[lang];
-const labels = lang === 'en'
-  ? { signals: 'Required signals', cold: 'Cold start', train: 'Training cost', serve: 'Serving cost', explain: 'Explainability', intuition: 'Core intuition', use: 'Use when', avoid: 'Avoid when', related: 'See it in a project' }
-  : { signals: '所需信号', cold: '冷启动', train: '训练成本', serve: '服务成本', explain: '可解释性', intuition: '核心直觉', use: '适用场景', avoid: '不适用场景', related: '在项目中查看' };
+const math = (latex: string) => katex.renderToString(latex, { displayMode: true, throwOnError: true, output: 'html' });
+const cosineLatex = String.raw`\cos(x,y)=\frac{x^\top y}{\lVert x\rVert_2\lVert y\rVert_2}`;
+const code = `audio_features = [
+    "acousticness", "danceability", "energy",
+    "instrumentalness", "liveness", "loudness",
+    "speechiness", "tempo", "valence",
+]
+
+scaled = MinMaxScaler().fit_transform(tracks[audio_features])
+vectors = normalize(scaled)
+
+def exact_top_k(vectors, query_index, k=10):
+    scores = vectors @ vectors[query_index]
+    scores[query_index] = -np.inf
+    candidates = np.argpartition(-scores, k)[:k]
+    return candidates[np.argsort(-scores[candidates])]`;
+
+const page = zh ? {
+  summary: '基于内容的推荐使用物品自身的属性寻找相似对象。Spotify 项目把每首歌表示为九维音频向量，因此即使一首新歌还没有播放记录，也能进入推荐候选。',
+  problemTitle: '问题',
+  problem: '当系统只有歌曲属性，没有用户点击、收藏或播放历史时，无法根据“其他人也喜欢什么”学习协同关系。此时可以先解决一个更窄但真实的问题：给定一首种子歌曲，目录中哪些歌曲在已知音频属性上最接近？',
+  intuitionTitle: '直觉',
+  intuition: '把每首歌想成九个刻度组成的坐标点：舞动性、能量、节奏、积极情绪等。两首歌的刻度组合越接近，它们的内容越相似。这个相似只描述属性，不代表用户一定喜欢。',
+  dataTitle: '数据',
+  data: '模型需要每个物品都有稳定、可比较的属性。当前实现使用 acousticness、danceability、energy、instrumentalness、liveness、loudness、speechiness、tempo 和 valence。各列先补中位数，再用 MinMaxScaler 映射到 0–1；不使用用户行为，也不把 popularity、year 或 duration 混入主音频向量。',
+  algorithmTitle: '算法',
+  algorithm: '余弦相似度比较两个向量的方向。x、y 是两首歌的九维向量，xᵀy 是点积，‖x‖₂ 与 ‖y‖₂ 是向量长度。分数越接近 1，特征比例越相似。全量方法计算种子与所有歌曲的分数，排除种子自身，再取最高的 10 首。',
+  codeTitle: '代码',
+  code: '下面的代码与 Spotify 项目实验脚本使用同一处理顺序。L2 normalization 后，矩阵点积等于余弦相似度；argpartition 先高效找出候选，再按真实分数排序。',
+  limitsTitle: '局限',
+  limits: ['依赖手工选择的物品属性，遗漏的音乐风格、歌词语义或文化语境不会自动出现。', '能处理新物品冷启动，但不能在没有偏好信号时理解新用户。', '相似不等于喜欢，离线内容指标不能替代点击、完播、收藏等线上反馈。', '推荐容易停留在种子附近，可能降低惊喜度；目录变大后，全量扫描也会增加延迟。'],
+  project: '在 Spotify 项目中查看完整实验',
+} : {
+  summary: 'Content-based recommendation finds similar items from their own attributes. The Spotify project represents each track as a nine-dimensional audio vector, so a new track can enter retrieval before it has listening history.',
+  problemTitle: 'Problem',
+  problem: 'When a catalog has track attributes but no clicks, saves, or listening history, it cannot learn collaborative patterns such as “people who liked A also liked B.” It can still answer a narrower, honest question: given one seed track, which catalog items are closest in known audio attributes?',
+  intuitionTitle: 'Intuition',
+  intuition: 'Imagine every track as a point with nine coordinates—danceability, energy, tempo, musical positivity, and more. Tracks with similar coordinate patterns are content neighbors. That describes measurable similarity; it does not prove that a listener will like them.',
+  dataTitle: 'Data',
+  data: 'The method needs stable, comparable item attributes. This implementation uses acousticness, danceability, energy, instrumentalness, liveness, loudness, speechiness, tempo, and valence. Each column receives median imputation and MinMax scaling to 0–1. User behavior is absent, and popularity, year, and duration stay outside the primary audio vector.',
+  algorithmTitle: 'Algorithm',
+  algorithm: 'Cosine similarity compares vector direction. x and y are two nine-dimensional track vectors, xᵀy is their dot product, and ‖x‖₂ and ‖y‖₂ are their lengths. A score nearer one means more similar feature proportions. Exact retrieval scores the seed against the catalog, excludes the seed itself, and keeps the ten highest scores.',
+  codeTitle: 'Code',
+  code: 'This is the same processing order used by the Spotify experiment script. After L2 normalization, a matrix dot product equals cosine similarity. argpartition finds the candidate set efficiently, then the final line orders candidates by their actual scores.',
+  limitsTitle: 'Limitations',
+  limits: ['It depends on chosen item attributes; omitted style, lyrical meaning, and cultural context do not appear automatically.', 'It handles new-item cold start, but cannot understand a new user without a preference signal.', 'Similarity is not preference, so offline content metrics cannot replace clicks, completion, saves, or other online feedback.', 'Results can stay too close to the seed and reduce discovery; a full catalog scan also grows slower with catalog size.'],
+  project: 'See the full experiment in the Spotify project',
+};
 ---
-<BaseLayout lang={lang} title={`${algorithm.name[lang]} — ${t.siteName}`} description={algorithm.intuition[lang]} path={`/algorithms/${algorithm.slug}/`}>
+
+<BaseLayout lang={lang} title={`${algorithm.name[lang]} — ${t.siteName}`} description={page.summary} path={`/algorithms/${algorithm.slug}/`}>
   <article class="section container algorithm-page">
-    <header><p class="eyebrow">{domainNames[algorithm.domain][lang]} · {algorithm.family[lang]}</p><h1>{algorithm.name[lang]}</h1><p>{algorithm.intuition[lang]}</p></header>
-    <div class="specs">
-      <dl><dt>{labels.signals}</dt><dd>{algorithm.requiredSignals[lang]}</dd></dl><dl><dt>{labels.cold}</dt><dd>{algorithm.coldStart[lang]}</dd></dl><dl><dt>{labels.train}</dt><dd>{algorithm.trainCost[lang]}</dd></dl><dl><dt>{labels.serve}</dt><dd>{algorithm.serveCost[lang]}</dd></dl><dl><dt>{labels.explain}</dt><dd>{algorithm.explainability[lang]}</dd></dl>
-    </div>
-    <div class="guidance"><section><p class="eyebrow">{labels.use}</p><h2>{algorithm.useWhen[lang]}</h2></section><section><p class="eyebrow avoid">{labels.avoid}</p><h2>{algorithm.avoidWhen[lang]}</h2></section></div>
-    <a class="button" href={href(`/${lang}/projects/`)}>{labels.related}</a>
+    <header>
+      <p class="eyebrow">{domainNames[algorithm.domain][lang]} · {algorithm.family[lang]}</p>
+      <h1>{algorithm.name[lang]}</h1>
+      <p>{page.summary}</p>
+    </header>
+
+    <section><span>01</span><h2>{page.problemTitle}</h2><p>{page.problem}</p></section>
+    <section><span>02</span><h2>{page.intuitionTitle}</h2><p>{page.intuition}</p></section>
+    <section><span>03</span><h2>{page.dataTitle}</h2><p>{page.data}</p></section>
+    <section><span>04</span><h2>{page.algorithmTitle}</h2><p>{page.algorithm}</p><div class="formula" set:html={math(cosineLatex)}></div></section>
+    <section><span>05</span><h2>{page.codeTitle}</h2><p>{page.code}</p><div class="code-block"><Code code={code} lang="python" theme="github-dark" /></div></section>
+    <section><span>06</span><h2>{page.limitsTitle}</h2><ul>{page.limits.map((limit) => <li>{limit}</li>)}</ul></section>
+
+    <a class="button" href={href(`/${lang}/projects/spotify-content-recommender/`)}>{page.project}</a>
   </article>
 </BaseLayout>
+
 <style>
-  .algorithm-page{display:grid;gap:3rem}.algorithm-page header{display:grid;gap:1.2rem;max-width:900px}.algorithm-page h1{font-size:clamp(2.3rem,7vw,5.5rem)}.algorithm-page header>p:last-child{max-width:720px;color:var(--muted);font-size:1.2rem}
-  .specs{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line)}dl{margin:0;padding:1rem;background:var(--deep)}dt{color:var(--muted);font:.68rem 'IBM Plex Mono',monospace;text-transform:uppercase}dd{margin:1rem 0 0}
-  .guidance{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.guidance section{padding:1.5rem;border:1px solid var(--line);border-radius:var(--radius)}.guidance h2{margin-top:1rem;font:600 clamp(1.3rem,3vw,2rem) 'IBM Plex Sans',sans-serif;letter-spacing:0}.avoid{color:var(--danger)}
-  .button{justify-self:start}@media(max-width:850px){.specs{grid-template-columns:repeat(2,1fr)}.guidance{grid-template-columns:1fr}}@media(max-width:480px){.specs{grid-template-columns:1fr}}
+  .algorithm-page { display: grid; gap: 0; max-width: 900px; }
+  header { display: grid; gap: 1.2rem; padding-bottom: 3.5rem; }
+  h1 { font-size: clamp(2.3rem, 7vw, 5.2rem); }
+  header > p:last-child { max-width: 760px; color: var(--muted); font-size: 1.15rem; }
+  section { display: grid; gap: 1rem; padding: 3rem 0; border-top: 1px solid var(--line); }
+  section > span { color: var(--rec); font: .7rem 'IBM Plex Mono', monospace; }
+  section h2 { font-size: clamp(1.55rem, 4vw, 2.3rem); }
+  section p, li { color: var(--muted); font-size: 1rem; }
+  ul { display: grid; gap: .65rem; margin: 0; padding-left: 1.3rem; }
+  .formula, .code-block { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--deep); }
+  .formula { padding: 1.2rem; text-align: center; }
+  .formula :global(.katex-display) { margin: .25rem 0; }
+  .code-block :global(pre) { margin: 0 !important; padding: 1rem !important; overflow-x: auto; font-size: .84rem; }
+  .button { justify-self: start; margin-top: 2rem; }
+  @media (max-width: 560px) { .formula { text-align: left; } }
 </style>

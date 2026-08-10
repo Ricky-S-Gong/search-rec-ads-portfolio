@@ -37,9 +37,11 @@ export interface ProfileMeta {
   name: string;
   photo: string;
   photoAlt: Localized;
-  education: Localized;
-  experience: Localized;
+  school: Localized;
+  major: Localized;
+  industryRole: Localized;
   linkedin: string;
+  github: string;
   email: string;
 }
 
@@ -75,16 +77,17 @@ export const domainNames: Record<Domain, Localized> = {
 
 export const copy = {
   en: {
-    siteName: 'Search · Ads · Recommendation Cosmos Lab',
+    siteName: 'SAR Cosmos Lab',
     byline: 'A joint technical portfolio by Ricky Gong & Ziqi Xu',
     nav: { home: 'Home', projects: 'Projects', compare: 'Algorithms', roadmap: 'Roadmap', about: 'About' },
     language: '中文',
-    heroTitle: 'Search · Ads · Recommendation Cosmos Lab',
-    heroBody: 'A case-study portfolio focused on search, ads, and recommendation algorithms, showing how different methods work, how they are implemented, how they are evaluated, and where they are applied.',
+    heroTitle: 'SAR Cosmos Lab',
+    heroBody: 'SAR stands for Search, Advertising, and Recommendation. This technical portfolio shows how the algorithms work, how they are implemented and evaluated, and where they fit in real systems.',
+    domainCtas: { search: 'View Search projects', ads: 'View Ads projects', recommendation: 'View Recommendation projects' },
     explore: 'Read the Spotify case study',
     compare: 'Compare algorithm families',
     projectsTitle: 'Projects by domain',
-    projectsIntro: 'Switch between Search, Ads, and Recommendation. Every completed project includes reproducible code and evidence.',
+    projectsIntro: 'Projects focus on Search, Advertising, and Recommendation. Every completed project includes reproducible code and real experiment results.',
     decisionTitle: 'Algorithm families by domain',
     decisionIntro: 'Compare broad approaches within the same problem area. Project-specific models and implementation details stay in each case study.',
     complete: 'Completed', inProgress: 'In progress', planned: 'Planned', compute: 'Compute', dataset: 'Dataset',
@@ -95,13 +98,14 @@ export const copy = {
     nav: { home: '首页', projects: '项目', compare: '算法对比', roadmap: '路线图', about: '关于我们' },
     language: 'English',
     heroTitle: '搜广推宇宙实验室',
-    heroBody: '一个围绕搜索、广告与推荐算法的 Case Study Portfolio，展示不同算法的原理、实现、实验与应用。',
+    heroBody: '这是一个围绕搜索、广告与推荐算法构建的技术作品集，展示不同算法的原理、代码实现、实验过程与应用场景。',
+    domainCtas: { search: '查看搜索项目', ads: '查看广告项目', recommendation: '查看推荐项目' },
     explore: '阅读 Spotify 项目',
     compare: '比较算法类别',
     projectsTitle: '按方向查看项目',
-    projectsIntro: '在搜索、广告与推荐之间切换。每个已完成项目都提供可复现代码和真实实验结果。',
+    projectsIntro: '项目主要聚焦搜索、广告与推荐。每个已完成项目都提供可复现代码和真实实验结果。',
     decisionTitle: '按方向比较算法类别',
-    decisionIntro: '在同一业务方向下比较不同方法论；具体模型、距离函数和工程实现放在对应的 Project Case Study 中。',
+    decisionIntro: '在同一业务方向下比较不同方法；具体模型、距离函数和工程实现放在对应项目中。',
     complete: '已完成', inProgress: '进行中', planned: '计划中', compute: '计算环境', dataset: '数据集',
   },
 } as const;
@@ -154,18 +158,22 @@ export const profiles: ProfileMeta[] = [
     name: 'Ricky Gong',
     photo: '/images/people/ricky-gong.jpg',
     photoAlt: { en: 'Ricky Gong under cherry blossoms', zh: '樱花树下的 Ricky Gong' },
-    education: { en: 'MSE in Data Science, University of Pennsylvania', zh: '宾夕法尼亚大学数据科学硕士' },
-    experience: { en: 'Data Science Intern at Corsair', zh: 'Corsair 数据科学实习生' },
+    school: { en: 'University of Pennsylvania', zh: '宾夕法尼亚大学' },
+    major: { en: 'MSE in Data Science', zh: '数据科学硕士' },
+    industryRole: { en: 'Data Science Intern at Corsair', zh: 'Corsair 数据科学实习生' },
     linkedin: 'https://www.linkedin.com/in/shangyu-ricky-gong',
+    github: 'https://github.com/Ricky-S-Gong',
     email: 'sgong.recruiting@gmail.com',
   },
   {
     name: 'Ziqi Xu',
     photo: '/images/people/ziqi-xu.jpg',
     photoAlt: { en: 'Ziqi Xu on an oak-lined path', zh: '林荫小路上的 Ziqi Xu' },
-    education: { en: 'Statistics and Actuarial Science, UIUC', zh: '伊利诺伊大学厄巴纳-香槟分校统计与精算科学' },
-    experience: { en: 'Former Intern at Chubb', zh: '曾任 Chubb 实习生' },
+    school: { en: 'University of Illinois Urbana-Champaign', zh: '伊利诺伊大学厄巴纳-香槟分校' },
+    major: { en: 'Statistics and Actuarial Science', zh: '统计与精算科学' },
+    industryRole: { en: 'Former Intern at Chubb', zh: '曾任 Chubb 实习生' },
     linkedin: 'https://www.linkedin.com/in/ziqi12/',
+    github: 'https://github.com/ziqixu22',
     email: 'xuziqi2003@gmail.com',
   },
 ];

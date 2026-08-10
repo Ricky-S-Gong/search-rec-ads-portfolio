@@ -2,20 +2,25 @@
 import { algorithms, href, type Domain, type Lang } from '../data/site';
 const { lang, domain } = Astro.props as { lang: Lang; domain: Domain };
 const labels = lang === 'en'
-  ? { algorithm: 'Method', signals: 'Required signals', best: 'Best for', cold: 'Cold start', cost: 'Train / serve', explain: 'Explainability', limitation: 'Main limitation' }
-  : { algorithm: '方法', signals: '所需信号', best: '最适合', cold: '冷启动', cost: '训练 / 服务', explain: '可解释性', limitation: '主要局限' };
+  ? { algorithm: 'Method', core: 'Core approach', signals: 'Required data', best: 'Typical business scenario', limitation: 'Main limitation' }
+  : { algorithm: '算法', core: '核心方法', signals: '所需数据', best: '典型商业场景', limitation: '主要局限' };
 const rows = algorithms.filter((algorithm) => algorithm.domain === domain);
 ---
 <div class="table-wrap" tabindex="0" role="region" aria-label={lang === 'en' ? 'Algorithm comparison table' : '算法对比表'}>
   <table>
     <thead><tr>
-      <th>{labels.algorithm}</th><th>{labels.signals}</th><th>{labels.best}</th><th>{labels.cold}</th><th>{labels.cost}</th><th>{labels.explain}</th><th>{labels.limitation}</th>
+      <th>{labels.algorithm}</th><th>{labels.core}</th><th>{labels.signals}</th><th>{labels.best}</th><th>{labels.limitation}</th>
     </tr></thead>
     <tbody>
       {rows.map((algorithm) => (
         <tr>
-          <th><a href={href(`/${lang}/algorithms/${algorithm.slug}/`)}>{algorithm.name[lang]}</a><small>{algorithm.family[lang]}</small></th>
-          <td>{algorithm.requiredSignals[lang]}</td><td>{algorithm.bestFor[lang]}</td><td>{algorithm.coldStart[lang]}</td><td>{algorithm.trainCost[lang]} / {algorithm.serveCost[lang]}</td><td>{algorithm.explainability[lang]}</td><td>{algorithm.limitation[lang]}</td>
+          <th>
+            {algorithm.slug === 'content-based-filtering'
+              ? <a href={href(`/${lang}/algorithms/${algorithm.slug}/`)}>{algorithm.name[lang]}</a>
+              : algorithm.name[lang]}
+            <small>{algorithm.family[lang]}</small>
+          </th>
+          <td>{algorithm.intuition[lang]}</td><td>{algorithm.requiredSignals[lang]}</td><td>{algorithm.bestFor[lang]}</td><td>{algorithm.limitation[lang]}</td>
         </tr>
       ))}
     </tbody>
@@ -24,7 +29,7 @@ const rows = algorithms.filter((algorithm) => algorithm.domain === domain);
 
 <style>
   .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; }
-  table { width: 100%; min-width: 1180px; border-collapse: collapse; background: rgba(12,27,48,.7); }
+  table { width: 100%; min-width: 900px; border-collapse: collapse; background: rgba(12,27,48,.7); }
   th, td { padding: 1rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; font-size: .82rem; }
   thead th { color: var(--muted); font: .68rem 'IBM Plex Mono', monospace; text-transform: uppercase; }
   tbody th { width: 200px; }
