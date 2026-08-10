@@ -2,13 +2,13 @@
 import { href } from '../../data/site';
 ---
 <div class="asteroid-layer" aria-hidden="true">
-  <img class="asteroid near" data-depth="3" src={href('/images/cosmos/asteroids/bennu.webp')} width="820" height="615" loading="lazy" decoding="async" alt="" />
-  <img class="asteroid far one" data-depth="1" src={href('/images/cosmos/asteroids/itokawa.webp')} width="420" height="336" loading="lazy" decoding="async" alt="" />
-  <img class="asteroid far two" data-depth="2" src={href('/images/cosmos/asteroids/itokawa.webp')} width="420" height="336" loading="lazy" decoding="async" alt="" />
+  <img class="asteroid near" data-depth="3" src={href('/images/cosmos/asteroids/bennu-cutout.webp')} width="632" height="615" loading="lazy" decoding="async" alt="" />
+  <img class="asteroid far one" data-depth="1" src={href('/images/cosmos/asteroids/itokawa-cutout.webp')} width="275" height="176" loading="lazy" decoding="async" alt="" />
+  <img class="asteroid far two" data-depth="2" src={href('/images/cosmos/asteroids/itokawa-cutout.webp')} width="275" height="176" loading="lazy" decoding="async" alt="" />
 </div>
 
 <style>
-  .asteroid-layer{position:absolute;inset:0;z-index:7}.asteroid{position:absolute;display:block;height:auto;mix-blend-mode:screen;transform:translate3d(var(--px,0),var(--py,0),0) rotate(var(--rotation));filter:saturate(.4) brightness(.5)}
+  .asteroid-layer{position:absolute;inset:0;z-index:7}.asteroid{position:absolute;display:block;height:auto;transform:translate3d(var(--px,0),var(--py,0),0) rotate(var(--rotation));filter:saturate(.4) brightness(.5)}
   .near{right:-13rem;bottom:-10rem;width:clamp(340px,35vw,590px);--rotation:-18deg;opacity:.32;filter:blur(1.7px) saturate(.35) brightness(.44);animation:asteroid-drift-near 27s ease-in-out -9s infinite}
   .far{width:clamp(38px,4vw,68px);opacity:.2}.one{left:58%;top:13%;--rotation:24deg;animation:asteroid-drift-one 17s ease-in-out -6s infinite}.two{right:19%;bottom:13%;--rotation:-31deg;width:clamp(28px,3vw,48px);opacity:.16;animation:asteroid-drift-two 22s ease-in-out -14s infinite}
   @keyframes asteroid-drift-near{0%,100%{translate:0 0;rotate:0deg}48%{translate:-17px -12px;rotate:1.1deg}76%{translate:-7px -20px;rotate:.35deg}}
