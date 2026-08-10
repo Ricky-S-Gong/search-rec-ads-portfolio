@@ -12,3 +12,10 @@ export function weightedCosine(a: number[], b: number[], weights: number[]): num
   }
   return normA && normB ? product / Math.sqrt(normA * normB) : 0;
 }
+
+export function formatCosinePercent(value: number, digits = 2): string {
+  const epsilon = 1e-12;
+  if (!Number.isFinite(value) || value < -1 - epsilon || value > 1 + epsilon) return '—';
+  const bounded = Math.min(1, Math.max(-1, value));
+  return `${(bounded * 100).toFixed(digits)}%`;
+}

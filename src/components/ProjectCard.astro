@@ -25,18 +25,18 @@ const statusLabel = project.status === 'complete' ? t.complete : project.status 
   .project { display: grid; grid-template-columns: minmax(170px,.8fr) minmax(0,2fr) minmax(250px,1.15fr); gap: 1.4rem; padding: 1.35rem 0; border-top: 1px solid var(--line); position: relative; }
   .project::before { content: ''; position: absolute; top: -1px; left: 0; width: 100px; height: 1px; background: var(--domain); }
   .project-top { display: flex; align-items: flex-start; gap: .6rem; }
-  .status { display: inline-flex; align-items: center; gap: .4rem; font: .7rem 'IBM Plex Mono', monospace; text-transform: uppercase; color: var(--muted); }
+  .status { display: inline-flex; align-items: center; gap: .4rem; font: var(--meta-title-size)/1.2 'IBM Plex Mono', monospace; text-transform: uppercase; color: var(--muted); }
   .status i { width: 7px; aspect-ratio: 1; border-radius: 50%; background: var(--status-color); box-shadow: 0 0 10px color-mix(in srgb, var(--status-color) 65%, transparent); }
   .status-complete { --status-color: var(--complete); color: var(--complete); }
   .status-in-progress { --status-color: var(--in-progress); color: var(--in-progress); }
   .status-planned { --status-color: var(--planned); color: var(--planned); }
   .project-body { display: grid; gap: .8rem; }
-  h3 { overflow: hidden; font-size: clamp(1.3rem, 2.2vw, 1.8rem); white-space: nowrap; text-overflow: ellipsis; }
+  h3 { font-size: clamp(1.35rem, 2vw, 1.82rem); }
   h3 a { text-decoration: none; }
-  .project-meta { display: grid; align-content: start; gap: .55rem; color: var(--muted); font-size: .82rem; }
+  .project-meta { display: grid; align-content: start; gap: .7rem; color: var(--muted); font-size: 1rem; }
   .project-meta p { display: grid; gap: .2rem; line-height: 1.4; }
-  .project-meta p span { display: block; color: var(--starlight); font: .68rem/1.2 'IBM Plex Mono', monospace; text-transform: uppercase; }
+  .project-meta p span { display: block; color: var(--starlight); font: var(--meta-title-size)/1.2 'IBM Plex Mono', monospace; text-transform: uppercase; }
   .project-meta div { display: flex; align-items: center; flex-wrap: wrap; gap: .3rem; }
   .project-meta .tag { width: fit-content; padding: .18rem .48rem; line-height: 1.25; }
-  @media (max-width: 760px) { .project { grid-template-columns: 1fr; } h3 { white-space: normal; } }
+  @media (max-width: 900px) { .project { grid-template-columns: 1fr; } }
 </style>

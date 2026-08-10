@@ -26,3 +26,30 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## NASA DSCOVR EPIC Earth image
+
+`public/images/cosmos/earth-epic.jpg` is NASA DSCOVR EPIC natural-color image
+`epic_1b_20160722172628.jpg`. Credit: NASA EPIC Team.
+
+- Source: https://epic.gsfc.nasa.gov/
+- EPIC image policy: https://epic.gsfc.nasa.gov/about
+- NASA media usage guidelines: https://www.nasa.gov/nasa-brand-center/images-and-media/
+
+## Spotify full logo
+
+`public/images/brands/spotify-full-white.svg` is the unmodified white RGB full
+logo distributed in Spotify's official 2024 brand asset package. Spotify and
+the Spotify logo are trademarks of Spotify AB. Use is governed by Spotify's
+Design & Branding Guidelines:
+https://developer.spotify.com/documentation/design
+
+## Noto Sans SC and Noto Serif SC
+
+Chinese typography is provided by `@fontsource-variable/noto-sans-sc` and
+`@fontsource-variable/noto-serif-sc`. The underlying Noto font software is
+licensed under the SIL Open Font License 1.1.
+
+- Noto CJK: https://github.com/notofonts/noto-cjk
+- Fontsource packaging: https://fontsource.org/
+- SIL OFL 1.1: https://openfontlicense.org/open-font-license-official-text/

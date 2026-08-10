@@ -147,7 +147,7 @@ export const projects: ProjectMeta[] = [
     slug: 'movielens-collaborative-filtering', domain: 'recommendation', status: 'planned', compute: 'CPU',
     algorithms: ['UserCF', 'ItemCF', 'Matrix factorization'], dataset: 'MovieLens · user-item interactions',
     authors: ['Ricky Gong', 'Ziqi Xu'],
-    title: { en: 'Collaborative filtering with MovieLens', zh: 'MovieLens 协同过滤' },
+    title: { en: 'MovieLens collaborative filtering', zh: 'MovieLens 协同过滤' },
     summary: {
       en: 'The next recommendation project adds user-item interactions so personalization and ranking metrics can be evaluated correctly.',
       zh: '下一项推荐项目引入真实用户—物品交互，正确评估个性化与排序指标。',
