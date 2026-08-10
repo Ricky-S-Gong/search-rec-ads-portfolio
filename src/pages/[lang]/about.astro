@@ -21,13 +21,16 @@ const t = copy[lang];
             <img src={href(profile.photo)} width={index === 0 ? 1365 : 1616} height={index === 0 ? 2048 : 1080} loading={index === 0 ? 'eager' : 'lazy'} alt={profile.photoAlt[lang]} />
           </div>
           <div class="profile-copy">
-            <p class="eyebrow">{index === 0 ? 'Data Science' : 'Statistics & Actuarial Science'}</p>
             <h2>{profile.name}</h2>
-            <p>{profile.education[lang]}</p>
-            <p class="muted">{profile.experience[lang]}</p>
+            <dl class="profile-details">
+              <div><dt>{lang === 'en' ? 'School' : '学校'}</dt><dd>{profile.school[lang]}</dd></div>
+              <div><dt>{lang === 'en' ? 'Major' : '专业'}</dt><dd>{profile.major[lang]}</dd></div>
+              <div><dt>{lang === 'en' ? 'Industry role' : '业界职位'}</dt><dd>{profile.industryRole[lang]}</dd></div>
+            </dl>
             <div class="contacts">
               <a href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn <span aria-hidden="true">↗</span></a>
-              <a href={`mailto:${profile.email}`}>{profile.email}</a>
+              <a href={profile.github} target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+              <a href={`mailto:${profile.email}`}>{lang === 'en' ? 'Email' : '邮箱'} <span aria-hidden="true">↗</span></a>
             </div>
           </div>
         </article>
@@ -43,20 +46,21 @@ const t = copy[lang];
   h1 { font-size: clamp(2.5rem, 7vw, 5rem); }
   .crew { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(1rem, 3vw, 2rem); }
   .crew article { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(145deg, rgba(16,36,61,.92), rgba(7,17,31,.96)); }
-  .portrait { aspect-ratio: 4 / 3; overflow: hidden; border-bottom: 1px solid var(--line); background: var(--deep); }
-  .portrait img { width: 100%; height: 100%; object-fit: cover; }
-  .crew article:first-child .portrait img { object-position: 50% 45%; }
-  .crew article:last-child .portrait img { object-position: 52% 43%; }
+  .portrait { height: clamp(220px, 25vw, 300px); padding: .8rem; overflow: hidden; border-bottom: 1px solid var(--line); background: radial-gradient(circle at 50% 40%, rgba(128,98,255,.12), transparent 62%), var(--deep); }
+  .portrait img { width: 100%; height: 100%; object-fit: contain; object-position: center; }
   .profile-copy { display: grid; gap: .55rem; padding: clamp(1.2rem, 3vw, 1.7rem); }
   .profile-copy h2 { font-size: clamp(1.55rem, 3vw, 2.2rem); }
-  .profile-copy > p:not(.eyebrow) { font-size: 1rem; }
-  .contacts { display: flex; flex-wrap: wrap; gap: .55rem 1.2rem; margin-top: .65rem; padding-top: 1rem; border-top: 1px solid var(--line); }
-  .contacts a { overflow-wrap: anywhere; color: var(--starlight); font: .78rem/1.5 'IBM Plex Mono', monospace; text-decoration: none; }
-  .contacts a:hover { color: var(--search); }
+  .profile-details { display: grid; gap: .8rem; margin: .35rem 0 0; }
+  .profile-details div { display: grid; grid-template-columns: 7rem 1fr; gap: .7rem; }
+  .profile-details dt { color: var(--muted); font: .68rem/1.5 'IBM Plex Mono', monospace; text-transform: uppercase; }
+  .profile-details dd { margin: 0; color: var(--starlight); font-size: .92rem; }
+  .contacts { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .65rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+  .contacts a { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: .58rem .85rem; border: 1px solid var(--line); border-radius: 999px; color: var(--starlight); background: rgba(7,17,31,.62); font: .72rem/1.2 'IBM Plex Mono', monospace; text-decoration: none; }
+  .contacts a:hover, .contacts a:focus-visible { border-color: var(--search); color: var(--search); background: rgba(53,208,226,.07); }
   .license { margin-top: 2.5rem; color: var(--muted); font: .76rem/1.6 'IBM Plex Mono', monospace; }
   @media (max-width: 720px) {
     .crew { grid-template-columns: 1fr; }
-    .portrait { aspect-ratio: 16 / 11; }
-    .crew article:first-child .portrait img { object-position: 50% 42%; }
+    .portrait { height: 250px; }
+    .profile-details div { grid-template-columns: 6rem 1fr; }
   }
 </style>
