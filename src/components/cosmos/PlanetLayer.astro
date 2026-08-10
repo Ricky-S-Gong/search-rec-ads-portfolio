@@ -1,0 +1,40 @@
+---
+import { href } from '../../data/site';
+import { planets } from '../../data/cosmos';
+---
+<div class="planet-layer" aria-hidden="true">
+  {planets.map((planet) => (
+    <figure
+      class={`planet planet-${planet.name.toLowerCase()} ${planet.prominence}`}
+      data-planet={planet.name}
+      data-mobile={planet.mobile ? 'keep' : 'hide'}
+      data-depth={planet.depth}
+      style={`--x:${planet.x}%;--y:${planet.y}%;--size:${planet.size}px;--opacity:${planet.opacity};`}
+    >
+      <img
+        src={href(planet.src)}
+        width={planet.width}
+        height={planet.height}
+        loading={planet.name === 'Earth' || planet.name === 'Saturn' ? 'eager' : 'lazy'}
+        fetchpriority={planet.name === 'Earth' ? 'high' : 'auto'}
+        decoding="async"
+        alt=""
+      />
+    </figure>
+  ))}
+</div>
+
+<style>
+  .planet-layer{position:absolute;inset:0}.planet{position:absolute;left:var(--x);top:var(--y);width:var(--size);margin:0;opacity:var(--opacity);transform:translate(-50%,-50%) translate3d(var(--px,0),var(--py,0),0);will-change:transform;filter:saturate(.86) brightness(.84)}
+  .planet::before{content:'';position:absolute;inset:12%;border-radius:50%;background:radial-gradient(circle,rgba(109,160,235,.14),rgba(53,208,226,.045) 43%,transparent 72%);filter:blur(22px);transform:scale(1.08);pointer-events:none}
+  .planet img{position:relative;z-index:1;display:block;width:100%;height:auto;animation:planet-drift 16s ease-in-out infinite;filter:drop-shadow(0 0 24px rgba(102,170,222,.13))}
+  .planet-earth{z-index:5;filter:saturate(.92) brightness(.96)}.planet-earth img{animation-duration:19s;filter:drop-shadow(0 0 38px rgba(88,160,230,.28))}.planet-earth::before{inset:16% 28%;background:radial-gradient(circle,rgba(93,158,232,.25),rgba(53,208,226,.07) 45%,transparent 74%)}
+  .planet-jupiter{z-index:1;filter:saturate(.55) brightness(.47) contrast(1.08)}.planet-jupiter img{animation-duration:25s;filter:blur(.25px)}
+  .planet-saturn{z-index:4;filter:saturate(.72) brightness(.76)}.planet-saturn img{animation-duration:22s}.planet-saturn::before{inset:24% 12%;background:radial-gradient(ellipse,rgba(197,186,159,.14),rgba(117,125,218,.05) 47%,transparent 76%)}
+  .planet-mars{z-index:3;filter:saturate(.82) brightness(.78)}.planet-mars img{animation-duration:18s}
+  .planet-mercury,.planet-venus,.planet-uranus,.planet-neptune,.planet-pluto{z-index:2;filter:saturate(.55) brightness(.7)}
+  @keyframes planet-drift{0%,100%{translate:0 0;rotate:-.15deg}50%{translate:0 -7px;rotate:.15deg}}
+  @media(max-width:1023px){.planet-jupiter{--size:760px!important;--x:118%!important}.planet-saturn{--size:470px!important}.planet-earth{--size:520px!important}.planet[data-depth="1"]{opacity:calc(var(--opacity) * .72)}}
+  @media(max-width:767px){.planet[data-mobile="hide"]{display:none}.planet-earth{--x:83%!important;--y:23%!important;--size:390px!important;--opacity:.78!important}.planet-saturn{--x:91%!important;--y:3%!important;--size:360px!important;--opacity:.52!important}.planet-mars{--x:67%!important;--y:43%!important;--size:88px!important;--opacity:.54!important}}
+  @media(prefers-reduced-motion:reduce){.planet img{animation:none}}
+</style>

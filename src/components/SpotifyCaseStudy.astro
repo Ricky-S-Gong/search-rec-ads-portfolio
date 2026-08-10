@@ -89,9 +89,9 @@ const popularityLatex = String.raw`\Delta_{pop}=\overline{p}_{recommended}-\over
 const popularityDelta = spotifyMetrics.evaluation.recommendedPopularityMean - spotifyMetrics.evaluation.catalogPopularityMean;
 
 const copy = zh ? {
-  nav: ['问题', '数据', 'EDA', '特征', '算法', '召回', '结果', '评估与下一步', '交互实验台'],
-  problemTitle: '1. 问题：用一首种子歌启动推荐',
-  problemBody: '目标不是猜测某个用户会喜欢什么，而是回答一个更明确的问题：给定一首歌曲，目录中哪些歌曲在音频属性上最接近？这是物品到物品的基于内容推荐。',
+  nav: ['业务问题', '数据', 'EDA', '特征', '算法', '召回', '结果', '评估与下一步', '交互实验台'],
+  problemTitle: '1. 业务问题：在没有行为记录时帮助用户发现音乐',
+  problemBody: '音乐目录很大，但新用户没有收听、点赞或跳过记录，系统还不能建立稳定画像。本项目把问题收窄为一个可验证的会话级目标：给定一首种子歌曲，目录中哪些歌曲在可测量的音频属性上最接近，并且为什么相似？',
   conceptTitle: '概念：基于内容的推荐',
   conceptBody: '它根据物品本身的属性进行匹配。在这里，属性是歌曲的 energy、danceability、tempo 等音频特征。它不需要其他用户的点击或收藏记录，因此适合新歌曲冷启动；但它无法仅凭这些属性了解一位新用户的个人口味。',
   coldStartTitle: '新用户如何开始？',
@@ -140,9 +140,9 @@ const copy = zh ? {
   labTitle: '9. 交互实验台',
   labBody: '下面的实验台在浏览器本地计算 5,000 首演示歌曲的加权余弦相似度。选择歌曲并调整权重，可以直接观察“更重视 energy”如何改变推荐。它不调用 Spotify API，也不播放音频。',
 } : {
-  nav: ['Problem', 'Data', 'EDA', 'Features', 'Algorithm', 'Retrieval', 'Results', 'Evaluation & next steps', 'Interactive lab'],
-  problemTitle: '1. Problem: recommend from one seed track',
-  problemBody: 'The goal is not to guess what a particular listener will like. It is narrower: given one track, which catalog tracks are closest in measurable audio attributes? This is item-to-item content-based recommendation.',
+  nav: ['Business problem', 'Data', 'EDA', 'Features', 'Algorithm', 'Retrieval', 'Results', 'Evaluation & next steps', 'Interactive lab'],
+  problemTitle: '1. Business problem: support discovery without behavior history',
+  problemBody: 'A large music catalog is difficult to explore when a new listener has no plays, likes, or skips and the system cannot build a stable profile. This project narrows the need to a testable session-level goal: given one seed track, which catalog tracks are closest in measurable audio attributes, and why are they similar?',
   conceptTitle: 'Concept: content-based recommendation',
   conceptBody: 'It matches items using their own attributes. Here those attributes are audio features such as energy, danceability, and tempo. It can place a new track without waiting for clicks, but those attributes alone cannot reveal a new listener’s personal taste.',
   coldStartTitle: 'How does a new listener begin?',
