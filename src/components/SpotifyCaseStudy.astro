@@ -1,9 +1,8 @@
 ---
 import { Code } from 'astro:components';
 import katex from 'katex';
-import MetricsPanel from './MetricsPanel';
 import SpotifyLab from './SpotifyLab';
-import { href, type Lang, type MetricDefinition } from '../data/site';
+import { href, type Lang } from '../data/site';
 import spotifyMetrics from '../../public/artifacts/spotify/metrics.json';
 
 const { lang } = Astro.props as { lang: Lang };
@@ -84,17 +83,22 @@ const minMaxLatex = String.raw`m_{ij}=\frac{x_{ij}-x_j^{\min}}{x_j^{\max}-x_j^{\
 const l2Latex = String.raw`\widehat{x}_i=\frac{m_i}{\lVert m_i\rVert_2},\qquad \lVert m_i\rVert_2=\sqrt{\sum_{j=1}^{d}m_{ij}^2}`;
 const euclideanLatex = String.raw`d(x,y)=\sqrt{\sum_{j=1}^{d}(x_j-y_j)^2}`;
 const knnLatex = String.raw`N_K(q)=\operatorname{arg\,sort}_{i\ne q}\ d(q,x_i)\ [1{:}K]`;
+const clusterRecallLatex = String.raw`\operatorname{Recall@10}=\frac{|A_{10}\cap E_{10}|}{10}`;
+const knnOverlapLatex = String.raw`\operatorname{Overlap@10}=\frac{|K_{10}\cap E_{10}|}{10}`;
+const diversityLatex = String.raw`\operatorname{Diversity@K}=\frac{2}{K(K-1)}\sum_{i<j}\left(1-\cos(v_i,v_j)\right)`;
+const popularityLatex = String.raw`\Delta_{pop}=\overline{p}_{recommended}-\overline{p}_{catalog}`;
+const popularityDelta = spotifyMetrics.evaluation.recommendedPopularityMean - spotifyMetrics.evaluation.catalogPopularityMean;
 
 const copy = zh ? {
-  nav: ['问题', '数据', 'EDA', '特征工程', '算法', '候选召回', '结果', '评估', '改进'],
-  problemTitle: '1. 问题：在没有用户历史时推荐相似歌曲',
+  nav: ['问题', '数据', 'EDA', '特征', '算法', '召回', '结果', '评估与下一步', '交互实验台'],
+  problemTitle: '1. 问题：用一首种子歌启动推荐',
   problemBody: '目标不是猜测某个用户会喜欢什么，而是回答一个更明确的问题：给定一首歌曲，目录中哪些歌曲在音频属性上最接近？这是物品到物品的基于内容推荐。',
   conceptTitle: '概念：基于内容的推荐',
   conceptBody: '它根据物品本身的属性进行匹配。在这里，属性是歌曲的 energy、danceability、tempo 等音频特征。它不需要其他用户的点击或收藏记录，因此适合新歌曲冷启动；但它无法仅凭这些属性了解一位新用户的个人口味。',
-  coldStartTitle: '两种冷启动不是同一个问题',
-  coldStartBody: '新歌曲冷启动是“没有交互的新歌能否被推荐”：只要音频属性存在，本方法就能计算相似度。新用户冷启动是“不了解这个人的偏好”：这份数据没有用户行为，因此只能从用户主动选择的一首种子歌曲开始，不能自动完成个性化。',
+  coldStartTitle: '新用户如何开始？',
+  coldStartBody: '新用户没有收听、点赞或跳过记录，系统无法建立稳定画像。本项目要求用户主动选择一首种子歌，也可以用滑块提供临时的特征偏好。这只是一次会话级起点，只能缓解冷启动，不能替代长期个性化。',
   objective: '输入一首种子歌曲，输出 10 首不同歌曲，并解释相似来自哪些音频特征。',
-  dataTitle: '2. 数据：先确认数据能回答什么问题',
+  dataTitle: '2. 数据：可用信号与缺口',
   dataBody: 'Kaggle 数据包含歌曲属性，但没有用户、曝光、点击、跳过或收藏。这个缺口直接决定了我们只能评价内容相似度与系统效率，不能声称推荐符合用户偏好。',
   dataResult: '读取结果',
   dataResultBody: '170,653 行歌曲记录，年份覆盖 1921–2020；按 Spotify track ID 去重后仍为 170,653 首。九个音频特征的缺失或无效值在缩放前使用各列中位数处理。',
@@ -102,7 +106,7 @@ const copy = zh ? {
   edaTitle: '3. EDA：检查特征分布与年代变化',
   edaBody: '探索性数据分析（EDA）是在建模前检查数据范围、偏差与异常的过程。这里按年代聚合四个直观特征，判断目录是否存在明显的时间结构。',
   edaAnalysis: '图表说明不同年代的平均音频属性并不稳定。年代本身会影响相似性，因此我们没有把 year 混入主音频向量，而是把它保留为可单独对比的上下文特征。',
-  featureTitle: '4. 特征工程：让不同单位可以公平比较',
+  featureTitle: '4. 特征：统一不同量纲',
   featureBody: 'tempo 通常是几十到两百左右，energy 则位于 0–1。如果直接计算距离，tempo 会因为数值范围大而主导结果。MinMaxScaler 把每列映射到 0–1，再把每首歌表示成一个九维向量。',
   vectorTitle: '概念：向量与缩放',
   vectorBody: '向量只是按固定顺序排列的一组数字。例如一首歌可以写成 [danceability, energy, …, valence]。缩放不改变歌曲顺序，只让九个维度拥有可比较的数值范围。',
@@ -120,7 +124,7 @@ const copy = zh ? {
   weightedFormulaBody: 'W 是由九个滑块组成的对角矩阵。提高某个权重会在计算夹角前放大该特征；这些权重由访问者手动选择，不是从用户行为中学习得到的。',
   whyTitle: '为什么不直接使用协同过滤？',
   whyBody: '协同过滤根据大量用户的共同互动寻找关系，例如“听过 A 的人也常听 B”。这份数据没有用户—歌曲互动，所以实现协同过滤需要伪造关键输入。我们把它留给下一项 MovieLens 项目。',
-  candidatesTitle: '6. 候选召回：用速度换取可测量的损失',
+  candidatesTitle: '6. 召回：比较候选方法',
   candidatesBody: '推荐系统通常先从整个目录找出较小的候选集，再对候选进行更精细的排序。本项目从无个性化兜底开始，逐步比较距离函数、可控权重与 K-Means 近似召回，观察每一步增加了什么能力，又付出了什么代价。',
   methodsTitle: '本项目中的实现对比',
   resultTitle: '7. 结果：把代理指标与用户效果分开',
@@ -128,26 +132,24 @@ const copy = zh ? {
   metricDetailsTitle: '每个数字究竟说明什么？',
   pcaTitle: 'PCA 可视化说明什么？',
   pcaBody: 'PCA（主成分分析）把九维特征压缩到二维，方便人眼观察。图中的颜色来自 K-Means 聚类。它只能帮助检查结构，不能证明聚类内歌曲对用户有用。',
-  evaluationTitle: '8. 评估：这份数据可以和不可以证明什么',
+  evaluationTitle: '8. 评估与下一步',
   evaluationBody: '由于没有真实用户相关性标签，本项目不报告 Precision@K、Recall@K 或 NDCG 作为推荐质量。页面中的 Recall@10 只比较近似召回与精确余弦的结果重合，不代表用户相关性。',
   onlineTitle: '如果上线，真正需要观察的指标',
   onlineItems: ['相似歌曲卡片的点击率和播放完成率', '收藏、加入歌单与重复播放', '新歌曲曝光覆盖率与热门度偏差', 'P95/P99 延迟、索引内存和失败率', '按新老用户、地区和音乐类型分组的效果'],
-  improveTitle: '9. 下一步：什么时候升级算法',
+  improveTitle: '升级路径',
   improveBody: '目录扩大时，可以使用 FAISS 等近似最近邻（ANN）索引。FAISS 是管理和搜索向量的工具，它能避免逐首扫描。获得用户互动后，可以使用协同过滤或矩阵分解；矩阵分解会学习用户和歌曲的 embedding。Embedding 是模型学习的一组紧凑数字，用来表示难以手工定义的兴趣。',
-  labTitle: '10. 浏览器实验台',
+  labTitle: '9. 交互实验台',
   labBody: '下面的实验台在浏览器本地计算 5,000 首演示歌曲的加权余弦相似度。选择歌曲并调整权重，可以直接观察“更重视 energy”如何改变推荐。它不调用 Spotify API，也不播放音频。',
-  reproduceTitle: '11. 复现与贡献',
-  reproduceBody: '运行 uv sync，下载 vatsalmavani/spotify-dataset，然后执行下面的命令。脚本会重新生成指标 JSON、两张 SVG 图和浏览器演示数据。',
 } : {
-  nav: ['Problem', 'Data', 'EDA', 'Features', 'Algorithm', 'Retrieval', 'Results', 'Evaluation', 'Improvement'],
-  problemTitle: '1. Problem: recommend similar tracks without user history',
+  nav: ['Problem', 'Data', 'EDA', 'Features', 'Algorithm', 'Retrieval', 'Results', 'Evaluation & next steps', 'Interactive lab'],
+  problemTitle: '1. Problem: recommend from one seed track',
   problemBody: 'The goal is not to guess what a particular listener will like. It is narrower: given one track, which catalog tracks are closest in measurable audio attributes? This is item-to-item content-based recommendation.',
   conceptTitle: 'Concept: content-based recommendation',
   conceptBody: 'It matches items using their own attributes. Here those attributes are audio features such as energy, danceability, and tempo. It can place a new track without waiting for clicks, but those attributes alone cannot reveal a new listener’s personal taste.',
-  coldStartTitle: 'Item and user cold start are different problems',
-  coldStartBody: 'Item cold start asks whether a track with no interactions can enter recommendations. It can here, as long as its audio attributes exist. User cold start asks what a new listener prefers. With no listener behavior, this system needs the person to choose a seed track and cannot personalize automatically.',
+  coldStartTitle: 'How does a new listener begin?',
+  coldStartBody: 'A new listener has no plays, likes, or skips, so the system cannot build a stable profile. This project asks them to choose one seed track and optionally use sliders for temporary feature preferences. That is only a session-level starting point: it mitigates cold start but does not replace long-term personalization.',
   objective: 'Input one seed track; return 10 different tracks and show which audio features made them similar.',
-  dataTitle: '2. Data: establish what the dataset can answer',
+  dataTitle: '2. Data: available signals and gaps',
   dataBody: 'The Kaggle data contains track attributes but no users, impressions, clicks, skips, or saves. That absence limits the project to content similarity and system efficiency; it cannot prove user preference.',
   dataResult: 'Loaded result',
   dataResultBody: '170,653 track rows spanning 1921–2020. Deduplication by Spotify track ID leaves 170,653 unique tracks. Invalid values in the nine audio columns are replaced with each column median before scaling.',
@@ -155,7 +157,7 @@ const copy = zh ? {
   edaTitle: '3. EDA: inspect distributions and change over time',
   edaBody: 'Exploratory data analysis (EDA) checks ranges, bias, and anomalies before modeling. We aggregate four intuitive features by decade to see whether the catalog has a strong time structure.',
   edaAnalysis: 'Average audio attributes change across decades. Because year can therefore dominate similarity for reasons unrelated to sound, the primary vector excludes year and keeps it as a separate contextual feature.',
-  featureTitle: '4. Feature engineering: compare unlike units fairly',
+  featureTitle: '4. Features: make units comparable',
   featureBody: 'Tempo is commonly measured in tens or hundreds while energy is bounded from 0 to 1. Raw distance would let tempo dominate simply because its numerical range is larger. MinMaxScaler maps every column to 0–1, then each track becomes a nine-dimensional vector.',
   vectorTitle: 'Concept: vectors and scaling',
   vectorBody: 'A vector is just an ordered list of numbers. A track might be [danceability, energy, …, valence]. Scaling does not reorder tracks; it gives the nine dimensions comparable numerical ranges.',
@@ -173,7 +175,7 @@ const copy = zh ? {
   weightedFormulaBody: 'W is a diagonal matrix made from the nine sliders. Raising one weight emphasizes that feature before the angle is measured. These weights are chosen manually by the visitor; they are not learned personalization.',
   whyTitle: 'Why not collaborative filtering here?',
   whyBody: 'Collaborative filtering learns from shared behavior—for example, “people who played A also played B.” This dataset has no user–track interactions, so implementing it would require inventing the key signal. We reserve it for the next MovieLens project.',
-  candidatesTitle: '6. Candidate retrieval: trade measurable quality for speed',
+  candidatesTitle: '6. Retrieval: compare candidate methods',
   candidatesBody: 'Recommenders commonly retrieve a smaller candidate set before applying more detailed ranking. We begin with a non-personalized fallback, then compare distance functions, controllable feature emphasis, and K-Means approximate retrieval to show what each step adds and costs.',
   methodsTitle: 'Project-specific implementation comparison',
   resultTitle: '7. Results: separate proxy metrics from user outcomes',
@@ -181,16 +183,14 @@ const copy = zh ? {
   metricDetailsTitle: 'What does each number actually mean?',
   pcaTitle: 'What does the PCA plot show?',
   pcaBody: 'PCA (Principal Component Analysis) compresses nine dimensions into two for human inspection. Colors show K-Means groups. It helps diagnose structure; it does not prove that tracks in one cluster are useful recommendations.',
-  evaluationTitle: '8. Evaluation: what this dataset can and cannot prove',
+  evaluationTitle: '8. Evaluation and next steps',
   evaluationBody: 'Without user relevance labels, this project does not report Precision@K, Recall@K, or NDCG as recommendation quality. The displayed Recall@10 only compares approximate candidates with exact cosine neighbors; it is not user relevance.',
   onlineTitle: 'Metrics a production test would need',
   onlineItems: ['Click-through and listening completion from similarity modules', 'Saves, playlist additions, and repeat plays', 'New-track exposure coverage and popularity bias', 'P95/P99 latency, index memory, and failure rate', 'Results segmented by user tenure, region, and music category'],
-  improveTitle: '9. Improvement: when to upgrade the approach',
+  improveTitle: 'Upgrade path',
   improveBody: 'As the catalog grows, an approximate nearest-neighbor (ANN) index such as FAISS can replace full scans. FAISS is a tool for storing and searching vectors efficiently. Once user interactions exist, collaborative filtering or matrix factorization can learn user and track embeddings. An embedding is a compact learned list of numbers representing patterns that are hard to hand-code.',
-  labTitle: '10. Browser experiment',
+  labTitle: '9. Interactive lab',
   labBody: 'The lab below calculates weighted cosine similarity over 5,000 demo tracks entirely in the browser. Select a seed and change weights to see how “care more about energy” alters results. It does not call Spotify APIs or play audio.',
-  reproduceTitle: '11. Reproduce and contribute',
-  reproduceBody: 'Run uv sync, download vatsalmavani/spotify-dataset, then execute the command below. The script regenerates the metrics JSON, two SVG figures, and browser demo data.',
 };
 
 const methodCards = zh ? [
@@ -267,39 +267,6 @@ const methodCards = zh ? [
   },
 ];
 
-const metricDefinitions: MetricDefinition[] = [
-  {
-    key: 'latency', label: { en: 'Median query latency', zh: '查询延迟中位数' },
-    variables: { en: 'Measured milliseconds per sampled query on the recorded CPU environment.', zh: '在记录的 CPU 环境中，对抽样查询测量每次计算的毫秒数。' },
-    intuition: { en: 'Half of measured queries are faster and half are slower.', zh: '一半查询更快，另一半更慢；中位数不容易被极端值带偏。' },
-    businessMeaning: { en: 'A systems-cost comparison only. Production still needs P95/P99 latency, concurrency, and index-memory measurements.', zh: '它只比较系统计算成本。生产环境仍需测量 P95/P99、并发与索引内存。' },
-  },
-  {
-    key: 'clusterRecall', label: { en: 'Cluster Recall@10', zh: 'Cluster Recall@10' }, latex: String.raw`\operatorname{Recall@10}=\frac{|A_{10}\cap E_{10}|}{10}`,
-    variables: { en: 'A₁₀ is the K-Means candidate Top-10; E₁₀ is the exact-cosine Top-10.', zh: 'A₁₀ 是 K-Means 候选 Top-10，E₁₀ 是精确余弦 Top-10。' },
-    intuition: { en: 'It counts how many exact neighbors survive approximate retrieval.', zh: '它计算精确近邻中有多少仍被近似召回保留。' },
-    businessMeaning: { en: 'Useful for choosing a speed–fidelity operating point. It is not relevance recall and says nothing about listener enjoyment.', zh: '用于选择速度—保真度平衡点；它不是相关性召回，也不能说明用户是否喜欢。' },
-  },
-  {
-    key: 'knnOverlap', label: { en: 'KNN overlap@10', zh: 'KNN 重合率@10' }, latex: String.raw`\operatorname{Overlap@10}=\frac{|K_{10}\cap E_{10}|}{10}`,
-    variables: { en: 'K₁₀ is Euclidean KNN; E₁₀ is exact cosine.', zh: 'K₁₀ 是欧氏 KNN 结果，E₁₀ 是精确余弦结果。' },
-    intuition: { en: 'Low overlap means the distance choice changes which tracks count as similar.', zh: '重合率低说明距离函数会明显改变哪些歌曲被认为相似。' },
-    businessMeaning: { en: 'A sensitivity check for modeling choices, not a winner-versus-loser quality score.', zh: '它用于检查模型选择敏感性，不是判断推荐质量输赢的分数。' },
-  },
-  {
-    key: 'diversity', label: { en: 'Diversity@10', zh: 'Diversity@10' }, latex: String.raw`\operatorname{Diversity@K}=\frac{2}{K(K-1)}\sum_{i<j}\left(1-\cos(v_i,v_j)\right)`,
-    variables: { en: 'vᵢ and vⱼ are recommended-track vectors; K is list length.', zh: 'vᵢ 与 vⱼ 是推荐歌曲向量，K 是列表长度。' },
-    intuition: { en: 'Average pairwise cosine distance: larger means the list spans more varied audio profiles.', zh: '它是列表内两两余弦距离的平均值；越大表示音频特征越多样。' },
-    businessMeaning: { en: 'Flags overly narrow lists, but more diversity is not automatically more relevant.', zh: '用于发现过窄列表，但多样性更高并不自动代表更相关。' },
-  },
-  {
-    key: 'popularity', label: { en: 'Popularity bias', zh: '热门度偏差' }, latex: String.raw`\Delta_{pop}=\overline{p}_{recommended}-\overline{p}_{catalog}`,
-    variables: { en: 'p is Spotify popularity; the two means cover recommended tracks and the catalog.', zh: 'p 是 Spotify popularity，两项均值分别来自推荐结果与全目录。' },
-    intuition: { en: 'A positive difference favors popular tracks; a negative one leans toward less-popular tracks.', zh: '差值为正表示偏热门，为负表示结果更偏向非热门歌曲。' },
-    businessMeaning: { en: 'A directional exposure audit, not proof of fairness or satisfaction.', zh: '它只做曝光方向审计，不能证明公平性或满意度。' },
-  },
-];
-
 const fields = zh ? [
   ['acousticness', '原声乐器程度'], ['danceability', '适合舞动的程度'], ['energy', '强度与活力'],
   ['instrumentalness', '无歌词器乐的可能性'], ['liveness', '现场录音的可能性'], ['loudness', '整体响度'],
@@ -319,7 +286,7 @@ const fields = zh ? [
   <section id="step-1" class="case-step">
     <p class="step-label">Step 1</p><h2>{copy.problemTitle}</h2><p>{copy.problemBody}</p>
     <aside><h3>{copy.conceptTitle}</h3><p>{copy.conceptBody}</p></aside>
-    <aside class="cold-start"><h3>{copy.coldStartTitle}</h3><p>{copy.coldStartBody}</p></aside>
+    <aside class="user-start"><h3>{copy.coldStartTitle}</h3><p>{copy.coldStartBody}</p></aside>
     <div class="output"><strong>{zh ? '系统目标' : 'System objective'}</strong><p>{copy.objective}</p></div>
   </section>
 
@@ -341,26 +308,25 @@ const fields = zh ? [
     <p class="step-label">Step 4</p><h2>{copy.featureTitle}</h2><p>{copy.featureBody}</p>
     <aside><h3>{copy.vectorTitle}</h3><p>{copy.vectorBody}</p></aside>
     <div class="scaling-formulas">
-      <div class="formula-explanation"><h3>StandardScaler</h3><div class="formula" aria-label="StandardScaler formula" set:html={math(standardScalerLatex)}></div></div>
-      <div class="formula-explanation"><h3>MinMaxScaler</h3><div class="formula" aria-label="MinMaxScaler formula" set:html={math(minMaxLatex)}></div></div>
+      <div class="formula-card"><h3>StandardScaler</h3><div class="formula" aria-label="StandardScaler formula" set:html={math(standardScalerLatex)}></div></div>
+      <div class="formula-card"><h3>MinMaxScaler</h3><div class="formula" aria-label="MinMaxScaler formula" set:html={math(minMaxLatex)}></div></div>
     </div>
     <p class="symbol-guide">{copy.scaleSymbols}</p>
     <div class="code-block"><Code code={featureCode} lang="python" theme="github-dark" /></div>
     <aside><h3>{copy.normalizeTitle}</h3><p>{copy.normalizeBody}</p></aside>
-    <div class="formula-explanation"><div class="formula" aria-label="L2 normalization formula" set:html={math(l2Latex)}></div><p>{copy.l2Symbols}</p></div>
+    <div class="formula-card"><h3>L2 normalization</h3><div class="formula" aria-label="L2 normalization formula" set:html={math(l2Latex)}></div><p>{copy.l2Symbols}</p></div>
   </section>
 
   <section id="step-5" class="case-step">
     <p class="step-label">Step 5</p><h2>{copy.algorithmTitle}</h2><p>{copy.algorithmBody}</p>
     <div class="formula-explanation"><h3>{copy.exactFormulaTitle}</h3><div class="formula" aria-label="Exact cosine similarity formula" set:html={math(exactCosineLatex)}></div><p>{copy.exactFormulaBody}</p></div>
     <div class="code-block"><Code code={cosineCode} lang="python" theme="github-dark" /></div>
-    <div class="formula-explanation"><h3>{copy.weightedFormulaTitle}</h3><div class="formula" aria-label="Weighted cosine similarity formula" set:html={math(weightedCosineLatex)}></div><p>{copy.weightedFormulaBody}</p></div>
     <aside><h3>{copy.whyTitle}</h3><p>{copy.whyBody}</p></aside>
   </section>
 
   <section id="step-6" class="case-step">
     <p class="step-label">Step 6</p><h2>{copy.candidatesTitle}</h2><p>{copy.candidatesBody}</p>
-    <div class="formula-explanation"><h3>{copy.knnFormulaTitle}</h3><div class="formula-stack"><div class="formula" aria-label="Euclidean distance formula" set:html={math(euclideanLatex)}></div><div class="formula" aria-label="K nearest neighbors selection formula" set:html={math(knnLatex)}></div></div><p>{copy.knnFormulaBody}</p></div>
+    <div class="formula-card"><h3>{copy.knnFormulaTitle}</h3><div class="formula-stack"><div class="formula" aria-label="Euclidean distance formula" set:html={math(euclideanLatex)}></div><div class="formula" aria-label="K nearest neighbors selection formula" set:html={math(knnLatex)}></div></div><p>{copy.knnFormulaBody}</p></div>
     <div class="method-cards">
       {methodCards.map((method) => (
         <article class="method-card">
@@ -382,20 +348,11 @@ const fields = zh ? [
   <section id="step-7" class="case-step wide-step">
     <p class="step-label">Step 7</p><h2>{copy.resultTitle}</h2><p>{copy.resultBody}</p>
     <div class="code-block narrow"><Code code={evaluateCode} lang="python" theme="github-dark" /></div>
-    <MetricsPanel client:visible lang={lang} />
-    <h3>{copy.metricDetailsTitle}</h3>
-    <div class="metric-definitions">
-      {metricDefinitions.map((metric) => (
-        <article>
-          <h4>{metric.label[lang]}</h4>
-          {metric.latex && <div class="formula compact" set:html={math(metric.latex)}></div>}
-          <dl>
-            <div><dt>{zh ? '变量 / 定义' : 'Variables / definition'}</dt><dd>{metric.variables[lang]}</dd></div>
-            <div><dt>{zh ? '直觉' : 'Intuition'}</dt><dd>{metric.intuition[lang]}</dd></div>
-            <div><dt>{zh ? '业务意义与限制' : 'Business meaning and limit'}</dt><dd>{metric.businessMeaning[lang]}</dd></div>
-          </dl>
-        </article>
-      ))}
+    <div class="result-cards">
+      <article><h3>{zh ? '查询延迟' : 'Query latency'}</h3><div class="paired-values"><div><span>Exact</span><strong>{spotifyMetrics.evaluation.exactLatencyMs.toFixed(2)} ms</strong></div><div><span>Cluster</span><strong>{spotifyMetrics.evaluation.clusterLatencyMs.toFixed(2)} ms</strong></div></div><p>{zh ? '单次查询耗时的中位数，仅衡量本次 CPU 计算成本。P95 表示 95% 请求不超过该延迟；P99 表示 99% 请求不超过该延迟，更能发现少数慢请求。单位都是毫秒，通常越低越好；当前脚本只计算了中位数，因此不展示或推测 P95/P99。' : 'Median time per query, measuring only CPU cost here. P95 means 95% of requests finish within that latency; P99 covers 99% and exposes slow tail requests. Both use milliseconds and are generally lower-is-better. This script records only the median, so it does not display or infer P95/P99.'}</p></article>
+      <article><h3>{zh ? '召回一致性' : 'Retrieval agreement'}</h3><div class="paired-values"><div><span>Cluster Recall@10</span><strong>{(spotifyMetrics.evaluation.clusterRecallAt10 * 100).toFixed(1)}%</strong></div><div><span>KNN overlap@10</span><strong>{(spotifyMetrics.evaluation.euclideanOverlapWithCosineAt10 * 100).toFixed(1)}%</strong></div></div><div class="mini-formulas"><div set:html={math(clusterRecallLatex)}></div><div set:html={math(knnOverlapLatex)}></div></div><p>{zh ? 'A₁₀ 是聚类候选、K₁₀ 是欧氏 KNN、E₁₀ 是精确余弦。前者衡量近似召回保留多少精确邻居，后者展示距离选择的敏感性；都不是用户相关性。' : 'A₁₀ is cluster retrieval, K₁₀ is Euclidean KNN, and E₁₀ is exact cosine. The first measures approximate fidelity; the second reveals sensitivity to distance choice. Neither is user relevance.'}</p></article>
+      <article><h3>Diversity@10</h3><strong class="primary-value">{spotifyMetrics.evaluation.diversityAt10.toFixed(3)}</strong><div class="formula compact" set:html={math(diversityLatex)}></div><p>{zh ? '它是 Top-10 歌曲之间两两余弦距离的平均值；vᵢ、vⱼ 是推荐向量，K=10。非负向量下范围为 0–1。例如平均相似度 0.90 对应多样性 0.10。当前 0.004 表示列表非常集中：内容一致但探索很弱。它不是越大越好——过低会重复，过高可能偏离兴趣。' : 'This averages pairwise cosine distance among the Top-10; vᵢ and vⱼ are recommended vectors and K=10. With these non-negative vectors the range is 0–1. Average similarity 0.90, for example, gives diversity 0.10. The current 0.004 is very narrow: consistent but weak at exploration. Higher is not always better—too low repeats, too high may drift from intent.'}</p></article>
+      <article><h3>{zh ? '热门度偏差' : 'Popularity bias'}</h3><strong class="primary-value">{popularityDelta.toFixed(2)}</strong><div class="formula compact" set:html={math(popularityLatex)}></div><p>{zh ? `推荐歌曲平均 popularity 减去全目录平均值。当前差值为 ${popularityDelta.toFixed(2)}，负值表示结果略偏向较不热门歌曲；它只是曝光方向审计，不证明公平或满意度。` : `Mean recommended popularity minus the catalog mean. The current ${popularityDelta.toFixed(2)} is negative, so results lean slightly less popular. This audits exposure direction; it does not prove fairness or satisfaction.`}</p></article>
     </div>
     <figure><img src={href('/artifacts/spotify/feature-space.svg')} width="720" height="432" loading="lazy" alt={zh ? '按 K-Means 聚类着色的 Spotify 音频特征 PCA 投影' : 'PCA projection of Spotify audio features colored by K-Means cluster'} /><figcaption><strong>{copy.pcaTitle}</strong> {copy.pcaBody}</figcaption></figure>
   </section>
@@ -403,21 +360,13 @@ const fields = zh ? [
   <section id="step-8" class="case-step">
     <p class="step-label">Step 8</p><h2>{copy.evaluationTitle}</h2><p>{copy.evaluationBody}</p>
     <h3>{copy.onlineTitle}</h3><ul>{copy.onlineItems.map((item) => <li>{item}</li>)}</ul>
+    <aside><h3>{copy.improveTitle}</h3><p>{copy.improveBody}</p></aside>
   </section>
 
-  <section id="step-9" class="case-step">
-    <p class="step-label">Step 9</p><h2>{copy.improveTitle}</h2><p>{copy.improveBody}</p>
-  </section>
-
-  <section class="case-step wide-step">
-    <p class="step-label">Step 10</p><h2>{copy.labTitle}</h2><p>{copy.labBody}</p>
+  <section id="step-9" class="case-step wide-step">
+    <p class="step-label">Step 9</p><h2>{copy.labTitle}</h2><p>{copy.labBody}</p>
+    <div class="formula-explanation"><h3>{copy.weightedFormulaTitle}</h3><div class="formula" aria-label="Weighted cosine similarity formula" set:html={math(weightedCosineLatex)}></div><p>{copy.weightedFormulaBody} {zh ? '演示数据的九个特征先经 MinMax 缩放至 [0,1] 并保留四位小数。结果直接显示 0–1 范围内的真实加权余弦，并保留四位小数；越接近 1 只表示特征方向越相似，不是用户喜欢的概率。' : 'The nine demo features are MinMax-scaled to [0,1] and stored to four decimals. Results show raw weighted cosine on 0–1 with four decimals; closer to 1 means more similar feature direction, not a probability of listener preference.'}</p></div>
     <SpotifyLab client:visible lang={lang} />
-  </section>
-
-  <section class="case-step">
-    <p class="step-label">Step 11</p><h2>{copy.reproduceTitle}</h2><p>{copy.reproduceBody}</p>
-    <div class="code-block"><Code code={'uv run python research/spotify-music/run_experiment.py --data <path-to-data.csv>'} lang="bash" theme="github-dark" /></div>
-    <p>{zh ? '代码与实验：Ricky Gong、Ziqi Xu。具体所有权通过 Issue 和 Pull Request 持续记录。' : 'Code and experiments: Ricky Gong and Ziqi Xu. Detailed ownership is tracked through Issues and Pull Requests.'}</p>
   </section>
 </div>
 
@@ -427,7 +376,7 @@ const fields = zh ? [
   .case-nav a:hover { color: var(--starlight); }
   .case-study { width: min(calc(100% - 2rem), 880px); margin-inline: auto; }
   .case-step { display: grid; gap: 1.15rem; padding: 4.5rem 0; border-top: 1px solid var(--line); scroll-margin-top: 130px; }
-  .case-step h2 { font-size: clamp(1.7rem, 4vw, 2.55rem); }
+  .case-step h2 { font:600 var(--step-title-size)/1.15 var(--title-font);letter-spacing:-.03em; }
   .case-step h3 { margin-top: .8rem; font-size: 1.15rem; }
   .case-step > p, .case-step li { color: var(--muted); font-size: 1.02rem; }
   .step-label { color: var(--rec) !important; font: .72rem 'IBM Plex Mono', monospace !important; text-transform: uppercase; }
@@ -435,13 +384,14 @@ const fields = zh ? [
   aside h3, .output strong { display: block; margin: 0 0 .35rem; }
   aside p, .output p { color: var(--muted); }
   .output { border-left-color: var(--complete); background: rgba(85,217,139,.06); }
-  .cold-start { border-left-color: var(--ads); background: rgba(247,185,85,.06); }
+  .user-start { border-left-color: var(--ads); background: rgba(247,185,85,.06); }
   .code-block { overflow: hidden; border: 1px solid var(--line); border-radius: 14px; }
   .code-block :global(pre) { margin: 0 !important; padding: 1rem !important; overflow-x: auto; font-size: .83rem; }
-  .formula { padding: 1.2rem; overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; color: var(--starlight); background: var(--deep); font: clamp(.92rem, 2vw, 1.18rem) 'IBM Plex Mono', monospace; text-align: center; }
-  .formula :global(.katex-display) { margin: .25rem 0; }
+  .formula { display:grid;place-items:center;min-height:92px;padding:1.2rem;overflow-x:auto;border:1px solid var(--line);border-radius:14px;color:var(--starlight);background:var(--deep);font:clamp(.92rem,2vw,1.18rem) 'IBM Plex Mono',monospace;text-align:center; }
+  .formula :global(.katex-display) { margin:0; }
   .formula-explanation { display: grid; gap: .75rem; }
   .formula-explanation > p { color: var(--muted); }
+  .formula-card{display:grid;align-content:start;gap:.75rem;padding:1rem;border:1px solid var(--line);border-radius:14px;background:rgba(12,27,48,.58)}.formula-card h3{margin:0}.formula-card>p{color:var(--muted)}
   .scaling-formulas, .formula-stack { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
   .symbol-guide { color: var(--muted); font-size: .92rem; }
   .field-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; margin: 0; border: 1px solid var(--line); background: var(--line); }
@@ -463,22 +413,16 @@ const fields = zh ? [
   .method-result { padding: .8rem; border-left: 2px solid var(--complete); background: rgba(85,217,139,.05); }
   .method-result span { color: var(--complete); font: .66rem 'IBM Plex Mono', monospace; text-transform: uppercase; }
   .method-result p { margin-top: .25rem; }
-  .metric-definitions { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-  .metric-definitions > article { display: grid; align-content: start; gap: .8rem; padding: 1rem; border: 1px solid var(--line); border-radius: 14px; background: var(--deep); }
-  .metric-definitions h4 { margin: 0; font-size: 1rem; }
+  .result-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.result-cards>article{display:grid;align-content:start;gap:1rem;min-height:360px;padding:1.2rem;border:1px solid var(--line);border-radius:16px;background:var(--deep)}.result-cards h3{margin:0;font:600 1.12rem var(--title-font)}.result-cards p{color:var(--muted);font-size:.9rem}.paired-values{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}.paired-values>div{display:grid;gap:.25rem;padding:.75rem;border:1px solid var(--line);border-radius:10px}.paired-values span{color:var(--muted);font:.64rem 'IBM Plex Mono',monospace}.paired-values strong,.primary-value{font:600 clamp(1.45rem,3vw,2.15rem) var(--title-font);font-variant-numeric:tabular-nums}.primary-value{color:var(--rec)}.mini-formulas{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;overflow:hidden}.mini-formulas>div{overflow-x:auto;color:var(--starlight);font-size:.68rem}.mini-formulas :global(.katex-display){margin:0}
   .formula.compact { padding: .75rem; font-size: .82rem; }
   .formula.compact :global(.katex) { font-size: .95em; }
-  .metric-definitions dl { display: grid; gap: .65rem; margin: 0; }
-  .metric-definitions dl div { display: grid; gap: .15rem; }
-  .metric-definitions dt { color: var(--rec); font: .65rem 'IBM Plex Mono', monospace; text-transform: uppercase; }
-  .metric-definitions dd { margin: 0; color: var(--muted); font-size: .84rem; }
   table { width: 100%; min-width: 680px; border-collapse: collapse; }
   th, td { padding: .8rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; font-size: .85rem; }
   thead th { color: var(--muted); font: .68rem 'IBM Plex Mono', monospace; text-transform: uppercase; }
   tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
   ul { margin: 0; padding-left: 1.2rem; }
   li + li { margin-top: .45rem; }
-  @media (max-width: 760px) { .metric-definitions, .scaling-formulas, .formula-stack { grid-template-columns: 1fr; } }
+  @media (max-width: 760px) { .result-cards,.scaling-formulas,.formula-stack { grid-template-columns:1fr; }.result-cards>article{min-height:0} }
   @media (max-width: 650px) { .field-grid { grid-template-columns: 1fr 1fr; } .case-step { padding-block: 3.5rem; } .formula { text-align: left; } }
   @media (max-width: 430px) { .field-grid { grid-template-columns: 1fr; } }
 </style>

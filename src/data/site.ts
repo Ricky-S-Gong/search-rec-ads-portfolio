@@ -11,6 +11,7 @@ export interface ProjectMeta {
   compute: 'CPU' | 'GPU recommended' | 'GPU required';
   algorithms: string[];
   dataset: string;
+  sourceUrl?: string;
   authors: string[];
   title: Localized;
   summary: Localized;
@@ -135,6 +136,7 @@ export const projects: ProjectMeta[] = [
     slug: 'spotify-content-recommender', domain: 'recommendation', status: 'complete', compute: 'CPU',
     algorithms: ['Popularity', 'Euclidean KNN', 'Cosine', 'Weighted cosine', 'K-Means retrieval'],
     dataset: 'Kaggle Spotify dataset · 170,653 tracks', authors: ['Ricky Gong', 'Ziqi Xu'],
+    sourceUrl: 'https://www.kaggle.com/datasets/vatsalmavani/spotify-dataset',
     title: { en: 'Spotify content recommender', zh: 'Spotify 内容推荐' },
     summary: {
       en: 'An item-to-item recommender built from audio attributes, with exact and approximate retrieval compared under cold-start and latency constraints.',

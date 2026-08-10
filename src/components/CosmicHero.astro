@@ -1,0 +1,100 @@
+<div class="cosmic-hero" aria-hidden="true">
+  <canvas></canvas>
+</div>
+
+<script>
+  /**
+   * Galaxy motion adapted from Danziger/starsjs (MIT).
+   * Copyright (c) 2023 Dani Gámez Franco.
+   * https://github.com/Danziger/starsjs
+   */
+  const root = document.querySelector<HTMLElement>('.cosmic-hero');
+  const canvas = root?.querySelector('canvas');
+  const context = canvas?.getContext('2d');
+
+  if (root && canvas && context) {
+    const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    let width = 0;
+    let height = 0;
+    let stars: Array<{ orbit: number; angle: number; speed: number; size: number; alpha: number; color: string }> = [];
+    let frame = 0;
+    let visible = true;
+    const colors = ['237,245,255', '53,208,226', '167,139,250', '247,185,85'];
+
+    const random = (min: number, max: number) => min + Math.random() * (max - min);
+
+    const rebuild = () => {
+      const bounds = root.getBoundingClientRect();
+      width = Math.max(1, Math.round(bounds.width));
+      height = Math.max(1, Math.round(bounds.height));
+      const dpr = Math.min(devicePixelRatio || 1, 1.5);
+      canvas.width = Math.round(width * dpr);
+      canvas.height = Math.round(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const count = Math.max(260, Math.min(900, Math.round((width * height) / 1500)));
+      const maxOrbit = Math.max(width, height) * (width < 700 ? .58 : .53);
+      stars = Array.from({ length: count }, (_, index) => ({
+        orbit: Math.pow(Math.random(), .68) * maxOrbit,
+        angle: random(0, Math.PI * 2) + index * .013,
+        speed: random(.00022, .00062),
+        size: random(.35, 1.65),
+        alpha: random(.24, .95),
+        color: colors[index % colors.length],
+      }));
+      draw(0);
+    };
+
+    const draw = (time: number) => {
+      context.clearRect(0, 0, width, height);
+      const mobile = width < 700;
+      const centerX = width * (mobile ? .72 : .76);
+      const centerY = height * (mobile ? .25 : .48);
+      const glow = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.min(width, height) * .48);
+      glow.addColorStop(0, 'rgba(237,245,255,.3)');
+      glow.addColorStop(.08, 'rgba(167,139,250,.2)');
+      glow.addColorStop(.35, 'rgba(53,208,226,.07)');
+      glow.addColorStop(1, 'rgba(7,17,31,0)');
+      context.fillStyle = glow;
+      context.fillRect(0, 0, width, height);
+
+      for (const star of stars) {
+        const angle = star.angle + time * star.speed;
+        const flatten = mobile ? .28 : .34;
+        const x = centerX + Math.sin(angle) * star.orbit;
+        const y = centerY + Math.cos(angle) * star.orbit * flatten;
+        const twinkle = reduceMotion.matches ? 1 : .74 + Math.sin(time * .0013 + star.angle * 3) * .26;
+        context.beginPath();
+        context.fillStyle = `rgba(${star.color},${star.alpha * twinkle})`;
+        context.arc(x, y, star.size, 0, Math.PI * 2);
+        context.fill();
+      }
+    };
+
+    const animate = (time: number) => {
+      draw(time);
+      frame = !reduceMotion.matches && visible && !document.hidden ? requestAnimationFrame(animate) : 0;
+    };
+    const syncAnimation = () => {
+      if (frame) cancelAnimationFrame(frame);
+      frame = 0;
+      draw(0);
+      if (!reduceMotion.matches && visible && !document.hidden) frame = requestAnimationFrame(animate);
+    };
+
+    const resizeObserver = new ResizeObserver(rebuild);
+    const intersectionObserver = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; syncAnimation(); }, { rootMargin: '100px' });
+    resizeObserver.observe(root);
+    intersectionObserver.observe(root);
+    reduceMotion.addEventListener('change', syncAnimation);
+    document.addEventListener('visibilitychange', syncAnimation);
+    rebuild();
+    syncAnimation();
+  }
+</script>
+
+<style>
+  .cosmic-hero { position: absolute; z-index: -3; inset: 0 calc(50% - 50vw); overflow: hidden; background: radial-gradient(circle at 75% 45%, #172a4c, #07111f 58%); }
+  canvas { display: block; width: 100%; height: 100%; }
+</style>
