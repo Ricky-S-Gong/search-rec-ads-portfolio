@@ -1,5 +1,10 @@
+---
+import { href } from '../data/site';
+---
 <div class="cosmic-hero" aria-hidden="true">
   <canvas></canvas>
+  <img class="earth" src={href('/images/cosmos/earth-epic.jpg')} width="512" height="512" alt="" decoding="async" />
+  <span class="credit">Earth: NASA EPIC Team</span>
 </div>
 
 <script>
@@ -13,14 +18,21 @@
   const context = canvas?.getContext('2d');
 
   if (root && canvas && context) {
+    type Star = { orbit: number; angle: number; speed: number; size: number; alpha: number; color: string };
+    type Meteor = { born: number; life: number; x: number; y: number; length: number; speed: number };
     const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const colors = ['237,245,255', '53,208,226', '167,139,250', '247,185,85'];
+    const asteroidSeeds = [
+      { x: .13, y: .22, r: 13, tilt: .2 }, { x: .89, y: .72, r: 20, tilt: -.4 },
+      { x: .59, y: .12, r: 9, tilt: .8 }, { x: .47, y: .84, r: 15, tilt: -.8 },
+    ];
     let width = 0;
     let height = 0;
-    let stars: Array<{ orbit: number; angle: number; speed: number; size: number; alpha: number; color: string }> = [];
+    let stars: Star[] = [];
+    let meteors: Meteor[] = [];
+    let nextMeteor = 0;
     let frame = 0;
     let visible = true;
-    const colors = ['237,245,255', '53,208,226', '167,139,250', '247,185,85'];
-
     const random = (min: number, max: number) => min + Math.random() * (max - min);
 
     const rebuild = () => {
@@ -33,68 +45,113 @@
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const count = Math.max(260, Math.min(900, Math.round((width * height) / 1500)));
-      const maxOrbit = Math.max(width, height) * (width < 700 ? .58 : .53);
+      const count = Math.max(300, Math.min(960, Math.round((width * height) / 1350)));
+      const maxOrbit = Math.max(width, height) * (width < 700 ? .62 : .56);
       stars = Array.from({ length: count }, (_, index) => ({
-        orbit: Math.pow(Math.random(), .68) * maxOrbit,
+        orbit: Math.pow(Math.random(), .66) * maxOrbit,
         angle: random(0, Math.PI * 2) + index * .013,
-        speed: random(.00022, .00062),
-        size: random(.35, 1.65),
-        alpha: random(.24, .95),
+        speed: random(.0002, .00058), size: random(.35, 1.7), alpha: random(.2, .92),
         color: colors[index % colors.length],
       }));
       draw(0);
+    };
+
+    const drawAsteroids = () => {
+      for (const asteroid of asteroidSeeds) {
+        const x = width * asteroid.x;
+        const y = height * asteroid.y;
+        context.save();
+        context.translate(x, y);
+        context.rotate(asteroid.tilt);
+        context.beginPath();
+        for (let point = 0; point < 10; point += 1) {
+          const angle = point / 10 * Math.PI * 2;
+          const radius = asteroid.r * (point % 3 === 0 ? .78 : 1);
+          const px = Math.cos(angle) * radius;
+          const py = Math.sin(angle) * radius * .72;
+          point ? context.lineTo(px, py) : context.moveTo(px, py);
+        }
+        context.closePath();
+        context.fillStyle = 'rgba(122,143,165,.11)';
+        context.strokeStyle = 'rgba(185,205,226,.22)';
+        context.lineWidth = 1;
+        context.fill(); context.stroke();
+        for (const [cx, cy, cr] of [[-.3, -.1, .16], [.28, .16, .12], [.02, .28, .09]]) {
+          context.beginPath();
+          context.ellipse(asteroid.r * cx, asteroid.r * cy, asteroid.r * cr, asteroid.r * cr * .55, 0, 0, Math.PI * 2);
+          context.strokeStyle = 'rgba(203,218,232,.16)'; context.stroke();
+        }
+        context.restore();
+      }
+    };
+
+    const drawMeteors = (time: number) => {
+      if (!reduceMotion.matches && time >= nextMeteor && meteors.length < 2) {
+        meteors.push({ born: time, life: 1100, x: random(width * .52, width * .95), y: random(20, height * .38), length: random(70, 130), speed: random(.18, .28) });
+        nextMeteor = time + random(8000, 14000);
+      }
+      meteors = meteors.filter((meteor) => time - meteor.born < meteor.life);
+      for (const meteor of meteors) {
+        const age = time - meteor.born;
+        const x = meteor.x - age * meteor.speed;
+        const y = meteor.y + age * meteor.speed * .48;
+        const fade = Math.sin(Math.min(1, age / meteor.life) * Math.PI);
+        const gradient = context.createLinearGradient(x, y, x + meteor.length, y - meteor.length * .48);
+        gradient.addColorStop(0, `rgba(237,245,255,${.9 * fade})`);
+        gradient.addColorStop(1, 'rgba(53,208,226,0)');
+        context.beginPath(); context.moveTo(x, y); context.lineTo(x + meteor.length, y - meteor.length * .48);
+        context.strokeStyle = gradient; context.lineWidth = 1.4; context.stroke();
+      }
     };
 
     const draw = (time: number) => {
       context.clearRect(0, 0, width, height);
       const mobile = width < 700;
       const centerX = width * (mobile ? .72 : .76);
-      const centerY = height * (mobile ? .25 : .48);
-      const glow = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.min(width, height) * .48);
-      glow.addColorStop(0, 'rgba(237,245,255,.3)');
-      glow.addColorStop(.08, 'rgba(167,139,250,.2)');
-      glow.addColorStop(.35, 'rgba(53,208,226,.07)');
-      glow.addColorStop(1, 'rgba(7,17,31,0)');
-      context.fillStyle = glow;
-      context.fillRect(0, 0, width, height);
-
+      const centerY = height * (mobile ? .24 : .47);
+      const glow = context.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.min(width, height) * .58);
+      glow.addColorStop(0, 'rgba(237,245,255,.34)'); glow.addColorStop(.08, 'rgba(167,139,250,.22)');
+      glow.addColorStop(.38, 'rgba(53,208,226,.08)'); glow.addColorStop(1, 'rgba(7,17,31,0)');
+      context.fillStyle = glow; context.fillRect(0, 0, width, height);
+      const flatten = mobile ? .29 : .35;
       for (const star of stars) {
         const angle = star.angle + time * star.speed;
-        const flatten = mobile ? .28 : .34;
         const x = centerX + Math.sin(angle) * star.orbit;
         const y = centerY + Math.cos(angle) * star.orbit * flatten;
-        const twinkle = reduceMotion.matches ? 1 : .74 + Math.sin(time * .0013 + star.angle * 3) * .26;
-        context.beginPath();
-        context.fillStyle = `rgba(${star.color},${star.alpha * twinkle})`;
-        context.arc(x, y, star.size, 0, Math.PI * 2);
-        context.fill();
+        const twinkle = reduceMotion.matches ? 1 : .76 + Math.sin(time * .0013 + star.angle * 3) * .24;
+        if (star.orbit > width * .22 && star.size < 1.15) {
+          context.beginPath(); context.moveTo(x, y);
+          context.lineTo(x + Math.cos(angle) * 7, y - Math.sin(angle) * 7 * flatten);
+          context.strokeStyle = `rgba(${star.color},${star.alpha * .17})`; context.lineWidth = .55; context.stroke();
+        }
+        context.beginPath(); context.fillStyle = `rgba(${star.color},${star.alpha * twinkle})`;
+        context.arc(x, y, star.size, 0, Math.PI * 2); context.fill();
       }
+      drawAsteroids();
+      drawMeteors(time);
     };
 
-    const animate = (time: number) => {
-      draw(time);
-      frame = !reduceMotion.matches && visible && !document.hidden ? requestAnimationFrame(animate) : 0;
-    };
+    const animate = (time: number) => { draw(time); frame = !reduceMotion.matches && visible && !document.hidden ? requestAnimationFrame(animate) : 0; };
     const syncAnimation = () => {
       if (frame) cancelAnimationFrame(frame);
-      frame = 0;
-      draw(0);
+      frame = 0; meteors = []; nextMeteor = performance.now() + random(8000, 14000); draw(0);
       if (!reduceMotion.matches && visible && !document.hidden) frame = requestAnimationFrame(animate);
     };
-
     const resizeObserver = new ResizeObserver(rebuild);
     const intersectionObserver = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; syncAnimation(); }, { rootMargin: '100px' });
-    resizeObserver.observe(root);
-    intersectionObserver.observe(root);
-    reduceMotion.addEventListener('change', syncAnimation);
-    document.addEventListener('visibilitychange', syncAnimation);
-    rebuild();
-    syncAnimation();
+    resizeObserver.observe(root); intersectionObserver.observe(root);
+    reduceMotion.addEventListener('change', syncAnimation); document.addEventListener('visibilitychange', syncAnimation);
+    rebuild(); syncAnimation();
   }
 </script>
 
 <style>
-  .cosmic-hero { position: absolute; z-index: -3; inset: 0 calc(50% - 50vw); overflow: hidden; background: radial-gradient(circle at 75% 45%, #172a4c, #07111f 58%); }
-  canvas { display: block; width: 100%; height: 100%; }
+  .cosmic-hero { position: absolute; z-index: -3; inset: 0; overflow: hidden; background: radial-gradient(circle at 76% 44%, #1a3158, #07111f 60%); }
+  canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+  .earth { position: absolute; right: clamp(3rem, 9vw, 10rem); top: 47%; width: clamp(170px, 19vw, 290px); height: auto; translate: 0 -50%; filter: drop-shadow(0 0 38px rgba(88,160,230,.25)); opacity: .9; }
+  .credit { position: absolute; right: var(--page-gutter); bottom: .65rem; color: rgba(237,245,255,.46); font: .58rem 'IBM Plex Mono', monospace; }
+  @media (max-width: 700px) {
+    .earth { right: -1.5rem; top: 8%; width: clamp(142px, 43vw, 185px); translate: 0; opacity: .72; }
+    .credit { font-size: .52rem; }
+  }
 </style>

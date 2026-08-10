@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import SpotifyCaseStudy from '../../../components/SpotifyCaseStudy.astro';
-import { copy, domainNames, languages, projects, type Lang } from '../../../data/site';
+import { copy, domainNames, href, languages, projects, type Lang } from '../../../data/site';
 import spotifyMetrics from '../../../../public/artifacts/spotify/metrics.json';
 export const getStaticPaths = () => languages.flatMap((lang) => projects.filter((p) => p.status === 'complete').map((project) => ({ params: { lang, slug: project.slug }, props: { project } })));
 const lang = Astro.params.lang as Lang;
@@ -15,7 +15,10 @@ const starSummary = lang === 'zh'
 <BaseLayout lang={lang} title={`${project.title[lang]} — ${t.siteName}`} description={project.summary[lang]} path={`/projects/${project.slug}/`}>
   <article>
     <header class="project-hero container">
-      <div class="hero-copy"><p class="eyebrow">{domainNames[project.domain][lang]} / Content-based / CPU</p><h1>{project.title[lang]}</h1><p class="lede">{starSummary}</p></div>
+      <div class="hero-heading">
+        <div class="hero-copy"><p class="eyebrow">{domainNames[project.domain][lang]} / Content-based / CPU</p><h1>{project.title[lang]}</h1><p class="lede">{starSummary}</p></div>
+        <img class="spotify-logo" src={href('/images/brands/spotify-full-white.svg')} width="148" height="41" alt="Spotify" />
+      </div>
       <div class="hero-facts">
         <article><span>{lang === 'en' ? 'Dataset' : '数据集'}</span><strong>{spotifyMetrics.dataset.deduplicatedRows.toLocaleString()} {lang === 'en' ? 'tracks' : '首歌曲'}</strong><p>{spotifyMetrics.dataset.yearRange.join('–')} · {Object.keys(spotifyMetrics.dataset.featureProfile).length} {lang === 'en' ? 'audio features' : '项音频特征'}</p></article>
         <article><span>{lang === 'en' ? 'Data source' : '数据来源'}</span><strong>Kaggle Spotify Dataset</strong>{project.sourceUrl && <a class="source-link" href={project.sourceUrl} target="_blank" rel="noreferrer">Kaggle Source <span aria-hidden="true">↗</span></a>}</article>
@@ -26,5 +29,5 @@ const starSummary = lang === 'zh'
   </article>
 </BaseLayout>
 <style>
-  .project-hero{display:grid;gap:clamp(2rem,5vw,3.5rem);padding-block:clamp(4rem,9vw,7rem)}.hero-copy{display:grid;gap:1.2rem}.project-hero h1{max-width:18ch;font-size:clamp(2.25rem,5vw,4.35rem);overflow-wrap:anywhere}.lede{max-width:900px;color:var(--muted);font-size:clamp(1rem,1.8vw,1.14rem)}.hero-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.hero-facts article{display:grid;align-content:start;gap:.55rem;min-height:180px;padding:1.2rem;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,rgba(16,36,61,.88),rgba(7,17,31,.94))}.hero-facts span{color:var(--rec);font:.68rem 'IBM Plex Mono',monospace;text-transform:uppercase}.hero-facts strong{font-size:1.05rem}.hero-facts p{color:var(--muted);font-size:.9rem}.source-link{justify-self:start;margin-top:.25rem;padding:.55rem .8rem;border:1px solid var(--line);border-radius:999px;color:var(--starlight);font:.72rem 'IBM Plex Mono',monospace;text-decoration:none}.source-link:hover,.source-link:focus-visible{border-color:var(--search);color:var(--search)}@media(max-width:780px){.project-hero h1{max-width:14ch;font-size:clamp(2.1rem,11vw,3.25rem)}.hero-facts{grid-template-columns:1fr}.hero-facts article{min-height:0}}
+  .project-hero{display:grid;gap:clamp(2rem,5vw,3.5rem);padding-block:clamp(4rem,9vw,7rem)}.hero-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:2rem}.hero-copy{display:grid;gap:1.2rem}.spotify-logo{width:clamp(96px,11vw,148px);height:auto;margin-top:.2rem}.project-hero h1{max-width:18ch;font-size:clamp(2.25rem,5vw,4.35rem);overflow-wrap:anywhere}.lede{max-width:900px;color:var(--muted);font-size:clamp(1rem,1.8vw,1.14rem)}.hero-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}.hero-facts article{display:grid;align-content:start;gap:.55rem;min-height:180px;padding:1.2rem;border:1px solid var(--line);border-radius:16px;background:linear-gradient(145deg,rgba(16,36,61,.88),rgba(7,17,31,.94))}.hero-facts span{color:var(--rec);font:var(--meta-title-size) 'IBM Plex Mono',monospace;text-transform:uppercase}.hero-facts strong{font-size:1.05rem}.hero-facts p{color:var(--muted);font-size:.9rem}.source-link{justify-self:start;margin-top:.25rem;padding:.55rem .8rem;border:1px solid var(--line);border-radius:999px;color:var(--starlight);font:.72rem 'IBM Plex Mono',monospace;text-decoration:none}.source-link:hover,.source-link:focus-visible{border-color:var(--search);color:var(--search)}@media(max-width:780px){.hero-heading{grid-template-columns:1fr}.spotify-logo{grid-row:1;margin-bottom:.2rem}.project-hero h1{max-width:14ch;font-size:clamp(2.1rem,11vw,3.25rem)}.hero-facts{grid-template-columns:1fr}.hero-facts article{min-height:0}}
 </style>

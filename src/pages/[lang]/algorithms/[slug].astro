@@ -1,7 +1,7 @@
 ---
 import { Code } from 'astro:components';
-import katex from 'katex';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
+import KatexMath from '../../../components/KatexMath.astro';
 import { algorithms, copy, domainNames, href, languages, type Lang } from '../../../data/site';
 
 export const getStaticPaths = () => {
@@ -13,89 +13,101 @@ const lang = Astro.params.lang as Lang;
 const { algorithm } = Astro.props;
 const zh = lang === 'zh';
 const t = copy[lang];
-const math = (latex: string) => katex.renderToString(latex, { displayMode: true, throwOnError: true, output: 'html' });
-const cosineLatex = String.raw`\cos(x,y)=\frac{x^\top y}{\lVert x\rVert_2\lVert y\rVert_2}`;
-const code = `audio_features = [
-    "acousticness", "danceability", "energy",
-    "instrumentalness", "liveness", "loudness",
-    "speechiness", "tempo", "valence",
-]
+const normalizeLatex = String.raw`\hat v_i=\frac{v_i}{\lVert v_i\rVert_2}`;
+const profileLatex = String.raw`u=\frac{\sum_{i\in I_u}\alpha_{ui}\hat v_i}{\sum_{i\in I_u}\alpha_{ui}}`;
+const cosineLatex = String.raw`s(u,\hat v_j)=\frac{u^\top\hat v_j}{\lVert u\rVert_2\lVert\hat v_j\rVert_2}`;
+const code = `import numpy as np
+from sklearn.preprocessing import MinMaxScaler, normalize
 
-scaled = MinMaxScaler().fit_transform(tracks[audio_features])
-vectors = normalize(scaled)
+# One row per item; columns can describe text, category, image,
+# audio, tags, or other structured attributes.
+scaled_features = MinMaxScaler().fit_transform(feature_matrix)
+item_vectors = normalize(scaled_features)
 
-def exact_top_k(vectors, query_index, k=10):
-    scores = vectors @ vectors[query_index]
-    scores[query_index] = -np.inf
+def build_user_profile(item_vectors, liked_item_indices, interaction_weights):
+    liked_vectors = item_vectors[liked_item_indices]
+    user = np.average(liked_vectors, axis=0, weights=interaction_weights)
+    norm = np.linalg.norm(user)
+    return user / norm if norm else user
+
+def recommend(user, item_vectors, seen_item_indices, k=10):
+    scores = item_vectors @ user
+    scores[seen_item_indices] = -np.inf
     candidates = np.argpartition(-scores, k)[:k]
-    return candidates[np.argsort(-scores[candidates])]`;
+    return candidates[np.argsort(-scores[candidates])], scores[candidates]
+
+user = build_user_profile(
+    item_vectors,
+    liked_item_indices,
+    interaction_weights,
+)
+recommended_items, scores = recommend(
+    user,
+    item_vectors,
+    seen_item_indices=liked_item_indices,
+)`;
 
 const page = zh ? {
-  summary: '基于内容的推荐使用物品自身的属性寻找相似对象。Spotify 项目把每首歌表示为九维音频向量，因此即使一首新歌还没有播放记录，也能进入推荐候选。',
+  summary: '基于内容的推荐利用物品本身的属性建立向量，再把用户已经喜欢的物品聚合成画像，为每位用户寻找属性相近的新物品。',
   problemTitle: '问题',
-  problem: '当系统只有歌曲属性，没有用户点击、收藏或播放历史时，无法根据“其他人也喜欢什么”学习协同关系。此时可以先解决一个更窄但真实的问题：给定一首种子歌曲，目录中哪些歌曲在已知音频属性上最接近？',
+  problem: '当系统拥有物品信息，却只有很少用户互动时，热门榜单无法表达个人偏好，协同过滤也缺少足够的共同使用记录。我们需要直接利用“物品是什么”来开始推荐。',
   intuitionTitle: '直觉',
-  intuition: '把每首歌想成九个刻度组成的坐标点：舞动性、能量、节奏、积极情绪等。两首歌的刻度组合越接近，它们的内容越相似。这个相似只描述属性，不代表用户一定喜欢。',
+  intuition: '先把书籍、商品、文章、电影或歌曲描述成一组可比较的属性。再把用户喜欢过的物品放在一起，形成一张临时兴趣地图。候选物品越靠近这张地图，越值得被召回。',
   dataTitle: '数据',
-  data: '模型需要每个物品都有稳定、可比较的属性。当前实现使用 acousticness、danceability、energy、instrumentalness、liveness、loudness、speechiness、tempo 和 valence。各列先补中位数，再用 MinMaxScaler 映射到 0–1；不使用用户行为，也不把 popularity、year 或 duration 混入主音频向量。',
+  data: '物品向量可以来自文本的 TF-IDF 或 embedding、类别与标签的 one-hot、图像或音频 embedding，以及价格、时长等结构化属性。不同来源必须清洗、编码和缩放，避免某个数值范围较大的特征无意中主导相似度。用户画像还需要点赞、收藏、长时间观看等正向互动，以及表示强弱的权重。',
   algorithmTitle: '算法',
-  algorithm: '余弦相似度比较两个向量的方向。x、y 是两首歌的九维向量，xᵀy 是点积，‖x‖₂ 与 ‖y‖₂ 是向量长度。分数越接近 1，特征比例越相似。全量方法计算种子与所有歌曲的分数，排除种子自身，再取最高的 10 首。',
   codeTitle: '代码',
-  code: '下面的代码与 Spotify 项目实验脚本使用同一处理顺序。L2 normalization 后，矩阵点积等于余弦相似度；argpartition 先高效找出候选，再按真实分数排序。',
+  codeIntro: '下面是与具体行业无关的最小实现。feature_matrix 只要求“每行一个物品、每列一个特征”；liked_item_indices 和 interaction_weights 来自用户行为。代码先建立画像，再排除看过的物品并取 Top-K。',
   limitsTitle: '局限',
-  limits: ['依赖手工选择的物品属性，遗漏的音乐风格、歌词语义或文化语境不会自动出现。', '能处理新物品冷启动，但不能在没有偏好信号时理解新用户。', '相似不等于喜欢，离线内容指标不能替代点击、完播、收藏等线上反馈。', '推荐容易停留在种子附近，可能降低惊喜度；目录变大后，全量扫描也会增加延迟。'],
-  project: '在 Spotify 项目中查看完整实验',
+  limits: ['新物品只要有属性就能进入候选，但完全没有行为的新用户仍然没有画像。', '结果容易围绕既有兴趣反复推荐，过度相似会降低探索性。', '画像需要随时间更新；旧行为权重过高会掩盖兴趣变化。', '推荐上限受特征质量限制，未编码的语义、风格或社会影响不会自动出现。', '有足够用户—物品交互后，应加入协同过滤；同时需要内容冷启动与行为个性化时，应使用混合推荐。'],
+  project: '查看 Spotify 物品到物品实例',
 } : {
-  summary: 'Content-based recommendation finds similar items from their own attributes. The Spotify project represents each track as a nine-dimensional audio vector, so a new track can enter retrieval before it has listening history.',
+  summary: 'Content-based recommendation represents items with their own attributes, then aggregates items a user valued into a profile and retrieves new items with similar attributes.',
   problemTitle: 'Problem',
-  problem: 'When a catalog has track attributes but no clicks, saves, or listening history, it cannot learn collaborative patterns such as “people who liked A also liked B.” It can still answer a narrower, honest question: given one seed track, which catalog items are closest in known audio attributes?',
+  problem: 'When item information is rich but user interaction is sparse, popularity lists are not personal and collaborative filtering lacks shared behavior. The system needs a way to start from what each item is.',
   intuitionTitle: 'Intuition',
-  intuition: 'Imagine every track as a point with nine coordinates—danceability, energy, tempo, musical positivity, and more. Tracks with similar coordinate patterns are content neighbors. That describes measurable similarity; it does not prove that a listener will like them.',
+  intuition: 'Describe books, products, articles, films, or tracks with comparable attributes. Combine the items a person valued into a temporary map of their interests. Candidate items closer to that map are stronger retrieval choices.',
   dataTitle: 'Data',
-  data: 'The method needs stable, comparable item attributes. This implementation uses acousticness, danceability, energy, instrumentalness, liveness, loudness, speechiness, tempo, and valence. Each column receives median imputation and MinMax scaling to 0–1. User behavior is absent, and popularity, year, and duration stay outside the primary audio vector.',
+  data: 'Item vectors may combine TF-IDF or text embeddings, category and tag encodings, image or audio embeddings, and structured attributes such as price or duration. These sources need cleaning, encoding, and scaling so a large numeric range does not dominate accidentally. A user profile also needs positive actions—likes, saves, or long engagement—and weights that express their strength.',
   algorithmTitle: 'Algorithm',
-  algorithm: 'Cosine similarity compares vector direction. x and y are two nine-dimensional track vectors, xᵀy is their dot product, and ‖x‖₂ and ‖y‖₂ are their lengths. A score nearer one means more similar feature proportions. Exact retrieval scores the seed against the catalog, excludes the seed itself, and keeps the ten highest scores.',
   codeTitle: 'Code',
-  code: 'This is the same processing order used by the Spotify experiment script. After L2 normalization, a matrix dot product equals cosine similarity. argpartition finds the candidate set efficiently, then the final line orders candidates by their actual scores.',
+  codeIntro: 'This minimal implementation is domain-independent. feature_matrix only requires one item per row and one feature per column; liked_item_indices and interaction_weights come from behavior. It builds a profile, removes seen items, and returns Top-K.',
   limitsTitle: 'Limitations',
-  limits: ['It depends on chosen item attributes; omitted style, lyrical meaning, and cultural context do not appear automatically.', 'It handles new-item cold start, but cannot understand a new user without a preference signal.', 'Similarity is not preference, so offline content metrics cannot replace clicks, completion, saves, or other online feedback.', 'Results can stay too close to the seed and reduce discovery; a full catalog scan also grows slower with catalog size.'],
-  project: 'See the full experiment in the Spotify project',
+  limits: ['A new item can enter once it has attributes, but a new user with no action still has no profile.', 'Results can remain too close to known interests, reducing discovery and novelty.', 'Profiles need time-aware updates; old interactions can hide changing taste.', 'Quality is bounded by the features—missing meaning, style, or social influence does not appear automatically.', 'With sufficient user–item interaction, add collaborative filtering; use a hybrid when both content cold start and behavioral personalization matter.'],
+  project: 'See the Spotify item-to-item example',
 };
 ---
 
 <BaseLayout lang={lang} title={`${algorithm.name[lang]} — ${t.siteName}`} description={page.summary} path={`/algorithms/${algorithm.slug}/`}>
-  <article class="section container algorithm-page">
-    <header>
-      <p class="eyebrow">{domainNames[algorithm.domain][lang]} · {algorithm.family[lang]}</p>
-      <h1>{algorithm.name[lang]}</h1>
-      <p>{page.summary}</p>
-    </header>
-
+  <article class="section reading-container algorithm-page">
+    <header><p class="eyebrow">{domainNames[algorithm.domain][lang]} · {algorithm.family[lang]}</p><h1>{algorithm.name[lang]}</h1><p>{page.summary}</p></header>
     <section><span>01</span><h2>{page.problemTitle}</h2><p>{page.problem}</p></section>
     <section><span>02</span><h2>{page.intuitionTitle}</h2><p>{page.intuition}</p></section>
     <section><span>03</span><h2>{page.dataTitle}</h2><p>{page.data}</p></section>
-    <section><span>04</span><h2>{page.algorithmTitle}</h2><p>{page.algorithm}</p><div class="formula" set:html={math(cosineLatex)}></div></section>
-    <section><span>05</span><h2>{page.codeTitle}</h2><p>{page.code}</p><div class="code-block"><Code code={code} lang="python" theme="github-dark" /></div></section>
-    <section><span>06</span><h2>{page.limitsTitle}</h2><ul>{page.limits.map((limit) => <li>{limit}</li>)}</ul></section>
-
+    <section>
+      <span>04</span><h2>{page.algorithmTitle}</h2>
+      <p>{zh ? <>首先把第 <KatexMath latex="i" /> 个物品向量 <KatexMath latex="v_i" /> 归一化为单位长度。然后对用户 <KatexMath latex="u" /> 的物品集合 <KatexMath latex="I_u" /> 做加权平均；<KatexMath latex="\alpha_{ui}" /> 表示互动强度。最后用余弦相似度为候选排序。</> : <>First normalize item vector <KatexMath latex="v_i" /> to unit length. Then average the set <KatexMath latex="I_u" /> for user <KatexMath latex="u" />, weighted by interaction strength <KatexMath latex="\alpha_{ui}" />. Finally rank candidates with cosine similarity.</>}</p>
+      <div class="formula-set"><KatexMath latex={normalizeLatex} display label={zh ? '物品向量 L2 归一化公式' : 'Item vector L2 normalization formula'} /><KatexMath latex={profileLatex} display label={zh ? '用户画像加权平均公式' : 'Weighted user profile formula'} /><KatexMath latex={cosineLatex} display label={zh ? '用户与候选物品余弦相似度公式' : 'User-to-item cosine similarity formula'} /></div>
+    </section>
+    <section><span>05</span><h2>{page.codeTitle}</h2><p>{page.codeIntro}</p><div class="code-block"><Code code={code} lang="python" theme="github-dark" /></div></section>
+    <section><span>06</span><h2>{page.limitsTitle}</h2><ul class="card-points">{page.limits.map((limit) => <li>{limit}</li>)}</ul></section>
     <a class="button" href={href(`/${lang}/projects/spotify-content-recommender/`)}>{page.project}</a>
   </article>
 </BaseLayout>
 
 <style>
-  .algorithm-page { display: grid; gap: 0; max-width: 900px; }
+  .algorithm-page { display: grid; gap: 0; }
   header { display: grid; gap: 1.2rem; padding-bottom: 3.5rem; }
-  h1 { font-size: clamp(2.3rem, 7vw, 5.2rem); }
-  header > p:last-child { max-width: 760px; color: var(--muted); font-size: 1.15rem; }
+  h1 { font-size: var(--title-page-size); }
+  header > p:last-child { max-width: 780px; color: var(--muted); font-size: clamp(1.05rem,1.5vw,1.22rem); }
   section { display: grid; gap: 1rem; padding: 3rem 0; border-top: 1px solid var(--line); }
-  section > span { color: var(--rec); font: .7rem 'IBM Plex Mono', monospace; }
-  section h2 { font-size: clamp(1.55rem, 4vw, 2.3rem); }
-  section p, li { color: var(--muted); font-size: 1rem; }
-  ul { display: grid; gap: .65rem; margin: 0; padding-left: 1.3rem; }
-  .formula, .code-block { overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--deep); }
-  .formula { padding: 1.2rem; text-align: center; }
-  .formula :global(.katex-display) { margin: .25rem 0; }
-  .code-block :global(pre) { margin: 0 !important; padding: 1rem !important; overflow-x: auto; font-size: .84rem; }
+  section > span { color: var(--rec); font: var(--meta-title-size) 'IBM Plex Mono', monospace; }
+  section h2 { font-size: var(--title-step-size); }
+  section p, li { max-width: 800px; color: var(--muted); font-size: clamp(1rem,1.2vw,1.08rem); }
+  .formula-set { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; }
+  .formula-set :global(.katex-math-block:last-child) { grid-column: 1 / -1; }
+  .code-block { max-width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: var(--deep); }
+  .code-block :global(pre) { margin: 0 !important; padding: 1.1rem !important; overflow-x: auto; font-size: .86rem; }
   .button { justify-self: start; margin-top: 2rem; }
-  @media (max-width: 560px) { .formula { text-align: left; } }
+  @media (max-width: 680px) { .formula-set { grid-template-columns: 1fr; }.formula-set :global(.katex-math-block:last-child) { grid-column: auto; } }
 </style>

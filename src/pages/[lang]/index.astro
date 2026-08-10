@@ -8,15 +8,17 @@ const lang = Astro.params.lang as Lang;
 const t = copy[lang];
 ---
 <BaseLayout lang={lang} title={`${t.siteName} — Ricky Gong & Ziqi Xu`} description={t.heroBody} path="/">
-  <section class="hero container">
+  <section class="hero">
     <CosmicHero />
-    <div class="hero-copy">
-      <h1>{t.heroTitle}</h1>
-      <p class="lede">{t.heroBody}</p>
-      <div class="domain-buttons" aria-label={lang === 'en' ? 'Browse projects by domain' : '按方向浏览项目'}>
-        <a class="domain-button search" href="#projects" data-home-domain="search">{t.domainCtas.search}</a>
-        <a class="domain-button ads" href="#projects" data-home-domain="ads">{t.domainCtas.ads}</a>
-        <a class="domain-button recommendation" href="#projects" data-home-domain="recommendation">{t.domainCtas.recommendation}</a>
+    <div class="container hero-inner">
+      <div class="hero-copy">
+        <h1>{t.heroTitle}</h1>
+        <p class="lede">{t.heroBody}</p>
+        <div class="domain-buttons" aria-label={lang === 'en' ? 'Browse projects by domain' : '按方向浏览项目'}>
+          <a class="domain-button search" href="#projects" data-home-domain="search">{t.domainCtas.search}</a>
+          <a class="domain-button ads" href="#projects" data-home-domain="ads">{t.domainCtas.ads}</a>
+          <a class="domain-button recommendation" href="#projects" data-home-domain="recommendation">{t.domainCtas.recommendation}</a>
+        </div>
       </div>
     </div>
   </section>
@@ -46,8 +48,9 @@ const t = copy[lang];
   });
 </script>
 <style>
-  .hero { position: relative; isolation: isolate; display: grid; align-content: center; min-height: min(780px, calc(100vh - 68px)); padding-block: clamp(5rem, 11vw, 8.5rem); overflow: clip; }
-  .hero::after { content: ''; position: absolute; z-index: -2; inset: 0 calc(50% - 50vw); pointer-events: none; background: linear-gradient(90deg, rgba(7,17,31,.97) 0%, rgba(7,17,31,.86) 40%, rgba(7,17,31,.24) 78%, rgba(7,17,31,.52) 100%), linear-gradient(0deg, var(--void), transparent 28%); }
+  .hero { position: relative; isolation: isolate; display: grid; align-content: center; width: 100%; min-height: min(820px, calc(100vh - 68px)); overflow: clip; }
+  .hero::after { content: ''; position: absolute; z-index: -1; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(7,17,31,.98) 0%, rgba(7,17,31,.9) 38%, rgba(7,17,31,.28) 76%, rgba(7,17,31,.58) 100%), linear-gradient(0deg, var(--void), transparent 30%); }
+  .hero-inner { padding-block: clamp(5rem, 11vw, 8.5rem); }
   .hero-copy { position: relative; z-index: 2; display: grid; gap: 1.35rem; max-width: 900px; text-shadow: 0 2px 28px rgba(7,17,31,.9); }
   .hero h1 { max-width: 980px; font-size: clamp(3rem, 7vw, 6rem); }
   :global(html[lang='en']) .hero h1 { max-width: none; font-size: clamp(3rem, 6.2vw, 5.5rem); line-height: .98; white-space: nowrap; }
@@ -63,7 +66,7 @@ const t = copy[lang];
   .algorithm-link-inner { display: flex; align-items: end; justify-content: space-between; gap: 2rem; }
   .algorithm-link-inner > div { display: grid; gap: 1rem; max-width: 760px; }
   @media (max-width: 700px) {
-    .hero { min-height: 650px; overflow: hidden; }
+    .hero { min-height: 700px; }
     .hero h1, :global(html[lang='en']) .hero h1 { max-width: 16ch; font-size: clamp(2.3rem, 11vw, 3.25rem); white-space: normal; }
     .hero::after { background: linear-gradient(0deg, rgba(7,17,31,.98) 0%, rgba(7,17,31,.82) 46%, rgba(7,17,31,.24) 82%, rgba(7,17,31,.55) 100%); }
     .domain-buttons { display: grid; align-items: start; justify-items: start; }

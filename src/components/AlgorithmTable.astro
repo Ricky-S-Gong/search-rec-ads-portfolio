@@ -30,10 +30,10 @@ const rows = algorithms.filter((algorithm) => algorithm.domain === domain);
 <style>
   .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; }
   table { width: 100%; min-width: 900px; border-collapse: collapse; background: rgba(12,27,48,.7); }
-  th, td { padding: 1rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; font-size: .82rem; }
-  thead th { color: var(--muted); font: .68rem 'IBM Plex Mono', monospace; text-transform: uppercase; }
-  tbody th { width: 200px; }
+  th, td { padding: 1.2rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; font-size: clamp(1rem,1.1vw,1.08rem); line-height: 1.55; }
+  thead th { color: var(--muted); font: clamp(.78rem,.9vw,.88rem) 'IBM Plex Mono', monospace; text-transform: uppercase; }
+  tbody th { width: 230px; font-size: clamp(1.18rem,1.5vw,1.4rem); }
   tbody th a { color: var(--starlight); }
-  tbody th small { display: block; margin-top: .25rem; color: var(--muted); font-weight: 400; }
+  tbody th small { display: block; margin-top: .4rem; color: var(--muted); font-size: .82rem; font-weight: 400; }
   tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 </style>

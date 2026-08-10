@@ -1,5 +1,5 @@
 import { useDeferredValue, useEffect, useMemo, useState } from 'react';
-import { weightedCosine } from '../lib/similarity';
+import { formatCosinePercent, weightedCosine } from '../lib/similarity';
 import './SpotifyLab.css';
 
 type Lang = 'en' | 'zh';
@@ -23,6 +23,7 @@ const ui = {
     empty: 'No track matches that search.', zero: 'Raise at least one feature weight to calculate similarity.', score: 'weighted cosine',
     note: 'Computed locally from a stratified 5,000-track demonstration set. No Spotify API or user data.', error: 'The experiment artifact did not load. Refresh the page or check the generated JSON.',
     featureGuide: 'Radar feature key', seedValue: 'Seed', candidateValue: 'Selected result', difference: 'Difference', compare: 'Compare on radar',
+    scoreNote: 'Displayed value = weighted cosine similarity × 100%. It is not a probability of preference or prediction accuracy.',
   },
   zh: {
     title: '调整“相似”的定义', search: '种子歌曲', placeholder: '搜索歌曲或艺术家…',
@@ -30,6 +31,7 @@ const ui = {
     empty: '没有匹配的歌曲。', zero: '至少提高一个特征权重才能计算相似度。', score: '加权余弦',
     note: '基于分层抽取的 5,000 首演示歌曲在浏览器本地计算，不调用 Spotify API，也不使用用户数据。', error: '实验数据未能加载，请刷新页面或检查生成的 JSON。',
     featureGuide: '雷达图特征对照', seedValue: '种子歌曲', candidateValue: '当前对比结果', difference: '差值', compare: '在雷达图中对比',
+    scoreNote: '展示值为加权余弦相似度 × 100%，不代表喜欢概率或预测准确率。',
   },
 };
 
@@ -164,8 +166,8 @@ export default function SpotifyLab({ lang }: { lang: Lang }) {
                 <path className="seed-shape" d={radarPath(seed.features)} />
                 {comparison && <path className="comparison-shape" d={radarPath(comparison.features)} />}
               </svg>
-              <div className="radar-series"><span><i className="seed-swatch"></i>{t.seedValue}</span><span><i className="comparison-swatch"></i>{t.candidateValue}</span></div>
-              {activeFeature !== null && comparison && activeName && <div className="feature-tooltip" aria-live="polite"><strong>{activeFeature + 1}. {featureLabel(activeName)}</strong><span>{t.seedValue}: {seed.features[activeFeature].toFixed(4)}</span><span>{t.candidateValue}: {comparison.features[activeFeature].toFixed(4)}</span><span>{t.difference}: {Math.abs(seed.features[activeFeature] - comparison.features[activeFeature]).toFixed(4)}</span></div>}
+              <div className="radar-series"><span><i className="seed-swatch"></i>{t.seedValue}</span><span><i className="comparison-swatch"></i>{t.candidateValue}{comparison ? ` · ${formatCosinePercent(comparison.score)}` : ''}</span></div>
+              {activeFeature !== null && comparison && activeName && <div className="feature-tooltip" aria-live="polite"><strong>{activeFeature + 1}. {featureLabel(activeName)}</strong><span>{t.seedValue}: {seed.features[activeFeature].toFixed(4)}</span><span>{t.candidateValue}: {comparison.features[activeFeature].toFixed(4)}</span><span>{t.difference}: {Math.abs(seed.features[activeFeature] - comparison.features[activeFeature]).toFixed(4)}</span><span>{t.score}: {formatCosinePercent(comparison.score)}</span></div>}
             </div>
             <div className="feature-legend" aria-label={t.featureGuide}>
               <strong>{t.featureGuide}</strong>
@@ -176,9 +178,9 @@ export default function SpotifyLab({ lang }: { lang: Lang }) {
               ))}</div>
             </div>
           </div>
-          <div className="results-heading"><div><span>{t.results}</span><strong>{comparison ? `${seed.name} → ${comparison.name}` : 'Weighted cosine'}</strong><small>n = {artifact.tracks.length.toLocaleString()}</small></div></div>
+          <div className="results-heading"><div><span>{t.results}</span><strong>{comparison ? `${seed.name} → ${comparison.name}` : 'Weighted cosine'}</strong><small>n = {artifact.tracks.length.toLocaleString()}</small></div><p>{t.scoreNote}</p></div>
           {hasWeight ? <ol>{results.map((track) => (
-            <li key={track.id} className={comparison?.id === track.id ? 'selected' : ''}><button type="button" onClick={() => setComparisonId(track.id)} aria-pressed={comparison?.id === track.id} aria-label={`${t.compare}: ${track.name}`}><span className="rank"></span><div><strong>{track.name}</strong><small>{track.artist} · {track.year}</small></div><output><strong>{track.score.toFixed(4)}</strong><small>{t.score} · 0–1</small></output></button></li>
+            <li key={track.id} className={comparison?.id === track.id ? 'selected' : ''}><button type="button" onClick={() => setComparisonId(track.id)} aria-pressed={comparison?.id === track.id} aria-label={`${t.compare}: ${track.name}`}><span className="rank"></span><div><strong>{track.name}</strong><small>{track.artist} · {track.year}</small></div><output><strong>{formatCosinePercent(track.score)}</strong><small>{t.score} × 100%</small></output></button></li>
           ))}</ol> : <p className="warning">{t.zero}</p>}
         </div>
       </div>

@@ -55,13 +55,13 @@ const initialDomain: Domain = 'recommendation';
 <style>
   .algorithm-tabs { border-top: 1px solid var(--line); }
   .tab-list { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
-  .tab-list button { min-height: 68px; color: var(--muted); background: transparent; border: 0; border-right: 1px solid var(--line); cursor: pointer; font-weight: 600; }
+  .tab-list button { min-height: 76px; padding-inline: 1rem; color: var(--muted); background: transparent; border: 0; border-right: 1px solid var(--line); cursor: pointer; font-size: clamp(1rem,1.4vw,1.12rem); font-weight: 600; }
   .tab-list button:last-child { border-right: 0; }
   .tab-list button[data-domain="search"] { --domain-color: var(--search); }
   .tab-list button[data-domain="ads"] { --domain-color: var(--ads); }
   .tab-list button[data-domain="recommendation"] { --domain-color: var(--rec); }
   .tab-list button[aria-selected="true"] { color: var(--starlight); background: color-mix(in srgb, var(--domain-color) 10%, transparent); box-shadow: inset 0 -3px var(--domain-color); }
-  .algorithm-panel { padding-top: 1.5rem; }
-  .algorithm-panel > p { max-width: 760px; margin-bottom: 1rem; color: var(--muted); }
+  .algorithm-panel { padding-top: 2rem; }
+  .algorithm-panel > p { max-width: 800px; margin-bottom: 1.25rem; color: var(--muted); font-size: clamp(1rem,1.2vw,1.08rem); }
   @media (max-width: 600px) { .tab-list button { min-height: 58px; font-size: .86rem; } }
 </style>

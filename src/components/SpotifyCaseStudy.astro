@@ -1,13 +1,12 @@
 ---
 import { Code } from 'astro:components';
-import katex from 'katex';
 import SpotifyLab from './SpotifyLab';
+import KatexMath from './KatexMath.astro';
 import { href, type Lang } from '../data/site';
 import spotifyMetrics from '../../public/artifacts/spotify/metrics.json';
 
 const { lang } = Astro.props as { lang: Lang };
 const zh = lang === 'zh';
-const math = (latex: string) => katex.renderToString(latex, { displayMode: true, throwOnError: true, output: 'html' });
 
 const inspectCode = `raw = pd.read_csv(data_path)
 tracks = raw.drop_duplicates("id", keep="first").copy()
@@ -112,10 +111,10 @@ const copy = zh ? {
   vectorBody: '向量只是按固定顺序排列的一组数字。例如一首歌可以写成 [danceability, energy, …, valence]。缩放不改变歌曲顺序，只让九个维度拥有可比较的数值范围。',
   normalizeTitle: 'L2 normalization 做什么？',
   normalizeBody: 'MinMaxScaler 先统一每个特征的范围；L2 normalization 再把每首歌的向量长度缩放为 1。完成后，两个向量的点积就等于余弦相似度，因此可以用一次矩阵乘法搜索全部歌曲。',
-  scaleSymbols: 'xᵢⱼ 表示第 i 首歌的第 j 个特征；μⱼ、σⱼ 是第 j 列的均值和标准差；xⱼᵐⁱⁿ、xⱼᵐᵃˣ 是该列最小值和最大值；d=9。StandardScaler 让每列以 0 为中心、标准差为 1，因此高方差特征不会只因单位较大而支配欧氏距离。MinMaxScaler 保留列内顺序并映射到 0–1，但会受极端值影响。',
-  l2Symbols: 'mᵢ 是 MinMax 缩放后的第 i 首歌向量，‖mᵢ‖₂ 是它的欧氏长度，x̂ᵢ 是长度为 1 的向量。L2 normalization 不再逐列缩放，而是逐首歌曲消除向量总长度，让点积可以直接表示余弦相似度。',
+  scaleSymbols: 'StandardScaler 让每列以 0 为中心、标准差为 1，因此特征不会只因单位较大而支配欧氏距离。MinMaxScaler 保留列内顺序并映射到 0–1，但会受极端值影响。',
+  l2Symbols: 'L2 normalization 不再逐列缩放，而是逐首歌曲消除向量总长度，让点积可以直接表示余弦相似度。',
   knnFormulaTitle: '欧氏距离与 KNN 如何选邻居',
-  knnFormulaBody: 'x 和 y 是两首歌经过 StandardScaler 的九维向量，xⱼ、yⱼ 是第 j 个特征，d=9。欧氏距离把每一维差值的平方相加再开方；KNN 对种子 q 与所有其他歌曲的距离排序，取距离最小的 K 首。本项目令 K=10，并明确排除 q 自身。',
+  knnFormulaBody: '欧氏距离把每一维差值的平方相加再开方；KNN 对种子与所有其他歌曲的距离排序，取距离最小的 10 首，并明确排除种子自身。',
   algorithmTitle: '5. 算法：为什么选择余弦相似度',
   algorithmBody: '余弦相似度比较两个向量的方向，而不是原始长度。两首歌的九个特征比例越接近，夹角越小，相似度越接近 1。对于已经缩放的音频属性，它提供了直观、可解释的相似歌曲基线。',
   exactFormulaTitle: '精确余弦相似度',
@@ -163,10 +162,10 @@ const copy = zh ? {
   vectorBody: 'A vector is just an ordered list of numbers. A track might be [danceability, energy, …, valence]. Scaling does not reorder tracks; it gives the nine dimensions comparable numerical ranges.',
   normalizeTitle: 'What does L2 normalization do?',
   normalizeBody: 'MinMaxScaler first makes feature ranges comparable. L2 normalization then rescales each track vector to length one. After that step, a dot product equals cosine similarity, so one matrix multiplication can search the full catalog.',
-  scaleSymbols: 'xᵢⱼ is feature j for track i; μⱼ and σⱼ are that column’s mean and standard deviation; xⱼᵐⁱⁿ and xⱼᵐᵃˣ are its extrema; d=9. StandardScaler centers each feature at zero with unit variance, so a large unit alone cannot dominate Euclidean distance. MinMaxScaler preserves within-column order and maps values to 0–1, although it remains sensitive to extrema.',
-  l2Symbols: 'mᵢ is track i after MinMax scaling, ‖mᵢ‖₂ is its Euclidean length, and x̂ᵢ has length one. L2 normalization acts per track rather than per column: it removes total vector magnitude so a dot product can represent cosine similarity.',
+  scaleSymbols: 'StandardScaler centers every feature at zero with unit variance, so a large unit alone cannot dominate Euclidean distance. MinMaxScaler preserves within-column order and maps values to 0–1, although it remains sensitive to extrema.',
+  l2Symbols: 'L2 normalization acts per track rather than per column: it removes total vector magnitude so a dot product can represent cosine similarity.',
   knnFormulaTitle: 'How Euclidean distance and KNN choose neighbors',
-  knnFormulaBody: 'x and y are two nine-dimensional StandardScaler vectors; xⱼ and yⱼ are feature j and d=9. Euclidean distance squares each feature gap, sums the gaps, and takes the square root. KNN sorts every other track by its distance from seed q and keeps the K smallest. Here K=10 and q itself is explicitly excluded.',
+  knnFormulaBody: 'Euclidean distance squares each feature gap, sums the gaps, and takes the square root. KNN sorts every other track by distance, keeps the 10 smallest, and explicitly excludes the seed itself.',
   algorithmTitle: '5. Algorithm: why cosine similarity',
   algorithmBody: 'Cosine similarity compares vector direction rather than raw length. When two tracks have similar proportions across the nine features, the angle is small and similarity approaches 1. On scaled audio attributes, it is an intuitive and explainable baseline.',
   exactFormulaTitle: 'Exact cosine similarity',
@@ -308,29 +307,29 @@ const fields = zh ? [
     <p class="step-label">Step 4</p><h2>{copy.featureTitle}</h2><p>{copy.featureBody}</p>
     <aside><h3>{copy.vectorTitle}</h3><p>{copy.vectorBody}</p></aside>
     <div class="scaling-formulas">
-      <div class="formula-card"><h3>StandardScaler</h3><div class="formula" aria-label="StandardScaler formula" set:html={math(standardScalerLatex)}></div></div>
-      <div class="formula-card"><h3>MinMaxScaler</h3><div class="formula" aria-label="MinMaxScaler formula" set:html={math(minMaxLatex)}></div></div>
+      <div class="formula-card"><h3>StandardScaler</h3><KatexMath latex={standardScalerLatex} display label="StandardScaler formula" /></div>
+      <div class="formula-card"><h3>MinMaxScaler</h3><KatexMath latex={minMaxLatex} display label="MinMaxScaler formula" /></div>
     </div>
-    <p class="symbol-guide">{copy.scaleSymbols}</p>
+    <p class="symbol-guide">{zh ? <><KatexMath latex="x_{ij}" /> 表示第 <KatexMath latex="i" /> 首歌的第 <KatexMath latex="j" /> 个特征；<KatexMath latex="\mu_j" />、<KatexMath latex="\sigma_j" /> 是该列均值和标准差；<KatexMath latex="x_j^{\min}" />、<KatexMath latex="x_j^{\max}" /> 是极值；<KatexMath latex="d=9" />。{copy.scaleSymbols}</> : <><KatexMath latex="x_{ij}" /> is feature <KatexMath latex="j" /> for track <KatexMath latex="i" />; <KatexMath latex="\mu_j" /> and <KatexMath latex="\sigma_j" /> are the column mean and standard deviation; <KatexMath latex="x_j^{\min}" /> and <KatexMath latex="x_j^{\max}" /> are its extrema; <KatexMath latex="d=9" />. {copy.scaleSymbols}</>}</p>
     <div class="code-block"><Code code={featureCode} lang="python" theme="github-dark" /></div>
     <aside><h3>{copy.normalizeTitle}</h3><p>{copy.normalizeBody}</p></aside>
-    <div class="formula-card"><h3>L2 normalization</h3><div class="formula" aria-label="L2 normalization formula" set:html={math(l2Latex)}></div><p>{copy.l2Symbols}</p></div>
+    <div class="formula-card"><h3>L2 normalization</h3><KatexMath latex={l2Latex} display label="L2 normalization formula" /><p>{zh ? <><KatexMath latex="m_i" /> 是缩放后的歌曲向量，<KatexMath latex="\lVert m_i\rVert_2" /> 是它的欧氏长度，<KatexMath latex="\hat x_i" /> 是单位向量。{copy.l2Symbols}</> : <><KatexMath latex="m_i" /> is the scaled track vector, <KatexMath latex="\lVert m_i\rVert_2" /> is its Euclidean length, and <KatexMath latex="\hat x_i" /> is the unit vector. {copy.l2Symbols}</>}</p></div>
   </section>
 
   <section id="step-5" class="case-step">
     <p class="step-label">Step 5</p><h2>{copy.algorithmTitle}</h2><p>{copy.algorithmBody}</p>
-    <div class="formula-explanation"><h3>{copy.exactFormulaTitle}</h3><div class="formula" aria-label="Exact cosine similarity formula" set:html={math(exactCosineLatex)}></div><p>{copy.exactFormulaBody}</p></div>
+    <div class="formula-explanation"><h3>{copy.exactFormulaTitle}</h3><KatexMath latex={exactCosineLatex} display label="Exact cosine similarity formula" /><p>{copy.exactFormulaBody}</p></div>
     <div class="code-block"><Code code={cosineCode} lang="python" theme="github-dark" /></div>
     <aside><h3>{copy.whyTitle}</h3><p>{copy.whyBody}</p></aside>
   </section>
 
   <section id="step-6" class="case-step">
     <p class="step-label">Step 6</p><h2>{copy.candidatesTitle}</h2><p>{copy.candidatesBody}</p>
-    <div class="formula-card"><h3>{copy.knnFormulaTitle}</h3><div class="formula-stack"><div class="formula" aria-label="Euclidean distance formula" set:html={math(euclideanLatex)}></div><div class="formula" aria-label="K nearest neighbors selection formula" set:html={math(knnLatex)}></div></div><p>{copy.knnFormulaBody}</p></div>
+    <div class="formula-card"><h3>{copy.knnFormulaTitle}</h3><div class="formula-stack"><KatexMath latex={euclideanLatex} display label="Euclidean distance formula" /><KatexMath latex={knnLatex} display label="K nearest neighbors selection formula" /></div><p>{zh ? <><KatexMath latex="x" /> 与 <KatexMath latex="y" /> 是九维 StandardScaler 向量，<KatexMath latex="x_j" /> 与 <KatexMath latex="y_j" /> 是第 <KatexMath latex="j" /> 个特征，<KatexMath latex="d=9" />。{copy.knnFormulaBody}</> : <><KatexMath latex="x" /> and <KatexMath latex="y" /> are nine-dimensional StandardScaler vectors; <KatexMath latex="x_j" /> and <KatexMath latex="y_j" /> are feature <KatexMath latex="j" />, with <KatexMath latex="d=9" />. {copy.knnFormulaBody}</>}</p></div>
     <div class="method-cards">
       {methodCards.map((method) => (
         <article class="method-card">
-          <div class="method-copy"><h3>{method.title}</h3><p>{method.body}</p><p><strong>{zh ? '取舍：' : 'Trade-off: '}</strong>{method.tradeoff}</p><div class="method-result"><span>{zh ? '实验结果' : 'Observed result'}</span><p>{method.result}</p></div><small>{method.complexity}</small></div>
+          <div class="method-copy"><h3>{method.title}</h3><ul class="card-points"><li>{method.body}</li><li><strong>{zh ? '取舍：' : 'Trade-off: '}</strong>{method.tradeoff}</li><li><strong>{zh ? '实验观察：' : 'Observed result: '}</strong>{method.result}</li><li><strong>{zh ? '复杂度：' : 'Complexity: '}</strong>{method.complexity}</li></ul></div>
           <div class="code-block"><Code code={method.code} lang="python" theme="github-dark" /></div>
         </article>
       ))}
@@ -349,10 +348,10 @@ const fields = zh ? [
     <p class="step-label">Step 7</p><h2>{copy.resultTitle}</h2><p>{copy.resultBody}</p>
     <div class="code-block narrow"><Code code={evaluateCode} lang="python" theme="github-dark" /></div>
     <div class="result-cards">
-      <article><h3>{zh ? '查询延迟' : 'Query latency'}</h3><div class="paired-values"><div><span>Exact</span><strong>{spotifyMetrics.evaluation.exactLatencyMs.toFixed(2)} ms</strong></div><div><span>Cluster</span><strong>{spotifyMetrics.evaluation.clusterLatencyMs.toFixed(2)} ms</strong></div></div><p>{zh ? '单次查询耗时的中位数，仅衡量本次 CPU 计算成本。P95 表示 95% 请求不超过该延迟；P99 表示 99% 请求不超过该延迟，更能发现少数慢请求。单位都是毫秒，通常越低越好；当前脚本只计算了中位数，因此不展示或推测 P95/P99。' : 'Median time per query, measuring only CPU cost here. P95 means 95% of requests finish within that latency; P99 covers 99% and exposes slow tail requests. Both use milliseconds and are generally lower-is-better. This script records only the median, so it does not display or infer P95/P99.'}</p></article>
-      <article><h3>{zh ? '召回一致性' : 'Retrieval agreement'}</h3><div class="paired-values"><div><span>Cluster Recall@10</span><strong>{(spotifyMetrics.evaluation.clusterRecallAt10 * 100).toFixed(1)}%</strong></div><div><span>KNN overlap@10</span><strong>{(spotifyMetrics.evaluation.euclideanOverlapWithCosineAt10 * 100).toFixed(1)}%</strong></div></div><div class="mini-formulas"><div set:html={math(clusterRecallLatex)}></div><div set:html={math(knnOverlapLatex)}></div></div><p>{zh ? 'A₁₀ 是聚类候选、K₁₀ 是欧氏 KNN、E₁₀ 是精确余弦。前者衡量近似召回保留多少精确邻居，后者展示距离选择的敏感性；都不是用户相关性。' : 'A₁₀ is cluster retrieval, K₁₀ is Euclidean KNN, and E₁₀ is exact cosine. The first measures approximate fidelity; the second reveals sensitivity to distance choice. Neither is user relevance.'}</p></article>
-      <article><h3>Diversity@10</h3><strong class="primary-value">{spotifyMetrics.evaluation.diversityAt10.toFixed(3)}</strong><div class="formula compact" set:html={math(diversityLatex)}></div><p>{zh ? '它是 Top-10 歌曲之间两两余弦距离的平均值；vᵢ、vⱼ 是推荐向量，K=10。非负向量下范围为 0–1。例如平均相似度 0.90 对应多样性 0.10。当前 0.004 表示列表非常集中：内容一致但探索很弱。它不是越大越好——过低会重复，过高可能偏离兴趣。' : 'This averages pairwise cosine distance among the Top-10; vᵢ and vⱼ are recommended vectors and K=10. With these non-negative vectors the range is 0–1. Average similarity 0.90, for example, gives diversity 0.10. The current 0.004 is very narrow: consistent but weak at exploration. Higher is not always better—too low repeats, too high may drift from intent.'}</p></article>
-      <article><h3>{zh ? '热门度偏差' : 'Popularity bias'}</h3><strong class="primary-value">{popularityDelta.toFixed(2)}</strong><div class="formula compact" set:html={math(popularityLatex)}></div><p>{zh ? `推荐歌曲平均 popularity 减去全目录平均值。当前差值为 ${popularityDelta.toFixed(2)}，负值表示结果略偏向较不热门歌曲；它只是曝光方向审计，不证明公平或满意度。` : `Mean recommended popularity minus the catalog mean. The current ${popularityDelta.toFixed(2)} is negative, so results lean slightly less popular. This audits exposure direction; it does not prove fairness or satisfaction.`}</p></article>
+      <article><h3>{zh ? '查询延迟' : 'Query latency'}</h3><div class="paired-values"><div><span>Exact</span><strong>{spotifyMetrics.evaluation.exactLatencyMs.toFixed(2)} ms</strong></div><div><span>Cluster</span><strong>{spotifyMetrics.evaluation.clusterLatencyMs.toFixed(2)} ms</strong></div></div><ul class="card-points"><li>{zh ? '定义：单次 CPU 查询耗时的中位数。' : 'Definition: median CPU time for one query.'}</li><li>{zh ? '当前结论：聚类候选更快，但牺牲部分精确近邻。' : 'Current conclusion: cluster candidates are faster but lose some exact neighbors.'}</li><li>{zh ? '限制：P95 表示 95% 请求不超过该延迟，P99 表示 99%；当前脚本没有生成这两个尾延迟数值。' : 'Limit: P95 covers 95% of requests and P99 covers 99%; this script did not produce either tail-latency value.'}</li></ul></article>
+      <article><h3>{zh ? '召回一致性' : 'Retrieval agreement'}</h3><div class="paired-values"><div><span>Cluster Recall@10</span><strong>{(spotifyMetrics.evaluation.clusterRecallAt10 * 100).toFixed(1)}%</strong></div><div><span>KNN overlap@10</span><strong>{(spotifyMetrics.evaluation.euclideanOverlapWithCosineAt10 * 100).toFixed(1)}%</strong></div></div><div class="mini-formulas"><KatexMath latex={clusterRecallLatex} display /><KatexMath latex={knnOverlapLatex} display /></div><ul class="card-points"><li>{zh ? <><KatexMath latex="A_{10}" /> 是聚类候选，<KatexMath latex="K_{10}" /> 是欧氏 KNN，<KatexMath latex="E_{10}" /> 是精确余弦。</> : <><KatexMath latex="A_{10}" /> is cluster retrieval, <KatexMath latex="K_{10}" /> is Euclidean KNN, and <KatexMath latex="E_{10}" /> is exact cosine.</>}</li><li>{zh ? '当前结论：聚类保留大部分精确邻居，而距离函数会明显改变结果。' : 'Current conclusion: clustering preserves most exact neighbors, while distance choice materially changes results.'}</li><li>{zh ? '限制：两者都不是用户相关性 Recall。' : 'Limit: neither number is user-relevance recall.'}</li></ul></article>
+      <article><h3>Diversity@10</h3><strong class="primary-value">{spotifyMetrics.evaluation.diversityAt10.toFixed(3)}</strong><KatexMath latex={diversityLatex} display /><ul class="card-points"><li>{zh ? <>定义：Top-10 中向量 <KatexMath latex="v_i" /> 与 <KatexMath latex="v_j" /> 两两余弦距离的平均值。</> : <>Definition: mean pairwise cosine distance between vectors <KatexMath latex="v_i" /> and <KatexMath latex="v_j" /> in the Top-10.</>}</li><li>{zh ? '当前结论：0.004 表示内容高度一致但探索性很弱；平均相似度 0.90 时，多样性为 0.10。' : 'Current conclusion: 0.004 is highly consistent but weak at exploration; mean similarity 0.90 gives diversity 0.10.'}</li><li>{zh ? '限制：并非越高越好；过低会重复，过高可能偏离兴趣。' : 'Limit: higher is not always better—too low repeats, too high may drift from intent.'}</li></ul></article>
+      <article><h3>{zh ? '热门度偏差' : 'Popularity bias'}</h3><strong class="primary-value">{popularityDelta.toFixed(2)}</strong><KatexMath latex={popularityLatex} display /><ul class="card-points"><li>{zh ? '定义：推荐歌曲平均 popularity 减去全目录平均值。' : 'Definition: mean recommended popularity minus the catalog mean.'}</li><li>{zh ? `当前结论：差值 ${popularityDelta.toFixed(2)} 为负，结果略偏向较不热门歌曲。` : `Current conclusion: the ${popularityDelta.toFixed(2)} delta is negative, so results lean slightly less popular.`}</li><li>{zh ? '限制：它只审计曝光方向，不证明公平或满意度。' : 'Limit: it audits exposure direction, not fairness or satisfaction.'}</li></ul></article>
     </div>
     <figure><img src={href('/artifacts/spotify/feature-space.svg')} width="720" height="432" loading="lazy" alt={zh ? '按 K-Means 聚类着色的 Spotify 音频特征 PCA 投影' : 'PCA projection of Spotify audio features colored by K-Means cluster'} /><figcaption><strong>{copy.pcaTitle}</strong> {copy.pcaBody}</figcaption></figure>
   </section>
@@ -365,18 +364,18 @@ const fields = zh ? [
 
   <section id="step-9" class="case-step wide-step">
     <p class="step-label">Step 9</p><h2>{copy.labTitle}</h2><p>{copy.labBody}</p>
-    <div class="formula-explanation"><h3>{copy.weightedFormulaTitle}</h3><div class="formula" aria-label="Weighted cosine similarity formula" set:html={math(weightedCosineLatex)}></div><p>{copy.weightedFormulaBody} {zh ? '演示数据的九个特征先经 MinMax 缩放至 [0,1] 并保留四位小数。结果直接显示 0–1 范围内的真实加权余弦，并保留四位小数；越接近 1 只表示特征方向越相似，不是用户喜欢的概率。' : 'The nine demo features are MinMax-scaled to [0,1] and stored to four decimals. Results show raw weighted cosine on 0–1 with four decimals; closer to 1 means more similar feature direction, not a probability of listener preference.'}</p></div>
+    <div class="formula-explanation"><h3>{copy.weightedFormulaTitle}</h3><KatexMath latex={weightedCosineLatex} display label="Weighted cosine similarity formula" /><p>{copy.weightedFormulaBody} {zh ? '演示数据的九个特征先经 MinMax 缩放至 [0,1] 并保留四位小数。展示值为真实加权余弦相似度乘以 100%，保留两位小数；它不是用户喜欢概率或预测准确率。' : 'The nine demo features are MinMax-scaled to [0,1] and stored to four decimals. The displayed value is true weighted cosine similarity multiplied by 100%, shown to two decimals; it is not a preference probability or prediction accuracy.'}</p></div>
     <SpotifyLab client:visible lang={lang} />
   </section>
 </div>
 
 <style>
-  .case-nav { position: sticky; top: 68px; z-index: 5; display: flex; gap: .35rem; width: min(calc(100% - 2rem), var(--max)); margin: 0 auto 2rem; padding: .65rem; overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: rgba(7,17,31,.94); }
+  .case-nav { position: sticky; top: 68px; z-index: 5; display: flex; gap: .35rem; width: min(calc(100% - 2 * var(--page-gutter)), var(--max)); margin: 0 auto 2rem; padding: .65rem; overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: rgba(7,17,31,.94); }
   .case-nav a { flex: 0 0 auto; padding: .35rem .55rem; color: var(--muted); font: .7rem 'IBM Plex Mono', monospace; text-decoration: none; }
   .case-nav a:hover { color: var(--starlight); }
-  .case-study { width: min(calc(100% - 2rem), 880px); margin-inline: auto; }
+  .case-study { width: min(calc(100% - 2 * var(--page-gutter)), var(--reading-max)); margin-inline: auto; }
   .case-step { display: grid; gap: 1.15rem; padding: 4.5rem 0; border-top: 1px solid var(--line); scroll-margin-top: 130px; }
-  .case-step h2 { font:600 var(--step-title-size)/1.15 var(--title-font);letter-spacing:-.03em; }
+  .case-step h2 { font:600 var(--title-step-size)/1.15 var(--title-font);letter-spacing:-.03em; }
   .case-step h3 { margin-top: .8rem; font-size: 1.15rem; }
   .case-step > p, .case-step li { color: var(--muted); font-size: 1.02rem; }
   .step-label { color: var(--rec) !important; font: .72rem 'IBM Plex Mono', monospace !important; text-transform: uppercase; }
@@ -407,13 +406,8 @@ const fields = zh ? [
   .method-card .code-block { width: 100%; min-width: 0; }
   .method-copy { display: grid; align-content: start; gap: .75rem; }
   .method-copy h3 { margin: 0; }
-  .method-copy p { color: var(--muted); font-size: .94rem; }
   .method-copy strong { color: var(--starlight); }
-  .method-copy > small { color: var(--search); font: .7rem 'IBM Plex Mono', monospace; }
-  .method-result { padding: .8rem; border-left: 2px solid var(--complete); background: rgba(85,217,139,.05); }
-  .method-result span { color: var(--complete); font: .66rem 'IBM Plex Mono', monospace; text-transform: uppercase; }
-  .method-result p { margin-top: .25rem; }
-  .result-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.result-cards>article{display:grid;align-content:start;gap:1rem;min-height:360px;padding:1.2rem;border:1px solid var(--line);border-radius:16px;background:var(--deep)}.result-cards h3{margin:0;font:600 1.12rem var(--title-font)}.result-cards p{color:var(--muted);font-size:.9rem}.paired-values{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}.paired-values>div{display:grid;gap:.25rem;padding:.75rem;border:1px solid var(--line);border-radius:10px}.paired-values span{color:var(--muted);font:.64rem 'IBM Plex Mono',monospace}.paired-values strong,.primary-value{font:600 clamp(1.45rem,3vw,2.15rem) var(--title-font);font-variant-numeric:tabular-nums}.primary-value{color:var(--rec)}.mini-formulas{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;overflow:hidden}.mini-formulas>div{overflow-x:auto;color:var(--starlight);font-size:.68rem}.mini-formulas :global(.katex-display){margin:0}
+  .result-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.result-cards>article{display:grid;align-content:start;gap:1rem;min-height:390px;padding:1.2rem;border:1px solid var(--line);border-radius:16px;background:var(--deep)}.result-cards h3{margin:0;font:600 1.12rem var(--title-font)}.paired-values{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}.paired-values>div{display:grid;gap:.25rem;padding:.75rem;border:1px solid var(--line);border-radius:10px}.paired-values span{color:var(--muted);font:.64rem 'IBM Plex Mono',monospace}.paired-values strong,.primary-value{font:600 clamp(1.45rem,3vw,2.15rem) var(--title-font);font-variant-numeric:tabular-nums}.primary-value{color:var(--rec)}.mini-formulas{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;overflow:hidden}.mini-formulas :global(.katex-math-block){min-width:0;margin:0;padding:.65rem;font-size:.7rem}.mini-formulas :global(.katex-display){margin:0}
   .formula.compact { padding: .75rem; font-size: .82rem; }
   .formula.compact :global(.katex) { font-size: .95em; }
   table { width: 100%; min-width: 680px; border-collapse: collapse; }

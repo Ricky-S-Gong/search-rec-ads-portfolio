@@ -1,0 +1,21 @@
+---
+import katex from 'katex';
+
+interface Props {
+  latex: string;
+  display?: boolean;
+  label?: string;
+}
+
+const { latex, display = false, label } = Astro.props;
+let rendered = '';
+try {
+  rendered = katex.renderToString(latex, { displayMode: display, throwOnError: true, output: 'html' });
+} catch (error) {
+  console.error(`KaTeX rendering failed for: ${latex}`, error);
+  rendered = `<code>${latex.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')}</code>`;
+}
+---
+{display
+  ? <div class="katex-math-block" role={label ? 'img' : undefined} aria-label={label} set:html={rendered}></div>
+  : <span class="katex-math-inline" role={label ? 'img' : undefined} aria-label={label} set:html={rendered}></span>}
