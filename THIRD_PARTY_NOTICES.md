@@ -68,9 +68,11 @@ imagery.
 - `planets/pluto.webp`: New Horizons natural-color view, NASA/Johns Hopkins
   University APL/Southwest Research Institute. Source:
   https://science.nasa.gov/resource/pluto-in-high-resolution/
-- `asteroids/bennu.webp`: OSIRIS-REx view of Bennu, NASA/Goddard/University of
+- `asteroids/bennu.webp` and derived transparent `asteroids/bennu-cutout.webp`:
+  OSIRIS-REx view of Bennu, NASA/Goddard/University of
   Arizona. Source: https://science.nasa.gov/solar-system/asteroids/101955-bennu/
-- `asteroids/itokawa.webp`: Hayabusa view of Itokawa, JAXA. Source:
+- `asteroids/itokawa.webp` and derived transparent `asteroids/itokawa-cutout.webp`:
+  Hayabusa view of Itokawa, JAXA. Source:
   https://science.nasa.gov/solar-system/asteroids/25143-itokawa/
 
 NASA media usage guidelines:
