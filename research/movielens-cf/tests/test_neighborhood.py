@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from movielens_cf.neighborhood import NeighborhoodCF, shrink_similarity
+from movielens_cf.neighborhood import NeighborhoodCF, select_top_indices, shrink_similarity
 
 
 def fixture_ratings() -> pd.DataFrame:
@@ -69,3 +69,23 @@ def test_batched_recommendations_match_single_user_results():
 
     assert batched[1] == model.recommend(1, n=2)
     assert batched[2] == model.recommend(2, n=2)
+
+
+def test_top_n_uses_unclipped_scores_before_movie_id_tie_breaking():
+    raw_scores = np.array([5.10, 5.45, 5.25])
+    movie_ids = np.array([10, 30, 20])
+
+    selected = select_top_indices(raw_scores, movie_ids, n=3)
+
+    assert movie_ids[selected].tolist() == [30, 20, 10]
+
+
+def test_recommendation_exposes_raw_rank_score_and_clipped_rating_estimate():
+    model = NeighborhoodCF(
+        mode="user", k=3, min_support=2, shrinkage=0, min_neighbors=1
+    ).fit(fixture_ratings())
+
+    recommendation = model.recommend(1, n=1)[0]
+
+    assert recommendation.ranking_score >= recommendation.rating_estimate
+    assert 1.0 <= recommendation.rating_estimate <= 5.0

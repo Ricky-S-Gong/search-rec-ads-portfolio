@@ -24,15 +24,32 @@ class Prediction:
 @dataclass(frozen=True)
 class Recommendation:
     movie_id: int
-    score: float
+    ranking_score: float
+    rating_estimate: float
     neighbor_count: int
     used_fallback: bool
+
+    @property
+    def score(self) -> float:
+        """Backward-compatible clipped estimate used by the Phase 2 artifact."""
+        return self.rating_estimate
 
 
 def shrink_similarity(similarity: float, support: int, shrinkage: float) -> float:
     if support < 0 or shrinkage < 0:
         raise ValueError("support and shrinkage must be non-negative")
     return float(similarity * support / (support + shrinkage)) if support + shrinkage else 0.0
+
+
+def select_top_indices(scores: np.ndarray, movie_ids: np.ndarray, n: int) -> np.ndarray:
+    """Select finite candidates by raw score, then deterministically by movie ID."""
+    finite = np.flatnonzero(np.isfinite(scores))
+    take = min(max(n, 0), len(finite))
+    if take == 0:
+        return np.array([], dtype=int)
+    if take < len(finite):
+        finite = finite[np.argpartition(-scores[finite], take - 1)[:take]]
+    return finite[np.lexsort((movie_ids[finite], -scores[finite]))]
 
 
 class NeighborhoodCF:
@@ -152,7 +169,13 @@ class NeighborhoodCF:
             if user_id not in self.user_index:
                 seen = self.seen.get(user_id, set())
                 result[user_id] = [
-                    Recommendation(movie_id, self.popularity.scores[movie_id], 0, True)
+                    Recommendation(
+                        movie_id,
+                        self.popularity.scores[movie_id],
+                        float(np.clip(self.popularity.scores[movie_id], 1, 5)),
+                        0,
+                        True,
+                    )
                     for movie_id in self.popularity.ranking
                     if movie_id not in seen
                 ][:n]
@@ -176,32 +199,36 @@ class NeighborhoodCF:
                 denominator = (self.binary[user_rows] @ absolute_similarity.T).toarray()
                 counts = (self.binary[user_rows] @ neighbor_indicator.T).toarray()
             supported = (counts >= self.min_neighbors) & (denominator > 0)
-            predictions = np.broadcast_to(self.user_means[user_rows, None], numerator.shape).copy()
+            raw_predictions = np.broadcast_to(self.user_means[user_rows, None], numerator.shape).copy()
             np.divide(numerator, denominator, out=numerator, where=denominator > 0)
-            predictions += numerator
-            predictions = np.clip(predictions, 1, 5)
-            scores = np.where(supported, predictions, fallback_scores[None, :])
+            raw_predictions += numerator
+            rating_estimates = np.clip(raw_predictions, 1, 5)
+            ranking_scores = np.where(supported, raw_predictions, fallback_scores[None, :])
+            rating_estimates = np.where(
+                supported, rating_estimates, np.clip(fallback_scores[None, :], 1, 5)
+            )
             for local_row, user_id in enumerate(batch_ids):
                 seen_indices = [
                     self.movie_index[movie_id]
                     for movie_id in self.seen[user_id]
                     if movie_id in self.movie_index
                 ]
-                scores[local_row, seen_indices] = -np.inf
-                take = min(n, int(np.isfinite(scores[local_row]).sum()))
-                if take == 0:
+                ranking_scores[local_row, seen_indices] = -np.inf
+                candidate_indices = select_top_indices(
+                    ranking_scores[local_row], self.movie_ids, n
+                )
+                if len(candidate_indices) == 0:
                     result[user_id] = []
                     continue
-                candidate_indices = np.argpartition(-scores[local_row], take - 1)[:take]
-                order = np.lexsort((self.movie_ids[candidate_indices], -scores[local_row, candidate_indices]))
                 result[user_id] = [
                     Recommendation(
                         int(self.movie_ids[index]),
-                        float(scores[local_row, index]),
+                        float(ranking_scores[local_row, index]),
+                        float(rating_estimates[local_row, index]),
                         int(counts[local_row, index]),
                         not bool(supported[local_row, index]),
                     )
-                    for index in candidate_indices[order]
+                    for index in candidate_indices
                 ]
         return result
 

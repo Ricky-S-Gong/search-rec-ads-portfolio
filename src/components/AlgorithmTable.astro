@@ -2,25 +2,31 @@
 import { algorithms, href, type Domain, type Lang } from '../data/site';
 const { lang, domain } = Astro.props as { lang: Lang; domain: Domain };
 const labels = lang === 'en'
-  ? { algorithm: 'Method', core: 'Core approach', signals: 'Required data', best: 'Typical business scenario', limitation: 'Main limitation' }
-  : { algorithm: '算法', core: '核心方法', signals: '所需数据', best: '典型商业场景', limitation: '主要局限' };
+  ? { algorithm: 'Method', core: 'Core approach', signals: 'Required data', cold: 'Cold start', serve: 'Serving', best: 'Use when', limitation: 'Avoid when / limitation', project: 'Project' }
+  : { algorithm: '算法', core: '核心方法', signals: '所需数据', cold: '冷启动', serve: '服务成本', best: '适用场景', limitation: '不适用 / 局限', project: '项目' };
 const rows = algorithms.filter((algorithm) => algorithm.domain === domain);
+const detailSlugs = new Set(['content-based-filtering', 'user-based-cf', 'item-based-cf']);
+const projectFor = (slug: string) => slug === 'content-based-filtering'
+  ? { path: 'spotify-content-recommender', label: lang === 'en' ? 'Spotify case study' : 'Spotify 项目' }
+  : ['user-based-cf', 'item-based-cf'].includes(slug)
+    ? { path: 'movielens-collaborative-filtering', label: lang === 'en' ? 'MovieLens case study' : 'MovieLens 项目' }
+    : null;
 ---
 <div class="table-wrap" tabindex="0" role="region" aria-label={lang === 'en' ? 'Algorithm comparison table' : '算法对比表'}>
   <table>
     <thead><tr>
-      <th>{labels.algorithm}</th><th>{labels.core}</th><th>{labels.signals}</th><th>{labels.best}</th><th>{labels.limitation}</th>
+      <th>{labels.algorithm}</th><th>{labels.core}</th><th>{labels.signals}</th><th>{labels.cold}</th><th>{labels.serve}</th><th>{labels.best}</th><th>{labels.limitation}</th><th>{labels.project}</th>
     </tr></thead>
     <tbody>
       {rows.map((algorithm) => (
         <tr>
           <th>
-            {algorithm.slug === 'content-based-filtering'
+            {detailSlugs.has(algorithm.slug)
               ? <a href={href(`/${lang}/algorithms/${algorithm.slug}/`)}>{algorithm.name[lang]}</a>
               : algorithm.name[lang]}
             <small>{algorithm.family[lang]}</small>
           </th>
-          <td>{algorithm.intuition[lang]}</td><td>{algorithm.requiredSignals[lang]}</td><td>{algorithm.bestFor[lang]}</td><td>{algorithm.limitation[lang]}</td>
+          <td>{algorithm.intuition[lang]}</td><td>{algorithm.requiredSignals[lang]}</td><td>{algorithm.coldStart[lang]}</td><td>{algorithm.serveCost[lang]}</td><td>{algorithm.useWhen[lang]}</td><td>{algorithm.avoidWhen[lang]}</td><td>{projectFor(algorithm.slug) ? <a href={href(`/${lang}/projects/${projectFor(algorithm.slug)!.path}/`)}>{projectFor(algorithm.slug)!.label}</a> : '—'}</td>
         </tr>
       ))}
     </tbody>
@@ -29,7 +35,8 @@ const rows = algorithms.filter((algorithm) => algorithm.domain === domain);
 
 <style>
   .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; }
-  table { width: 100%; min-width: 900px; border-collapse: collapse; background: rgba(12,27,48,.7); }
+  table { width: 100%; min-width: 1420px; border-collapse: collapse; background: rgba(12,27,48,.7); }
+  tbody td a { color: var(--starlight); }
   th, td { padding: 1.2rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; font-size: clamp(1rem,1.1vw,1.08rem); line-height: 1.55; }
   thead th { color: var(--muted); font: clamp(.78rem,.9vw,.88rem) 'IBM Plex Mono', monospace; text-transform: uppercase; }
   tbody th { width: 230px; font-size: clamp(1.18rem,1.5vw,1.4rem); }

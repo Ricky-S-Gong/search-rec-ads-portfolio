@@ -22,30 +22,37 @@
   "candidatePolicy": "Full fitted catalog minus seen movies",
   "dataset": "MovieLens 1M",
   "datasetUrl": "https://grouplens.org/datasets/movielens/1m/",
+  "diagnostics": {
+    "rankingCorrection": "Top-N uses raw neighborhood estimates; rating RMSE/MAE uses estimates clipped to [1, 5].",
+    "relevantItemHeadConcentration": {
+      "top10PercentShare": 0.41934936350777935,
+      "top20PercentShare": 0.6306459217350306
+    }
+  },
   "evaluationPopulation": {
     "rankingUsers": 5820,
     "testRatings": 102759,
     "trainingRatings": 897450
   },
-  "experimentCodeVersion": "movielens-cf-v1",
-  "generatedAtUtc": "2026-08-12T04:29:48+00:00",
+  "experimentCodeVersion": "movielens-cf-v2",
+  "generatedAtUtc": "2026-08-12T05:01:40+00:00",
   "k": 10,
   "metricCaveat": "Offline explicit-rating results; they do not measure CTR, watch time, retention, revenue, or causal lift.",
   "models": [
     {
       "beyondAccuracy": {
-        "catalog_coverage": 0.31849036111865325,
-        "long_tail_share": 0.41008591065292094,
-        "novelty": 10.833389103378469
+        "catalog_coverage": 0.2747759978278577,
+        "long_tail_share": 0.4201202749140893,
+        "novelty": 10.85093117552417
       },
       "confidence95": {
         "ndcgAt10": [
-          0.02190973630490707,
-          0.02535000935595804
+          0.021916216373674195,
+          0.025583977415813516
         ],
         "recallAt10": [
-          0.01754596303585552,
-          0.021012803083040342
+          0.018994201440393065,
+          0.02299346183378501
         ]
       },
       "hyperparameters": {
@@ -65,29 +72,29 @@
       },
       "segments": [
         {
-          "ndcgAt10": 0.0147156676970907,
-          "recallAt10": 0.02277205040091638,
+          "ndcgAt10": 0.016906492533784897,
+          "recallAt10": 0.028751431844215348,
           "segment": "sparse",
           "trainingRatingsMedian": 27.0,
           "users": 1455
         },
         {
-          "ndcgAt10": 0.013462178906804527,
-          "recallAt10": 0.017157311951126384,
+          "ndcgAt10": 0.012904545562469939,
+          "recallAt10": 0.017497954508263785,
           "segment": "light",
           "trainingRatingsMedian": 60.0,
           "users": 1455
         },
         {
-          "ndcgAt10": 0.021340733361969132,
-          "recallAt10": 0.01940886494268129,
+          "ndcgAt10": 0.020806731585795248,
+          "recallAt10": 0.019325153312577906,
           "segment": "active",
           "trainingRatingsMedian": 127.0,
           "users": 1455
         },
         {
-          "ndcgAt10": 0.04484417098747215,
-          "recallAt10": 0.017823309603548613,
+          "ndcgAt10": 0.04409917197870261,
+          "recallAt10": 0.01838093390529584,
           "segment": "power",
           "trainingRatingsMedian": 320.0,
           "users": 1455
@@ -96,32 +103,34 @@
       "similarity": "Mean-centered cosine",
       "system": {
         "fallbackShare": 0.06032646048109966,
-        "fitSeconds": 5.070689916959964,
+        "fitSeconds": 5.114716249983758,
         "neighborArtifactMiB": 3.682170867919922,
-        "recommendSeconds": 2.0504199999850243,
+        "recommendSeconds": 2.1036923750070855,
         "retainedNeighbors": 479609,
-        "usersPerSecond": 2838.442855630801
+        "top10ClippedShare": 0.44952367020790285,
+        "top10RawAboveRatingMaxShare": 0.44952367020790285,
+        "usersPerSecond": 2766.5641940544647
       },
       "test": {
-        "ndcg_at_10": 0.023590687738334126,
-        "recall_at_10": 0.019290384224568167,
+        "ndcg_at_10": 0.02367923541518817,
+        "recall_at_10": 0.02098886839258822,
         "users": 5820
       }
     },
     {
       "beyondAccuracy": {
-        "catalog_coverage": 0.7442302470811838,
-        "long_tail_share": 0.5706872852233676,
-        "novelty": 12.278190044502127
+        "catalog_coverage": 0.737170784686397,
+        "long_tail_share": 0.5688659793814433,
+        "novelty": 12.273735817952069
       },
       "confidence95": {
         "ndcgAt10": [
-          0.009134396136882423,
-          0.011505223251240603
+          0.009400512107528151,
+          0.01191019093868861
         ],
         "recallAt10": [
-          0.010839638186227178,
-          0.014274261650478732
+          0.01101660184396661,
+          0.01430132593607678
         ]
       },
       "hyperparameters": {
@@ -141,29 +150,29 @@
       },
       "segments": [
         {
-          "ndcgAt10": 0.014107699584703544,
-          "recallAt10": 0.026930126002290947,
+          "ndcgAt10": 0.01448741535658204,
+          "recallAt10": 0.02487972508591065,
           "segment": "sparse",
           "trainingRatingsMedian": 27.0,
           "users": 1455
         },
         {
-          "ndcgAt10": 0.008584216656212739,
-          "recallAt10": 0.01155648284514264,
+          "ndcgAt10": 0.010316449889268477,
+          "recallAt10": 0.0139049800905471,
           "segment": "light",
           "trainingRatingsMedian": 60.0,
           "users": 1455
         },
         {
-          "ndcgAt10": 0.006111951988864175,
-          "recallAt10": 0.006584164422647076,
+          "ndcgAt10": 0.006584514205072588,
+          "recallAt10": 0.006411547204451995,
           "segment": "active",
           "trainingRatingsMedian": 127.0,
           "users": 1455
         },
         {
-          "ndcgAt10": 0.012449921571631281,
-          "recallAt10": 0.005228683699323675,
+          "ndcgAt10": 0.010874605446441869,
+          "recallAt10": 0.0048996459072488474,
           "segment": "power",
           "trainingRatingsMedian": 320.0,
           "users": 1455
@@ -172,15 +181,17 @@
       "similarity": "Adjusted cosine",
       "system": {
         "fallbackShare": 0.02281786941580756,
-        "fitSeconds": 2.3705140840029344,
+        "fitSeconds": 2.344955625012517,
         "neighborArtifactMiB": 0.5184860229492188,
-        "recommendSeconds": 1.140929790912196,
+        "recommendSeconds": 1.258021124987863,
         "retainedNeighbors": 66117,
-        "usersPerSecond": 5101.10266762935
+        "top10ClippedShare": 0.0001758334505556337,
+        "top10RawAboveRatingMaxShare": 0.0001758334505556337,
+        "usersPerSecond": 4626.3134095273235
       },
       "test": {
-        "ndcg_at_10": 0.010313447450352934,
-        "recall_at_10": 0.012574864242351083,
+        "ndcg_at_10": 0.010565746224341244,
+        "recall_at_10": 0.01252397457203965,
         "users": 5820
       }
     }
@@ -196,5 +207,5 @@
   },
   "seed": 42,
   "split": "Per-user temporal 80/10/10; refit train+validation for final test",
-  "version": "movielens-cf-v1"
+  "version": "movielens-cf-v2"
 }

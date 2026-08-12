@@ -14,7 +14,7 @@ import pandas as pd
 import scipy
 import sklearn
 
-from movielens_cf.artifacts import write_json
+from movielens_cf.artifacts import validate_frontend_artifacts, write_json
 from movielens_cf.baselines import BayesianPopularity, BiasBaseline
 from movielens_cf.data import dataset_profile, load_movielens
 from movielens_cf.evaluation import (
@@ -81,11 +81,20 @@ def evaluate_configuration(
     recommendations = recommendation_ids(detailed)
     metrics, per_user = ranking_metrics(truth, recommendations, k=K)
     fallback = [item.used_fallback for values in detailed.values() for item in values]
+    personalized = [item for values in detailed.values() for item in values if not item.used_fallback]
     system = {
         "fitSeconds": fit_seconds,
         "recommendSeconds": recommend_seconds,
         "usersPerSecond": len(truth) / recommend_seconds if recommend_seconds else 0.0,
         "fallbackShare": float(np.mean(fallback)) if fallback else 0.0,
+        "top10RawAboveRatingMaxShare": (
+            float(np.mean([item.ranking_score > 5 for item in personalized]))
+            if personalized else 0.0
+        ),
+        "top10ClippedShare": (
+            float(np.mean([item.ranking_score != item.rating_estimate for item in personalized]))
+            if personalized else 0.0
+        ),
         "retainedNeighbors": int(model.similarity.nnz),
         "neighborArtifactMiB": float(
             (model.similarity.data.nbytes + model.similarity.indices.nbytes + model.similarity.indptr.nbytes)
@@ -134,47 +143,128 @@ def segment_metrics(
 
 def sample_payload(
     fitted: pd.DataFrame,
+    test: pd.DataFrame,
     movies: pd.DataFrame,
     user_model: NeighborhoodCF,
     item_model: NeighborhoodCF,
+    popularity: BayesianPopularity,
+    popular_recs: dict[int, list[int]],
+    evaluated_recommendations: dict[str, dict[int, list[int]]],
 ) -> dict:
-    title = movies.set_index("movie_id")["title"].astype(str).to_dict()
+    movie_rows = movies.set_index("movie_id")
+    title = movie_rows["title"].astype(str).to_dict()
+    genres = movie_rows["genres"].astype(str).to_dict()
     activity = fitted.groupby("user_id", observed=True).size().sort_values()
-    positions = np.linspace(0.1, 0.9, 5)
-    users = list(dict.fromkeys(int(activity.index[min(len(activity) - 1, round(position * (len(activity) - 1)))]) for position in positions))
+    truth = relevant_truth(test, set(item_model.movie_ids.astype(int)))
+    eligible = sorted(truth)
+    hit_users = [
+        user_id for user_id in eligible
+        if any(
+            truth[user_id].intersection(recommendations.get(user_id, []))
+            for recommendations in (popular_recs, *evaluated_recommendations.values())
+        )
+    ]
+    pool = hit_users or eligible
+    targets = activity.loc[pool].quantile([0.15, 0.5, 0.85]).to_numpy()
+    users = []
+    for target in targets:
+        user_id = min(
+            (candidate for candidate in pool if candidate not in users),
+            key=lambda candidate: (abs(float(activity.loc[candidate]) - target), candidate),
+        )
+        users.append(int(user_id))
     user_recs = user_model.recommend_many(users, n=K)
     item_recs = item_model.recommend_many(users, n=K)
+    item_counts = fitted.groupby("movie_id", observed=True).size().sort_values(ascending=False)
+    head = set(item_counts.head(max(1, int(np.ceil(len(item_counts) * 0.2)))).index.astype(int))
+
+    def movie_payload(movie_id: int, **extra: object) -> dict:
+        return {
+            "movieId": int(movie_id),
+            "title": title.get(int(movie_id), str(movie_id)),
+            "genres": genres.get(int(movie_id), "Unknown").split("|"),
+            "popularityBand": "head" if int(movie_id) in head else "long-tail",
+            **extra,
+        }
+
+    def evidence(model: NeighborhoodCF, user_id: int, movie_id: int) -> list[dict]:
+        user = model.user_index[user_id]
+        item = model.movie_index[movie_id]
+        neighbors = model.similarity.getrow(user if model.mode == "user" else item)
+        if model.mode == "user":
+            mask = model.binary[neighbors.indices, item].toarray().ravel() > 0
+            indices, weights = neighbors.indices[mask], neighbors.data[mask]
+            residuals = model.centered[indices, item].toarray().ravel()
+            labels = [f"Viewer {int(model.user_ids[index])}" for index in indices]
+        else:
+            mask = model.binary[user, neighbors.indices].toarray().ravel() > 0
+            indices, weights = neighbors.indices[mask], neighbors.data[mask]
+            residuals = model.centered[user, indices].toarray().ravel()
+            labels = [title.get(int(model.movie_ids[index]), str(model.movie_ids[index])) for index in indices]
+        denominator = float(np.abs(weights).sum())
+        contributions = weights * residuals / denominator if denominator else np.zeros_like(weights)
+        order = np.lexsort((np.asarray(labels), -np.abs(contributions)))[:3]
+        return [
+            {
+                "source": labels[position],
+                "similarity": round(float(weights[position]), 4),
+                "residual": round(float(residuals[position]), 3),
+                "contribution": round(float(contributions[position]), 4),
+            }
+            for position in order
+        ]
+
+    def cf_payload(model: NeighborhoodCF, user_id: int, recommendation: object) -> dict:
+        movie_id = int(recommendation.movie_id)
+        return movie_payload(
+            movie_id,
+            rankScore=round(float(recommendation.ranking_score), 4),
+            ratingEstimate=round(float(recommendation.rating_estimate), 3),
+            scoreWasClipped=bool(recommendation.ranking_score != recommendation.rating_estimate),
+            neighbors=int(recommendation.neighbor_count),
+            fallback=bool(recommendation.used_fallback),
+            hit=movie_id in truth[user_id],
+            evidence=[] if recommendation.used_fallback else evidence(model, user_id, movie_id),
+        )
+
     examples = []
     for user_id in users:
         history = fitted.loc[fitted["user_id"] == user_id].sort_values(
             ["rating", "timestamp"], ascending=[False, False]
         ).head(5)
+        relevant = test.loc[
+            (test["user_id"] == user_id) & (test["rating"] >= RELEVANCE)
+        ].sort_values(["timestamp", "movie_id"])
         examples.append(
             {
+                "userId": user_id,
                 "user": f"Viewer {user_id}",
                 "activity": int(activity.loc[user_id]),
                 "history": [
-                    {"title": title.get(int(row.movie_id), str(row.movie_id)), "rating": float(row.rating)}
+                    movie_payload(int(row.movie_id), rating=float(row.rating))
                     for row in history.itertuples(index=False)
                 ],
-                "userCf": [
-                    {
-                        "title": title.get(item.movie_id, str(item.movie_id)),
-                        "score": round(item.score, 3),
-                        "neighbors": item.neighbor_count,
-                        "fallback": item.used_fallback,
-                    }
-                    for item in user_recs[user_id]
+                "relevantTest": [
+                    movie_payload(int(row.movie_id), rating=float(row.rating))
+                    for row in relevant.itertuples(index=False)
                 ],
-                "itemCf": [
-                    {
-                        "title": title.get(item.movie_id, str(item.movie_id)),
-                        "score": round(item.score, 3),
-                        "neighbors": item.neighbor_count,
-                        "fallback": item.used_fallback,
-                    }
-                    for item in item_recs[user_id]
-                ],
+                "methods": {
+                    "popularity": [
+                        movie_payload(
+                            movie_id,
+                            rankScore=round(float(popularity.scores[movie_id]), 4),
+                            ratingEstimate=None,
+                            scoreWasClipped=False,
+                            neighbors=0,
+                            fallback=True,
+                            hit=movie_id in truth[user_id],
+                            evidence=[],
+                        )
+                        for movie_id in popular_recs[user_id]
+                    ],
+                    "userCf": [cf_payload(user_model, user_id, item) for item in user_recs[user_id]],
+                    "itemCf": [cf_payload(item_model, user_id, item) for item in item_recs[user_id]],
+                },
             }
         )
     seeds = [
@@ -191,17 +281,22 @@ def sample_payload(
         order = np.lexsort((item_model.movie_ids[row.indices], -row.data))[:5]
         related.append(
             {
-                "seed": title.get(movie_id, str(movie_id)),
+                "seed": movie_payload(movie_id),
                 "neighbors": [
-                    {
-                        "title": title.get(int(item_model.movie_ids[row.indices[position]]), "Unknown"),
-                        "similarity": round(float(row.data[position]), 4),
-                    }
+                    movie_payload(
+                        int(item_model.movie_ids[row.indices[position]]),
+                        similarity=round(float(row.data[position]), 4),
+                        support=int(
+                            item_model.binary[:, index].multiply(
+                                item_model.binary[:, row.indices[position]]
+                            ).sum()
+                        ),
+                    )
                     for position in order
                 ],
             }
         )
-    return {"version": "movielens-samples-v1", "users": examples, "relatedItems": related}
+    return {"version": "movielens-samples-v2", "users": examples, "relatedItems": related}
 
 
 def make_figures(profile: dict, models: list[dict], fitted: pd.DataFrame, output: Path) -> None:
@@ -230,16 +325,19 @@ def make_figures(profile: dict, models: list[dict], fitted: pd.DataFrame, output
     fig.tight_layout(); fig.savefig(output / "popularity-long-tail.svg", facecolor=fig.get_facecolor()); plt.close(fig)
 
 
-def run(data_dir: Path, output: Path) -> dict:
+def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
     output.mkdir(parents=True, exist_ok=True)
     ratings, movies = load_movielens(data_dir)
+    if smoke:
+        smoke_users = np.sort(ratings["user_id"].unique())[:250]
+        ratings = ratings.loc[ratings["user_id"].isin(smoke_users)].copy()
     profile = dataset_profile(ratings, movies)
     train, validation, test = per_user_temporal_split(ratings)
     validation_results = []
     selected = {}
     for mode in ("user", "item"):
         candidates = []
-        for params in CANDIDATES:
+        for params in (CANDIDATES[:1] if smoke else CANDIDATES):
             model, metrics, _, _, system = evaluate_configuration(train, validation, mode, params)
             candidates.append({"params": params, "metrics": metrics, "system": system})
         candidates.sort(key=lambda value: (-value["metrics"]["ndcg_at_10"], -value["metrics"]["recall_at_10"], value["system"]["fitSeconds"]))
@@ -305,10 +403,10 @@ def run(data_dir: Path, output: Path) -> dict:
         "compute": "CPU",
     }
     metadata = {
-        "version": "movielens-cf-v1",
-        "experimentCodeVersion": "movielens-cf-v1",
+        "version": "movielens-cf-v2",
+        "experimentCodeVersion": "movielens-cf-v2",
         "generatedAtUtc": datetime.now(UTC).isoformat(timespec="seconds"),
-        "dataset": "MovieLens 1M",
+        "dataset": "MovieLens 1M smoke subset" if smoke else "MovieLens 1M",
         "datasetUrl": "https://grouplens.org/datasets/movielens/1m/",
         "archiveMd5": "c4d9eecfca2ab87c1945afe126590906",
         "seed": SEED,
@@ -327,12 +425,38 @@ def run(data_dir: Path, output: Path) -> dict:
         },
         "baselines": baselines,
         "models": final_models,
+        "diagnostics": {
+            "relevantItemHeadConcentration": {
+                "top10PercentShare": float(
+                    test.loc[test["rating"] >= RELEVANCE, "movie_id"]
+                    .map(item_counts.rank(method="average", ascending=False, pct=True))
+                    .le(0.1).mean()
+                ),
+                "top20PercentShare": float(
+                    test.loc[test["rating"] >= RELEVANCE, "movie_id"]
+                    .map(item_counts.rank(method="average", ascending=False, pct=True))
+                    .le(0.2).mean()
+                ),
+            },
+            "rankingCorrection": "Top-N uses raw neighborhood estimates; rating RMSE/MAE uses estimates clipped to [1, 5].",
+        },
         "metricCaveat": "Offline explicit-rating results; they do not measure CTR, watch time, retention, revenue, or causal lift.",
     }
+    samples = sample_payload(
+        fitted,
+        test,
+        movies,
+        model_objects["user"],
+        model_objects["item"],
+        popularity,
+        popular_recs,
+        final_recommendations,
+    )
+    validate_frontend_artifacts(metrics, samples)
     write_json(output / "profile.json", {**metadata, "profile": profile})
     write_json(output / "metrics.json", metrics)
     write_json(output / "comparisons.json", {**metadata, "validation": validation_results, "models": final_models, "baselines": baselines})
-    write_json(output / "samples.json", sample_payload(fitted, movies, model_objects["user"], model_objects["item"]))
+    write_json(output / "samples.json", samples)
     make_figures(profile, [{"label": "Popularity", "test": popular_rank}, *final_models], fitted, output)
     return metrics
 
@@ -341,8 +465,9 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", type=Path, default=Path(__file__).with_name("data") / "ml-1m")
     parser.add_argument("--output", type=Path, default=Path(__file__).parents[2] / "public" / "artifacts" / "movielens")
+    parser.add_argument("--smoke", action="store_true", help="Run a fast 250-user end-to-end verification")
     args = parser.parse_args()
-    metrics = run(args.data, args.output)
+    metrics = run(args.data, args.output, smoke=args.smoke)
     for model in metrics["models"]:
         print(model["label"], model["test"], model["rating"], model["system"])
 

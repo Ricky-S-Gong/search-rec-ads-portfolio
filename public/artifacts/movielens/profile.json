@@ -3,8 +3,8 @@
   "candidatePolicy": "Full fitted catalog minus seen movies",
   "dataset": "MovieLens 1M",
   "datasetUrl": "https://grouplens.org/datasets/movielens/1m/",
-  "experimentCodeVersion": "movielens-cf-v1",
-  "generatedAtUtc": "2026-08-12T04:29:48+00:00",
+  "experimentCodeVersion": "movielens-cf-v2",
+  "generatedAtUtc": "2026-08-12T05:01:40+00:00",
   "k": 10,
   "profile": {
     "density": 0.044684,
@@ -109,5 +109,5 @@
   },
   "seed": 42,
   "split": "Per-user temporal 80/10/10; refit train+validation for final test",
-  "version": "movielens-cf-v1"
+  "version": "movielens-cf-v2"
 }

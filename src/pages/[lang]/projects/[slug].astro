@@ -4,7 +4,6 @@ import SpotifyCaseStudy from '../../../components/SpotifyCaseStudy.astro';
 import MovieLensCaseStudy from '../../../components/MovieLensCaseStudy.astro';
 import { copy, domainNames, href, languages, projects, type Lang } from '../../../data/site';
 import spotifyMetrics from '../../../../public/artifacts/spotify/metrics.json';
-import movielensMetrics from '../../../../public/artifacts/movielens/metrics.json';
 import movielensProfile from '../../../../public/artifacts/movielens/profile.json';
 export const getStaticPaths = () => languages.flatMap((lang) => projects.filter((p) => p.status === 'complete').map((project) => ({ params: { lang, slug: project.slug }, props: { project } })));
 const lang = Astro.params.lang as Lang;
@@ -13,8 +12,8 @@ const t = copy[lang];
 const metrics = spotifyMetrics.evaluation;
 const isMovieLens = project.slug === 'movielens-collaborative-filtering';
 const starSummary = isMovieLens ? (lang === 'zh'
-  ? `如何用 ${movielensProfile.profile.ratings.toLocaleString()} 条历史评分产生个性化且可解释的候选？本项目在完整未看目录上比较 Bayesian popularity、User-CF 与 Item-CF。结果没有被包装成单一“胜者”：User-CF 平衡排序与覆盖，Item-CF 将目录覆盖扩大到 ${(movielensMetrics.models[1].beyondAccuracy.catalog_coverage * 100).toFixed(1)}%，热门基线则保留为冷启动兜底。`
-  : `How can ${movielensProfile.profile.ratings.toLocaleString()} historical ratings produce personalized, explainable candidates? This study compares Bayesian popularity, User-CF, and Item-CF over the full unseen catalog. It avoids inventing one “winner”: User-CF balances ranking and reach, Item-CF expands catalog coverage to ${(movielensMetrics.models[1].beyondAccuracy.catalog_coverage * 100).toFixed(1)}%, and popularity remains the cold-start fallback.`) : (lang === 'zh'
+  ? `我们用 ${movielensProfile.profile.ratings.toLocaleString()} 条带时间的电影评分回答一个直观问题：相似的人，或相似的电影，能否帮助用户发现下一部喜欢的电影？实验严格隐藏每位用户较晚的评分再测试。结果不是单一“胜者”：热门榜在准确性上很强，个性化方法则把推荐扩展到更多电影。`
+  : `We use ${movielensProfile.profile.ratings.toLocaleString()} time-stamped movie ratings to ask a simple question: can similar people—or similar movies—help someone discover what they may like next? Later ratings are hidden before testing. There is no single “winner”: popularity is strong on accuracy, while personalized methods spread recommendations across much more of the catalog.`) : (lang === 'zh'
   ? `当用户没有收听、点赞或跳过记录时，音乐目录很难提供个性化发现。核心业务问题是：给定一首种子歌曲，如何从 ${spotifyMetrics.dataset.deduplicatedRows.toLocaleString()} 首歌曲中找到可解释的内容相似候选？本项目用 9 项音频特征构建会话级冷启动方案；CPU 实验将查询延迟从 ${metrics.exactLatencyMs.toFixed(2)} ms 降至 ${metrics.clusterLatencyMs.toFixed(2)} ms，同时保留 ${(metrics.clusterRecallAt10 * 100).toFixed(1)}% 的 Exact Top-10，但不把该结果解释为真实用户偏好。`
   : `Without plays, likes, or skips, a music catalog cannot yet personalize discovery. The business question is narrower: given one seed track, how can the system find explainable content-similar candidates among ${spotifyMetrics.dataset.deduplicatedRows.toLocaleString()} tracks? This session-level cold-start approach uses nine audio features; on CPU, median query latency fell from ${metrics.exactLatencyMs.toFixed(2)} ms to ${metrics.clusterLatencyMs.toFixed(2)} ms while preserving ${(metrics.clusterRecallAt10 * 100).toFixed(1)}% of the exact Top-10, without treating that agreement as listener preference.`);
 ---
@@ -27,7 +26,7 @@ const starSummary = isMovieLens ? (lang === 'zh'
       <div class="hero-facts">
         <article><span>{lang === 'en' ? 'Dataset' : '数据集'}</span><strong>{isMovieLens ? `${movielensProfile.profile.ratings.toLocaleString()} ${lang === 'en' ? 'ratings' : '条评分'}` : `${spotifyMetrics.dataset.deduplicatedRows.toLocaleString()} ${lang === 'en' ? 'tracks' : '首歌曲'}`}</strong><p>{isMovieLens ? `${movielensProfile.profile.users.toLocaleString()} ${lang === 'en' ? 'users' : '位用户'} · ${movielensProfile.profile.ratedMovies.toLocaleString()} ${lang === 'en' ? 'rated movies' : '部有评分电影'}` : `${spotifyMetrics.dataset.yearRange.join('–')} · ${Object.keys(spotifyMetrics.dataset.featureProfile).length} ${lang === 'en' ? 'audio features' : '项音频特征'}`}</p></article>
         <article><span>{lang === 'en' ? 'Data source' : '数据来源'}</span><strong>{isMovieLens ? 'GroupLens MovieLens 1M' : 'Kaggle Spotify Dataset'}</strong>{project.sourceUrl && <a class="source-link" href={project.sourceUrl} target="_blank" rel="noreferrer">{isMovieLens ? 'GroupLens' : 'Kaggle'} Source <span aria-hidden="true">↗</span></a>}</article>
-        <article><span>{lang === 'en' ? 'Core algorithm' : '核心算法'}</span><strong>{isMovieLens ? 'User-CF + Item-CF' : (lang === 'en' ? 'Exact cosine Top-10' : '精确余弦 Top-10')}</strong><p>{isMovieLens ? (lang === 'en' ? 'Sparse Top-K cosine · support · shrinkage · shared fallback.' : '稀疏 Top-K 余弦 · 支持度 · 收缩 · 共享兜底。') : (lang === 'en' ? 'Median fill → MinMax → L2. KNN and K-Means are comparisons.' : '中位数填补 → MinMax → L2；KNN 与 K-Means 仅作对照。')}</p></article>
+        <article><span>{lang === 'en' ? 'Core idea' : '核心思路'}</span><strong>{isMovieLens ? (lang === 'en' ? 'Learn from shared taste' : '从共同偏好中学习') : (lang === 'en' ? 'Exact cosine Top-10' : '精确余弦 Top-10')}</strong><p>{isMovieLens ? (lang === 'en' ? 'Compare similar users and similar movies, with a popularity fallback when history is thin.' : '分别比较相似用户与相似电影；历史不足时回退热门榜。') : (lang === 'en' ? 'Median fill → MinMax → L2. KNN and K-Means are comparisons.' : '中位数填补 → MinMax → L2；KNN 与 K-Means 仅作对照。')}</p></article>
       </div>
     </header>
     {isMovieLens ? <MovieLensCaseStudy lang={lang} /> : <SpotifyCaseStudy lang={lang} />}
