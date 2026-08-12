@@ -26,6 +26,7 @@ class Recommendation:
     movie_id: int
     ranking_score: float
     rating_estimate: float
+    similarity_weight_sum: float
     neighbor_count: int
     used_fallback: bool
 
@@ -173,6 +174,7 @@ class NeighborhoodCF:
                         movie_id,
                         self.popularity.scores[movie_id],
                         float(np.clip(self.popularity.scores[movie_id], 1, 5)),
+                        0.0,
                         0,
                         True,
                     )
@@ -225,6 +227,7 @@ class NeighborhoodCF:
                         int(self.movie_ids[index]),
                         float(ranking_scores[local_row, index]),
                         float(rating_estimates[local_row, index]),
+                        float(denominator[local_row, index]) if supported[local_row, index] else 0.0,
                         int(counts[local_row, index]),
                         not bool(supported[local_row, index]),
                     )

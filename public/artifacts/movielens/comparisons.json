@@ -7,6 +7,16 @@
         "long_tail_share": 0.0411340206185567,
         "novelty": 9.762310870901947
       },
+      "confidence95": {
+        "ndcgAt10": [
+          0.024805113257160043,
+          0.028757103100805946
+        ],
+        "recallAt10": [
+          0.020555205389785454,
+          0.024413107108684523
+        ]
+      },
       "test": {
         "ndcg_at_10": 0.026763659448595423,
         "recall_at_10": 0.022470338645343507,
@@ -23,7 +33,7 @@
   "dataset": "MovieLens 1M",
   "datasetUrl": "https://grouplens.org/datasets/movielens/1m/",
   "experimentCodeVersion": "movielens-cf-v2",
-  "generatedAtUtc": "2026-08-12T05:01:40+00:00",
+  "generatedAtUtc": "2026-08-12T05:48:13+00:00",
   "k": 10,
   "models": [
     {
@@ -90,13 +100,19 @@
       "similarity": "Mean-centered cosine",
       "system": {
         "fallbackShare": 0.06032646048109966,
-        "fitSeconds": 5.114716249983758,
+        "fitSeconds": 5.109758625039831,
         "neighborArtifactMiB": 3.682170867919922,
-        "recommendSeconds": 2.1036923750070855,
+        "rankingTieStats": {
+          "entriesInExactTieShare": 0.0004571303187112582,
+          "fullyTiedListShare": 0.00017562346329469617,
+          "largestTieGroup": 4,
+          "lists": 5694
+        },
+        "recommendSeconds": 2.0719592499081045,
         "retainedNeighbors": 479609,
         "top10ClippedShare": 0.44952367020790285,
         "top10RawAboveRatingMaxShare": 0.44952367020790285,
-        "usersPerSecond": 2766.5641940544647
+        "usersPerSecond": 2808.9355523078593
       },
       "test": {
         "ndcg_at_10": 0.02367923541518817,
@@ -168,13 +184,20 @@
       "similarity": "Adjusted cosine",
       "system": {
         "fallbackShare": 0.02281786941580756,
-        "fitSeconds": 2.344955625012517,
+        "fitSeconds": 2.360638999962248,
         "neighborArtifactMiB": 0.5184860229492188,
-        "recommendSeconds": 1.258021124987863,
+        "rankingTieStats": {
+          "entriesInExactTieShare": 0.8757209171472781,
+          "fullyTiedListShare": 0.7789291882556131,
+          "largestTieGroup": 10,
+          "lists": 5790
+        },
+        "recommendSeconds": 1.2956520000007004,
         "retainedNeighbors": 66117,
         "top10ClippedShare": 0.0001758334505556337,
+        "top10FiveStarOnlyEvidenceShare": 0.8786045857363904,
         "top10RawAboveRatingMaxShare": 0.0001758334505556337,
-        "usersPerSecond": 4626.3134095273235
+        "usersPerSecond": 4491.9469116682985
       },
       "test": {
         "ndcg_at_10": 0.010565746224341244,
@@ -188,9 +211,11 @@
     "compute": "CPU",
     "numpy": "2.5.1",
     "pandas": "3.0.5",
+    "platform": "macOS-13.0-x86_64-i386-64bit",
     "python": "3.12.2",
     "scikitLearn": "1.9.0",
-    "scipy": "1.18.0"
+    "scipy": "1.18.0",
+    "timingContext": "One single-process offline batch over the full ranking cohort; recommendSeconds includes candidate scoring, seen-item removal, and Top-10 selection, but excludes fitting, data loading, and artifact writing. BLAS thread count was not forced."
   },
   "seed": 42,
   "split": "Per-user temporal 80/10/10; refit train+validation for final test",
@@ -211,13 +236,19 @@
           },
           "system": {
             "fallbackShare": 0.06284332354465365,
-            "fitSeconds": 4.675875582965091,
+            "fitSeconds": 4.6863758330000564,
             "neighborArtifactMiB": 3.6335792541503906,
-            "recommendSeconds": 1.981155291898176,
+            "rankingTieStats": {
+              "entriesInExactTieShare": 0.0012534100125341002,
+              "fullyTiedListShare": 0.0,
+              "largestTieGroup": 5,
+              "lists": 5656
+            },
+            "recommendSeconds": 2.0708753750659525,
             "retainedNeighbors": 473240,
             "top10ClippedShare": 0.4517805795178058,
             "top10RawAboveRatingMaxShare": 0.4517805795178058,
-            "usersPerSecond": 2922.032424047621
+            "usersPerSecond": 2795.4362052403244
           }
         },
         {
@@ -234,13 +265,19 @@
           },
           "system": {
             "fallbackShare": 0.04316807738814994,
-            "fitSeconds": 4.732914541033097,
+            "fitSeconds": 4.766442458028905,
             "neighborArtifactMiB": 0.9440650939941406,
-            "recommendSeconds": 1.1369750829180703,
+            "rankingTieStats": {
+              "entriesInExactTieShare": 0.15249769818201514,
+              "fullyTiedListShare": 0.0006974716652136007,
+              "largestTieGroup": 9,
+              "lists": 5735
+            },
+            "recommendSeconds": 1.1809973750496283,
             "retainedNeighbors": 120720,
             "top10ClippedShare": 0.6852557274647506,
             "top10RawAboveRatingMaxShare": 0.6852557274647506,
-            "usersPerSecond": 5091.580358245328
+            "usersPerSecond": 4901.789049071114
           }
         },
         {
@@ -257,13 +294,19 @@
           },
           "system": {
             "fallbackShare": 0.027034030057004665,
-            "fitSeconds": 4.77543300006073,
+            "fitSeconds": 4.75472054106649,
             "neighborArtifactMiB": 1.8650856018066406,
-            "recommendSeconds": 1.4979100410128012,
+            "rankingTieStats": {
+              "entriesInExactTieShare": 0.07618286728806037,
+              "fullyTiedListShare": 0.0,
+              "largestTieGroup": 6,
+              "lists": 5754
+            },
+            "recommendSeconds": 1.5200061249779537,
             "retainedNeighbors": 241440,
             "top10ClippedShare": 0.6866400355082113,
             "top10RawAboveRatingMaxShare": 0.6866400355082113,
-            "usersPerSecond": 3864.718068173045
+            "usersPerSecond": 3808.537284732299
           }
         }
       ],
@@ -291,13 +334,20 @@
           },
           "system": {
             "fallbackShare": 0.027707721540853342,
-            "fitSeconds": 2.1470575840212405,
+            "fitSeconds": 2.403501542052254,
             "neighborArtifactMiB": 0.5109786987304688,
-            "recommendSeconds": 1.2145068339304999,
+            "rankingTieStats": {
+              "entriesInExactTieShare": 0.8815158298688839,
+              "fullyTiedListShare": 0.784197702749739,
+              "largestTieGroup": 10,
+              "lists": 5746
+            },
+            "recommendSeconds": 1.262814208981581,
             "retainedNeighbors": 65141,
             "top10ClippedShare": 0.00010659844366272253,
+            "top10FiveStarOnlyEvidenceShare": 0.8840741925167892,
             "top10RawAboveRatingMaxShare": 0.00010659844366272253,
-            "usersPerSecond": 4766.5437840848535
+            "usersPerSecond": 4584.205624886532
           }
         },
         {
@@ -314,13 +364,20 @@
           },
           "system": {
             "fallbackShare": 0.10238383140438763,
-            "fitSeconds": 2.1756459169555455,
+            "fitSeconds": 2.1904909160220996,
             "neighborArtifactMiB": 1.7691116333007812,
-            "recommendSeconds": 1.7737232079962268,
+            "rankingTieStats": {
+              "entriesInExactTieShare": 0.2801223947809018,
+              "fullyTiedListShare": 0.1775179856115108,
+              "largestTieGroup": 10,
+              "lists": 5560
+            },
+            "recommendSeconds": 1.8295803749933839,
             "retainedNeighbors": 230047,
             "top10ClippedShare": 0.0001732001616534842,
+            "top10FiveStarOnlyEvidenceShare": 0.2916690722244674,
             "top10RawAboveRatingMaxShare": 0.0001732001616534842,
-            "usersPerSecond": 3263.7561339346894
+            "usersPerSecond": 3164.113519757739
           }
         },
         {
@@ -337,13 +394,20 @@
           },
           "system": {
             "fallbackShare": 0.012316462256002764,
-            "fitSeconds": 2.153256915975362,
+            "fitSeconds": 2.179741790983826,
             "neighborArtifactMiB": 0.9975814819335938,
-            "recommendSeconds": 1.4119987080339342,
+            "rankingTieStats": {
+              "entriesInExactTieShare": 0.8634415936477955,
+              "fullyTiedListShare": 0.77683223341438,
+              "largestTieGroup": 10,
+              "lists": 5758
+            },
+            "recommendSeconds": 1.4782719580689445,
             "retainedNeighbors": 128921,
             "top10ClippedShare": 6.995819997551463e-05,
+            "top10FiveStarOnlyEvidenceShare": 0.8662049425468282,
             "top10RawAboveRatingMaxShare": 6.995819997551463e-05,
-            "usersPerSecond": 4099.86210827388
+            "usersPerSecond": 3916.058860753962
           }
         }
       ],

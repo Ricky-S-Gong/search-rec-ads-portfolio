@@ -22,8 +22,12 @@ uv run python research/spotify-music/run_experiment.py \
   --data research/spotify-music/data/data.csv
 uv run python research/movielens-cf/download_data.py
 uv run python research/movielens-cf/run_experiment.py
-uv run pytest
+.venv/bin/python research/run_python_tests.py
 ```
+
+CI uses `uv run pytest`. In the audited Codex desktop runtime the pytest
+launcher can hang before collection, so the checked-in fallback runner executes
+the same existing Python test functions deterministically for local verification.
 
 Raw datasets are gitignored. The site reads only compact, versioned artifacts
 from `public/artifacts/`.

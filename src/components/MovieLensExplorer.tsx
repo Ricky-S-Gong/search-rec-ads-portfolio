@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { recommendationOverlap } from '../lib/movielens-demo.mjs';
+import { recommendationOverlap, visibleRecommendations } from '../lib/movielens-demo.mjs';
 import './MovieLensExplorer.css';
 
 type Movie = { movieId: number; title: string; genres: string[]; popularityBand: string };
@@ -8,6 +8,7 @@ type Rec = Movie & {
   rankScore: number;
   ratingEstimate: number | null;
   scoreWasClipped: boolean;
+  similarityWeight?: number;
   neighbors: number;
   fallback: boolean;
   hit: boolean;
@@ -30,6 +31,7 @@ export default function MovieLensExplorer({ lang, samples }: { lang: 'en' | 'zh'
   const [userIndex, setUserIndex] = useState(0);
   const [view, setView] = useState<'users' | 'movies'>('users');
   const [seedIndex, setSeedIndex] = useState(0);
+  const [expanded, setExpanded] = useState(false);
   const zh = lang === 'zh';
   const sample = samples.users[userIndex];
   const related = samples.relatedItems[seedIndex];
@@ -64,19 +66,22 @@ export default function MovieLensExplorer({ lang, samples }: { lang: 'en' | 'zh'
           const recommendations = sample.methods[key];
           const hits = recommendations.filter((movie) => movie.hit).length;
           const tail = recommendations.filter((movie) => movie.popularityBand === 'long-tail').length;
+          const shown = visibleRecommendations(recommendations, expanded) as Rec[];
+          const fullyTied = recommendations.length > 1 && recommendations.every((movie) => movie.rankScore === recommendations[0].rankScore);
           return <section className={`method-column method-${key}`} key={key}>
-            <header><div><p className="mini-label">{methodLabels[key]}</p><strong>{hits} {zh ? '次命中' : `hit${hits === 1 ? '' : 's'}`} · {tail}/10 {zh ? '长尾' : 'long-tail'}</strong></div><span>{key === 'popularity' ? (zh ? '所有用户同一排序' : 'same ranking for everyone') : (zh ? '个性化' : 'personalized')}</span></header>
-            <ol>{recommendations.map((movie, index) => <li className={movie.hit ? 'is-hit' : ''} key={movie.movieId}>
+            <header><div><p className="mini-label">{methodLabels[key]}</p><strong>{hits} {zh ? '次命中' : `hit${hits === 1 ? '' : 's'}`} · {tail}/10 {zh ? '长尾' : 'long-tail'}</strong>{fullyTied && <small>{zh ? '原始分完全并列；按 movie ID 排序' : 'raw-score tie; ordered by movie ID'}</small>}</div><span>{key === 'popularity' ? (zh ? '所有用户同一排序' : 'same ranking for everyone') : (zh ? '个性化' : 'personalized')}</span></header>
+            <ol>{shown.map((movie, index) => <li className={movie.hit ? 'is-hit' : ''} key={movie.movieId}>
               <span className="rank">{String(index + 1).padStart(2, '0')}</span>
               <div><strong>{movie.title}</strong><small>{movie.genres.slice(0, 2).join(' · ')} · {movie.popularityBand === 'head' ? (zh ? '头部' : 'head') : (zh ? '长尾' : 'long-tail')}</small>
                 {movie.evidence.length > 0 && <details><summary>{zh ? '为什么推荐？' : 'Why this movie?'}</summary>{movie.evidence.map((item) => <p key={item.source}>{item.source}<br/><small>sim {item.similarity.toFixed(3)} · contribution {item.contribution >= 0 ? '+' : ''}{item.contribution.toFixed(3)}</small></p>)}</details>}
               </div>
-              <div className="score"><strong>{movie.rankScore.toFixed(3)}</strong><small>{zh ? '排序分' : 'rank score'}</small>{movie.ratingEstimate !== null && <small>{zh ? `展示 ${movie.ratingEstimate.toFixed(2)}${movie.scoreWasClipped ? '（截断）' : ''}` : `display ${movie.ratingEstimate.toFixed(2)}${movie.scoreWasClipped ? ' (clipped)' : ''}`}</small>}</div>
+              <div className="score"><strong>{movie.rankScore.toFixed(3)}</strong><small>{zh ? '排序分' : 'rank score'}</small>{movie.ratingEstimate !== null && <small>{zh ? `展示 ${movie.ratingEstimate.toFixed(2)}${movie.scoreWasClipped ? '（截断）' : ''}` : `display ${movie.ratingEstimate.toFixed(2)}${movie.scoreWasClipped ? ' (clipped)' : ''}`}</small>}{key !== 'popularity' && <small>{movie.neighbors} {zh ? '个邻居' : 'neighbors'} · Σ|sim| {(movie.similarityWeight ?? 0).toFixed(2)}</small>}</div>
               {movie.hit && <b>{zh ? '命中' : 'HIT'}</b>}
             </li>)}</ol>
           </section>;
         })}
       </div>
+      <button className="expand-lists" type="button" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}>{expanded ? (zh ? '收起为 Top-5' : 'Show Top-5') : (zh ? '展开 Top-10' : 'Expand to Top-10')}</button>
     </> : <>
       <div className="sample-picker"><label>{zh ? '种子电影' : 'Seed movie'}<select value={seedIndex} onChange={(event) => setSeedIndex(Number(event.target.value))}>{samples.relatedItems.map((group, index) => <option value={index} key={group.seed.movieId}>{group.seed.title}</option>)}</select></label><p>{zh ? 'Item-CF 使用共同评分行为，而不是电影类型标签来建立关系。' : 'Item-CF builds these relationships from shared rating behavior—not genre labels.'}</p></div>
       <div className="related-view"><article className="seed-card"><span>{zh ? '因为你喜欢' : 'Because you liked'}</span><h3>{related.seed.title}</h3><p>{related.seed.genres.join(' · ')}</p></article><ol>{related.neighbors.map((movie, index) => <li key={movie.movieId}><span className="rank">{String(index + 1).padStart(2, '0')}</span><div><strong>{movie.title}</strong><small>{movie.genres.join(' · ')}</small></div><div className="score"><strong>{movie.similarity.toFixed(3)}</strong><small>{zh ? '收缩后相似度' : 'shrunk similarity'}</small><small>{movie.support.toLocaleString()} {zh ? '位共同评分用户' : 'co-raters'}</small></div></li>)}</ol></div>

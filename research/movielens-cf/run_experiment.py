@@ -18,7 +18,9 @@ from movielens_cf.artifacts import validate_frontend_artifacts, write_json
 from movielens_cf.baselines import BayesianPopularity, BiasBaseline
 from movielens_cf.data import dataset_profile, load_movielens
 from movielens_cf.evaluation import (
+    paired_bootstrap_interval,
     ranking_metrics,
+    ranking_tie_stats,
     rating_metrics,
     recommendation_stats,
     user_bootstrap_interval,
@@ -82,6 +84,11 @@ def evaluate_configuration(
     metrics, per_user = ranking_metrics(truth, recommendations, k=K)
     fallback = [item.used_fallback for values in detailed.values() for item in values]
     personalized = [item for values in detailed.values() for item in values if not item.used_fallback]
+    personalized_scores = {
+        user_id: scores
+        for user_id, values in detailed.items()
+        if (scores := [item.ranking_score for item in values if not item.used_fallback])
+    }
     system = {
         "fitSeconds": fit_seconds,
         "recommendSeconds": recommend_seconds,
@@ -95,12 +102,26 @@ def evaluate_configuration(
             float(np.mean([item.ranking_score != item.rating_estimate for item in personalized]))
             if personalized else 0.0
         ),
+        "rankingTieStats": ranking_tie_stats(personalized_scores),
         "retainedNeighbors": int(model.similarity.nnz),
         "neighborArtifactMiB": float(
             (model.similarity.data.nbytes + model.similarity.indices.nbytes + model.similarity.indptr.nbytes)
             / 2**20
         ),
     }
+    if mode == "item" and personalized:
+        five_star_only = []
+        for user_id, values in detailed.items():
+            user_index = model.user_index[user_id]
+            for recommendation in values:
+                if recommendation.used_fallback:
+                    continue
+                item_index = model.movie_index[recommendation.movie_id]
+                neighbors = model.similarity.getrow(item_index).indices
+                rated = model.binary[user_index, neighbors].toarray().ravel() > 0
+                source_ratings = model.ratings[user_index, neighbors[rated]].toarray().ravel()
+                five_star_only.append(bool(len(source_ratings) and np.all(source_ratings == 5.0)))
+        system["top10FiveStarOnlyEvidenceShare"] = float(np.mean(five_star_only))
     return model, metrics, per_user, recommendations, system
 
 
@@ -196,11 +217,13 @@ def sample_payload(
             indices, weights = neighbors.indices[mask], neighbors.data[mask]
             residuals = model.centered[indices, item].toarray().ravel()
             labels = [f"Viewer {int(model.user_ids[index])}" for index in indices]
+            source_ratings = residuals + model.user_means[indices]
         else:
             mask = model.binary[user, neighbors.indices].toarray().ravel() > 0
             indices, weights = neighbors.indices[mask], neighbors.data[mask]
             residuals = model.centered[user, indices].toarray().ravel()
             labels = [title.get(int(model.movie_ids[index]), str(model.movie_ids[index])) for index in indices]
+            source_ratings = residuals + model.user_means[user]
         denominator = float(np.abs(weights).sum())
         contributions = weights * residuals / denominator if denominator else np.zeros_like(weights)
         order = np.lexsort((np.asarray(labels), -np.abs(contributions)))[:3]
@@ -209,6 +232,7 @@ def sample_payload(
                 "source": labels[position],
                 "similarity": round(float(weights[position]), 4),
                 "residual": round(float(residuals[position]), 3),
+                "sourceRating": round(float(source_ratings[position]), 1),
                 "contribution": round(float(contributions[position]), 4),
             }
             for position in order
@@ -220,6 +244,7 @@ def sample_payload(
             movie_id,
             rankScore=round(float(recommendation.ranking_score), 4),
             ratingEstimate=round(float(recommendation.rating_estimate), 3),
+            similarityWeight=round(float(recommendation.similarity_weight_sum), 4),
             scoreWasClipped=bool(recommendation.ranking_score != recommendation.rating_estimate),
             neighbors=int(recommendation.neighbor_count),
             fallback=bool(recommendation.used_fallback),
@@ -324,6 +349,27 @@ def make_figures(profile: dict, models: list[dict], fitted: pd.DataFrame, output
     ax.set_ylabel("Ratings (log scale)"); ax.spines[["top", "right"]].set_visible(False)
     fig.tight_layout(); fig.savefig(output / "popularity-long-tail.svg", facecolor=fig.get_facecolor()); plt.close(fig)
 
+    fig, axes = plt.subplots(1, 3, figsize=(12, 3.6), facecolor="#07111f")
+    for ax in axes:
+        ax.set_facecolor("#07111f")
+        ax.tick_params(colors="#9cb0c8", labelsize=8)
+        ax.spines[["top", "right"]].set_visible(False)
+    distribution = profile["ratingDistribution"]
+    rating_labels = sorted(distribution, key=int)
+    axes[0].bar(rating_labels, [distribution[label]["share"] for label in rating_labels], color="#35d0e2")
+    axes[0].set_title("Rating distribution", color="#edf5ff")
+    axes[0].set_ylabel("Share of ratings", color="#9cb0c8")
+    axes[1].hist(fitted.groupby("user_id", observed=True).size(), bins=35, color="#a78bfa")
+    axes[1].set_title("Ratings per user", color="#edf5ff")
+    axes[1].set_xlabel("Training interactions", color="#9cb0c8")
+    axes[2].hist(fitted.groupby("movie_id", observed=True).size(), bins=35, color="#f7b955")
+    axes[2].set_yscale("log")
+    axes[2].set_title("Ratings per movie", color="#edf5ff")
+    axes[2].set_xlabel("Training interactions", color="#9cb0c8")
+    fig.tight_layout()
+    fig.savefig(output / "eda-overview.svg", facecolor=fig.get_facecolor())
+    plt.close(fig)
+
 
 def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
     output.mkdir(parents=True, exist_ok=True)
@@ -380,7 +426,7 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
     truth = relevant_truth(test, set(item_counts.index.astype(int)))
     popularity = BayesianPopularity().fit(fitted)
     popular_recs = popularity_recommendations(popularity, fitted, list(truth))
-    popular_rank, _ = ranking_metrics(truth, popular_recs, k=K)
+    popular_rank, popular_per_user = ranking_metrics(truth, popular_recs, k=K)
     bias = BiasBaseline().fit(fitted)
     predictable = test.loc[test["user_id"].isin(bias.user_bias) & test["movie_id"].isin(bias.item_bias)]
     bias_predictions = [bias.predict(int(row.user_id), int(row.movie_id)) for row in predictable.itertuples(index=False)]
@@ -388,6 +434,10 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
         "bayesianPopularity": {
             "test": popular_rank,
             "beyondAccuracy": recommendation_stats(popular_recs, item_counts, len(item_counts)),
+            "confidence95": {
+                "ndcgAt10": user_bootstrap_interval(popular_per_user, "ndcg_at_10"),
+                "recallAt10": user_bootstrap_interval(popular_per_user, "recall_at_10"),
+            },
         },
         "biasRating": {
             **rating_metrics(predictable["rating"], bias_predictions),
@@ -401,6 +451,8 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
         "scipy": scipy.__version__,
         "scikitLearn": sklearn.__version__,
         "compute": "CPU",
+        "platform": platform.platform(),
+        "timingContext": "One single-process offline batch over the full ranking cohort; recommendSeconds includes candidate scoring, seen-item removal, and Top-10 selection, but excludes fitting, data loading, and artifact writing. BLAS thread count was not forced.",
     }
     metadata = {
         "version": "movielens-cf-v2",
@@ -427,6 +479,8 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
         "models": final_models,
         "diagnostics": {
             "relevantItemHeadConcentration": {
+                "definition": "Movies ranked by train+validation interaction count; head is the top 20% of fitted catalog items; denominator is relevant test ratings for the ranking cohort.",
+                "relevantTestRatings": int(test.loc[test["rating"] >= RELEVANCE].shape[0]),
                 "top10PercentShare": float(
                     test.loc[test["rating"] >= RELEVANCE, "movie_id"]
                     .map(item_counts.rank(method="average", ascending=False, pct=True))
@@ -436,6 +490,14 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
                     test.loc[test["rating"] >= RELEVANCE, "movie_id"]
                     .map(item_counts.rank(method="average", ascending=False, pct=True))
                     .le(0.2).mean()
+                ),
+            },
+            "pairedUserCfMinusPopularity": {
+                "ndcgAt10": paired_bootstrap_interval(
+                    final_per_user["user"], popular_per_user, "ndcg_at_10"
+                ),
+                "recallAt10": paired_bootstrap_interval(
+                    final_per_user["user"], popular_per_user, "recall_at_10"
                 ),
             },
             "rankingCorrection": "Top-N uses raw neighborhood estimates; rating RMSE/MAE uses estimates clipped to [1, 5].",

@@ -48,5 +48,7 @@ def validate_frontend_artifacts(metrics: dict, samples: dict) -> None:
             for item in methods[method]:
                 if not {"movieId", "rankScore", "hit"}.issubset(item):
                     raise ValueError(f"{method} recommendation missing ranking fields")
+                if method != "popularity" and "similarityWeight" not in item:
+                    raise ValueError(f"{method} recommendation missing confidence weight")
         if "relevantTest" not in user:
             raise ValueError("sample missing relevantTest")

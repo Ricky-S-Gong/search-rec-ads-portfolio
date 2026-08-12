@@ -7,7 +7,7 @@ the official MovieLens 1M ratings.
 uv sync --locked
 uv run python research/movielens-cf/download_data.py
 uv run python research/movielens-cf/run_experiment.py
-uv run pytest
+.venv/bin/python research/run_python_tests.py
 ```
 
 For a fast end-to-end check without replacing the published artifacts:
@@ -27,6 +27,19 @@ rating scale are reserved for RMSE/MAE and display, preventing distinct scores
 above five from collapsing into movie-ID tie breaks. The generated artifacts
 include popularity, User-CF, and Item-CF recommendation lists, held-out hits,
 and neighbor evidence for the browser explorer.
+
+Exact Item-CF ties are reported rather than hidden. With positive adjusted
+cosine weights, a user's all-five-star contributing history can produce an
+exact raw estimate of 5.0 for many candidates; equal scores use movie ID as the
+deterministic secondary key. Artifacts expose contributing-neighbor count and
+total absolute similarity weight as confidence context. The experiment also
+reports a paired user bootstrap for User-CF minus popularity.
+
+GitHub Actions continues to run `uv run pytest`. In the audited Codex desktop
+runtime, pytest hangs before collection, including with plugin autoload and the
+terminal reporter disabled. The repository fallback runner above imports and
+executes the same existing Python test functions and supports their current
+`tmp_path` fixture usage.
 
 Raw MovieLens files remain under `research/movielens-cf/data/`, which is
 gitignored. GroupLens does not permit redistribution without separate

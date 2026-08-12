@@ -22,8 +22,8 @@ def valid_payloads():
             "relevantTest": [{"movieId": 9}],
             "methods": {
                 "popularity": [{"movieId": 9, "rankScore": 4.2, "hit": True}],
-                "userCf": [{"movieId": 8, "rankScore": 5.3, "ratingEstimate": 5.0, "hit": False}],
-                "itemCf": [{"movieId": 7, "rankScore": 4.8, "ratingEstimate": 4.8, "hit": False}],
+                "userCf": [{"movieId": 8, "rankScore": 5.3, "ratingEstimate": 5.0, "similarityWeight": 1.2, "hit": False}],
+                "itemCf": [{"movieId": 7, "rankScore": 4.8, "ratingEstimate": 4.8, "similarityWeight": 0.9, "hit": False}],
             },
         }],
         "relatedItems": [],

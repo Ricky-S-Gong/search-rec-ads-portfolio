@@ -89,3 +89,15 @@ def test_recommendation_exposes_raw_rank_score_and_clipped_rating_estimate():
 
     assert recommendation.ranking_score >= recommendation.rating_estimate
     assert 1.0 <= recommendation.rating_estimate <= 5.0
+    assert recommendation.similarity_weight_sum > 0
+
+
+def test_fallback_recommendation_has_no_neighborhood_confidence_weight():
+    model = NeighborhoodCF(
+        mode="user", k=3, min_support=2, shrinkage=0, min_neighbors=1
+    ).fit(fixture_ratings())
+
+    recommendation = model.recommend(999, n=1)[0]
+
+    assert recommendation.used_fallback is True
+    assert recommendation.similarity_weight_sum == 0.0

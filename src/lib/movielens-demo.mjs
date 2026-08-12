@@ -14,3 +14,7 @@ export function recommendationOverlap(first, second) {
     .sort((a, b) => a - b);
   return { count: movieIds.length, movieIds };
 }
+
+export function visibleRecommendations(recommendations, expanded, defaultCount = 5) {
+  return recommendations.slice(0, expanded ? 10 : defaultCount);
+}

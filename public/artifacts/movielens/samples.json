@@ -285,13 +285,15 @@
                 "contribution": 0.8986,
                 "residual": 1.762,
                 "similarity": 0.0744,
-                "source": "Pulp Fiction (1994)"
+                "source": "Pulp Fiction (1994)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.8633,
                 "residual": 1.762,
                 "similarity": 0.0715,
-                "source": "Shawshank Redemption, The (1994)"
+                "source": "Shawshank Redemption, The (1994)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -305,6 +307,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.1458,
             "title": "Beautiful Girls (1996)"
           },
           {
@@ -313,13 +316,15 @@
                 "contribution": 1.6527,
                 "residual": 1.762,
                 "similarity": 0.0008,
-                "source": "Pulp Fiction (1994)"
+                "source": "Pulp Fiction (1994)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": -0.0148,
                 "residual": -0.238,
                 "similarity": 0.0,
-                "source": "Silence of the Lambs, The (1991)"
+                "source": "Silence of the Lambs, The (1991)",
+                "sourceRating": 3.0
               }
             ],
             "fallback": false,
@@ -333,6 +338,7 @@
             "rankScore": 4.876,
             "ratingEstimate": 4.876,
             "scoreWasClipped": false,
+            "similarityWeight": 0.0008,
             "title": "Boys, The (1997)"
           },
           {
@@ -341,19 +347,22 @@
                 "contribution": 0.6625,
                 "residual": 1.762,
                 "similarity": 0.0781,
-                "source": "Clerks (1994)"
+                "source": "Clerks (1994)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.654,
                 "residual": 1.762,
                 "similarity": 0.0771,
-                "source": "Being John Malkovich (1999)"
+                "source": "Being John Malkovich (1999)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.1926,
                 "residual": 0.762,
                 "similarity": 0.0525,
-                "source": "Pleasantville (1998)"
+                "source": "Pleasantville (1998)",
+                "sourceRating": 4.0
               }
             ],
             "fallback": false,
@@ -368,6 +377,7 @@
             "rankScore": 4.7472,
             "ratingEstimate": 4.747,
             "scoreWasClipped": false,
+            "similarityWeight": 0.2076,
             "title": "Man on the Moon (1999)"
           },
           {
@@ -376,19 +386,22 @@
                 "contribution": 0.963,
                 "residual": 1.762,
                 "similarity": 0.0049,
-                "source": "Clerks (1994)"
+                "source": "Clerks (1994)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3512,
                 "residual": 1.762,
                 "similarity": 0.0018,
-                "source": "Shawshank Redemption, The (1994)"
+                "source": "Shawshank Redemption, The (1994)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.173,
                 "residual": 0.762,
                 "similarity": 0.002,
-                "source": "Beauty and the Beast (1991)"
+                "source": "Beauty and the Beast (1991)",
+                "sourceRating": 4.0
               }
             ],
             "fallback": false,
@@ -402,6 +415,7 @@
             "rankScore": 4.7189,
             "ratingEstimate": 4.719,
             "scoreWasClipped": false,
+            "similarityWeight": 0.0089,
             "title": "Celestial Clockwork (1994)"
           },
           {
@@ -410,13 +424,15 @@
                 "contribution": 1.189,
                 "residual": 1.762,
                 "similarity": 0.1309,
-                "source": "Lion King, The (1994)"
+                "source": "Lion King, The (1994)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2477,
                 "residual": 0.762,
                 "similarity": 0.063,
-                "source": "Beauty and the Beast (1991)"
+                "source": "Beauty and the Beast (1991)",
+                "sourceRating": 4.0
               }
             ],
             "fallback": false,
@@ -431,6 +447,7 @@
             "rankScore": 4.6749,
             "ratingEstimate": 4.675,
             "scoreWasClipped": false,
+            "similarityWeight": 0.1939,
             "title": "Prince of Egypt, The (1998)"
           },
           {
@@ -439,19 +456,22 @@
                 "contribution": 0.3782,
                 "residual": 1.762,
                 "similarity": 0.1299,
-                "source": "Shawshank Redemption, The (1994)"
+                "source": "Shawshank Redemption, The (1994)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3501,
                 "residual": 1.762,
                 "similarity": 0.1202,
-                "source": "Pulp Fiction (1994)"
+                "source": "Pulp Fiction (1994)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3071,
                 "residual": 1.762,
                 "similarity": 0.1054,
-                "source": "Being John Malkovich (1999)"
+                "source": "Being John Malkovich (1999)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -465,6 +485,7 @@
             "rankScore": 4.5876,
             "ratingEstimate": 4.588,
             "scoreWasClipped": false,
+            "similarityWeight": 0.6051,
             "title": "What's Eating Gilbert Grape (1993)"
           },
           {
@@ -473,13 +494,15 @@
                 "contribution": 0.9921,
                 "residual": 1.762,
                 "similarity": 0.227,
-                "source": "Shawshank Redemption, The (1994)"
+                "source": "Shawshank Redemption, The (1994)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3329,
                 "residual": 0.762,
                 "similarity": 0.1761,
-                "source": "Toy Story (1995)"
+                "source": "Toy Story (1995)",
+                "sourceRating": 4.0
               }
             ],
             "fallback": false,
@@ -494,6 +517,7 @@
             "rankScore": 4.5631,
             "ratingEstimate": 4.563,
             "scoreWasClipped": false,
+            "similarityWeight": 0.4031,
             "title": "When Harry Met Sally... (1989)"
           },
           {
@@ -502,13 +526,15 @@
                 "contribution": 0.9876,
                 "residual": 1.762,
                 "similarity": 0.186,
-                "source": "Shawshank Redemption, The (1994)"
+                "source": "Shawshank Redemption, The (1994)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3348,
                 "residual": 0.762,
                 "similarity": 0.1458,
-                "source": "E.T. the Extra-Terrestrial (1982)"
+                "source": "E.T. the Extra-Terrestrial (1982)",
+                "sourceRating": 4.0
               }
             ],
             "fallback": false,
@@ -524,6 +550,7 @@
             "rankScore": 4.5605,
             "ratingEstimate": 4.561,
             "scoreWasClipped": false,
+            "similarityWeight": 0.3319,
             "title": "Witness (1985)"
           },
           {
@@ -532,13 +559,15 @@
                 "contribution": 0.9442,
                 "residual": 1.762,
                 "similarity": 0.1442,
-                "source": "Shawshank Redemption, The (1994)"
+                "source": "Shawshank Redemption, The (1994)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3536,
                 "residual": 0.762,
                 "similarity": 0.1249,
-                "source": "Usual Suspects, The (1995)"
+                "source": "Usual Suspects, The (1995)",
+                "sourceRating": 4.0
               }
             ],
             "fallback": false,
@@ -552,6 +581,7 @@
             "rankScore": 4.5359,
             "ratingEstimate": 4.536,
             "scoreWasClipped": false,
+            "similarityWeight": 0.2691,
             "title": "Natural, The (1984)"
           },
           {
@@ -560,13 +590,15 @@
                 "contribution": 0.9351,
                 "residual": 1.762,
                 "similarity": 0.1158,
-                "source": "Pulp Fiction (1994)"
+                "source": "Pulp Fiction (1994)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3575,
                 "residual": 0.762,
                 "similarity": 0.1024,
-                "source": "Reservoir Dogs (1992)"
+                "source": "Reservoir Dogs (1992)",
+                "sourceRating": 4.0
               }
             ],
             "fallback": false,
@@ -581,6 +613,7 @@
             "rankScore": 4.5308,
             "ratingEstimate": 4.531,
             "scoreWasClipped": false,
+            "similarityWeight": 0.2182,
             "title": "Jackie Brown (1997)"
           }
         ],
@@ -753,19 +786,22 @@
                 "contribution": 0.3454,
                 "residual": 1.8,
                 "similarity": 0.0344,
-                "source": "Viewer 3683"
+                "source": "Viewer 3683",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3009,
                 "residual": 1.97,
                 "similarity": 0.0274,
-                "source": "Viewer 5795"
+                "source": "Viewer 5795",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2691,
                 "residual": 1.754,
                 "similarity": 0.0275,
-                "source": "Viewer 5397"
+                "source": "Viewer 5397",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -780,6 +816,7 @@
             "rankScore": 4.6517,
             "ratingEstimate": 4.652,
             "scoreWasClipped": false,
+            "similarityWeight": 0.1792,
             "title": "Paths of Glory (1957)"
           },
           {
@@ -788,19 +825,22 @@
                 "contribution": 0.2508,
                 "residual": 1.8,
                 "similarity": 0.0344,
-                "source": "Viewer 3683"
+                "source": "Viewer 3683",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2489,
                 "residual": 1.525,
                 "similarity": 0.0403,
-                "source": "Viewer 4995"
+                "source": "Viewer 4995",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2185,
                 "residual": 1.97,
                 "similarity": 0.0274,
-                "source": "Viewer 5795"
+                "source": "Viewer 5795",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -815,6 +855,7 @@
             "rankScore": 4.4377,
             "ratingEstimate": 4.438,
             "scoreWasClipped": false,
+            "similarityWeight": 0.2467,
             "title": "Big Sleep, The (1946)"
           },
           {
@@ -823,19 +864,22 @@
                 "contribution": 0.4184,
                 "residual": 2.102,
                 "similarity": 0.032,
-                "source": "Viewer 1059"
+                "source": "Viewer 1059",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2564,
                 "residual": 1.484,
                 "similarity": 0.0278,
-                "source": "Viewer 3675"
+                "source": "Viewer 3675",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2431,
                 "residual": 1.163,
                 "similarity": 0.0336,
-                "source": "Viewer 2679"
+                "source": "Viewer 2679",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -850,6 +894,7 @@
             "rankScore": 4.4195,
             "ratingEstimate": 4.42,
             "scoreWasClipped": false,
+            "similarityWeight": 0.1609,
             "title": "Help! (1965)"
           },
           {
@@ -858,19 +903,22 @@
                 "contribution": 0.3069,
                 "residual": 1.54,
                 "similarity": 0.0286,
-                "source": "Viewer 2567"
+                "source": "Viewer 2567",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2872,
                 "residual": 1.484,
                 "similarity": 0.0278,
-                "source": "Viewer 3675"
+                "source": "Viewer 3675",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2294,
                 "residual": 1.014,
                 "similarity": 0.0325,
-                "source": "Viewer 5086"
+                "source": "Viewer 5086",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -886,6 +934,7 @@
             "rankScore": 4.3968,
             "ratingEstimate": 4.397,
             "scoreWasClipped": false,
+            "similarityWeight": 0.1436,
             "title": "Mister Roberts (1955)"
           },
           {
@@ -894,19 +943,22 @@
                 "contribution": 0.364,
                 "residual": 2.881,
                 "similarity": 0.0298,
-                "source": "Viewer 2106"
+                "source": "Viewer 2106",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2288,
                 "residual": 1.97,
                 "similarity": 0.0274,
-                "source": "Viewer 5795"
+                "source": "Viewer 5795",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.166,
                 "residual": 1.163,
                 "similarity": 0.0336,
-                "source": "Viewer 2679"
+                "source": "Viewer 2679",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -920,6 +972,7 @@
             "rankScore": 4.3777,
             "ratingEstimate": 4.378,
             "scoreWasClipped": false,
+            "similarityWeight": 0.2357,
             "title": "Mr. Smith Goes to Washington (1939)"
           },
           {
@@ -936,6 +989,7 @@
             "rankScore": 4.3413,
             "ratingEstimate": 4.341,
             "scoreWasClipped": false,
+            "similarityWeight": 0.0,
             "title": "Sanjuro (1962)"
           },
           {
@@ -944,19 +998,22 @@
                 "contribution": 0.2711,
                 "residual": 1.525,
                 "similarity": 0.0403,
-                "source": "Viewer 4995"
+                "source": "Viewer 4995",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2323,
                 "residual": 1.447,
                 "similarity": 0.0364,
-                "source": "Viewer 352"
+                "source": "Viewer 352",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2072,
                 "residual": 1.678,
                 "similarity": 0.028,
-                "source": "Viewer 23"
+                "source": "Viewer 23",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -971,6 +1028,7 @@
             "rankScore": 4.3229,
             "ratingEstimate": 4.323,
             "scoreWasClipped": false,
+            "similarityWeight": 0.2265,
             "title": "Hard-Boiled (Lashou shentan) (1992)"
           },
           {
@@ -979,19 +1037,22 @@
                 "contribution": 0.0684,
                 "residual": 2.483,
                 "similarity": 0.0358,
-                "source": "Viewer 2010"
+                "source": "Viewer 2010",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0519,
                 "residual": 2.102,
                 "similarity": 0.032,
-                "source": "Viewer 1059"
+                "source": "Viewer 1059",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0486,
                 "residual": 2.302,
                 "similarity": 0.0274,
-                "source": "Viewer 3411"
+                "source": "Viewer 3411",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1007,6 +1068,7 @@
             "rankScore": 4.3162,
             "ratingEstimate": 4.316,
             "scoreWasClipped": false,
+            "similarityWeight": 1.2977,
             "title": "Godfather, The (1972)"
           },
           {
@@ -1024,6 +1086,7 @@
             "rankScore": 4.3071,
             "ratingEstimate": 4.307,
             "scoreWasClipped": false,
+            "similarityWeight": 0.0,
             "title": "Yojimbo (1961)"
           },
           {
@@ -1039,6 +1102,7 @@
             "rankScore": 4.2845,
             "ratingEstimate": 4.284,
             "scoreWasClipped": false,
+            "similarityWeight": 0.0,
             "title": "General, The (1927)"
           }
         ]
@@ -1159,19 +1223,22 @@
                 "contribution": 0.5771,
                 "residual": 1.248,
                 "similarity": 0.1243,
-                "source": "Fried Green Tomatoes (1991)"
+                "source": "Fried Green Tomatoes (1991)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3358,
                 "residual": 1.248,
                 "similarity": 0.0723,
-                "source": "Terms of Endearment (1983)"
+                "source": "Terms of Endearment (1983)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3355,
                 "residual": 1.248,
                 "similarity": 0.0723,
-                "source": "Dead Poets Society (1989)"
+                "source": "Dead Poets Society (1989)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1185,6 +1252,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.2689,
             "title": "Little Women (1994)"
           },
           {
@@ -1193,13 +1261,15 @@
                 "contribution": 0.6257,
                 "residual": 1.248,
                 "similarity": 0.0297,
-                "source": "Election (1999)"
+                "source": "Election (1999)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.6227,
                 "residual": 1.248,
                 "similarity": 0.0295,
-                "source": "Dangerous Liaisons (1988)"
+                "source": "Dangerous Liaisons (1988)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1213,6 +1283,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.0592,
             "title": "Pushing Hands (1992)"
           },
           {
@@ -1221,13 +1292,15 @@
                 "contribution": 0.6985,
                 "residual": 1.248,
                 "similarity": 0.222,
-                "source": "Schindler's List (1993)"
+                "source": "Schindler's List (1993)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.5499,
                 "residual": 1.248,
                 "similarity": 0.1747,
-                "source": "Shawshank Redemption, The (1994)"
+                "source": "Shawshank Redemption, The (1994)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1242,6 +1315,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.3967,
             "title": "Killing Fields, The (1984)"
           },
           {
@@ -1250,13 +1324,15 @@
                 "contribution": 0.6353,
                 "residual": 1.248,
                 "similarity": 0.1002,
-                "source": "Shawshank Redemption, The (1994)"
+                "source": "Shawshank Redemption, The (1994)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.613,
                 "residual": 1.248,
                 "similarity": 0.0966,
-                "source": "Schindler's List (1993)"
+                "source": "Schindler's List (1993)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1270,6 +1346,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.1968,
             "title": "Shall We Dance? (Shall We Dansu?) (1996)"
           },
           {
@@ -1278,13 +1355,15 @@
                 "contribution": 0.676,
                 "residual": 1.248,
                 "similarity": 0.0505,
-                "source": "Titanic (1997)"
+                "source": "Titanic (1997)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.5724,
                 "residual": 1.248,
                 "similarity": 0.0428,
-                "source": "Steel Magnolias (1989)"
+                "source": "Steel Magnolias (1989)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1298,6 +1377,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.0933,
             "title": "Kiss Me, Guido (1997)"
           },
           {
@@ -1306,13 +1386,15 @@
                 "contribution": 0.6528,
                 "residual": 1.248,
                 "similarity": 0.0161,
-                "source": "Titanic (1997)"
+                "source": "Titanic (1997)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.5956,
                 "residual": 1.248,
                 "similarity": 0.0147,
-                "source": "Breakfast Club, The (1985)"
+                "source": "Breakfast Club, The (1985)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1326,6 +1408,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.0307,
             "title": "Welcome to Woop-Woop (1997)"
           },
           {
@@ -1334,13 +1417,15 @@
                 "contribution": 0.6513,
                 "residual": 1.248,
                 "similarity": 0.0702,
-                "source": "Terms of Endearment (1983)"
+                "source": "Terms of Endearment (1983)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.5971,
                 "residual": 1.248,
                 "similarity": 0.0643,
-                "source": "Steel Magnolias (1989)"
+                "source": "Steel Magnolias (1989)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1355,6 +1440,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.1345,
             "title": "Billy's Hollywood Screen Kiss (1997)"
           },
           {
@@ -1363,13 +1449,15 @@
                 "contribution": 0.6838,
                 "residual": 1.248,
                 "similarity": 0.0936,
-                "source": "Boys on the Side (1995)"
+                "source": "Boys on the Side (1995)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.5646,
                 "residual": 1.248,
                 "similarity": 0.0773,
-                "source": "Dying Young (1991)"
+                "source": "Dying Young (1991)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1384,6 +1472,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.1709,
             "title": "How Stella Got Her Groove Back (1998)"
           },
           {
@@ -1392,13 +1481,15 @@
                 "contribution": 0.6397,
                 "residual": 1.248,
                 "similarity": 0.0371,
-                "source": "American Beauty (1999)"
+                "source": "American Beauty (1999)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.6087,
                 "residual": 1.248,
                 "similarity": 0.0353,
-                "source": "Schindler's List (1993)"
+                "source": "Schindler's List (1993)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1412,6 +1503,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.0725,
             "title": "Color of Paradise, The (Rang-e Khoda) (1999)"
           },
           {
@@ -1420,19 +1512,22 @@
                 "contribution": 0.4619,
                 "residual": 1.248,
                 "similarity": 0.1051,
-                "source": "St. Elmo's Fire (1985)"
+                "source": "St. Elmo's Fire (1985)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3933,
                 "residual": 1.248,
                 "similarity": 0.0895,
-                "source": "Legends of the Fall (1994)"
+                "source": "Legends of the Fall (1994)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3931,
                 "residual": 1.248,
                 "similarity": 0.0895,
-                "source": "Dying Young (1991)"
+                "source": "Dying Young (1991)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1447,6 +1542,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.2841,
             "title": "Prince of Tides, The (1991)"
           }
         ],
@@ -1621,19 +1717,22 @@
                 "contribution": 0.4743,
                 "residual": 1.898,
                 "similarity": 0.082,
-                "source": "Viewer 3475"
+                "source": "Viewer 3475",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.4211,
                 "residual": 1.823,
                 "similarity": 0.0758,
-                "source": "Viewer 531"
+                "source": "Viewer 531",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2829,
                 "residual": 1.793,
                 "similarity": 0.0518,
-                "source": "Viewer 4611"
+                "source": "Viewer 4611",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1647,6 +1746,7 @@
             "rankScore": 5.2241,
             "ratingEstimate": 5.0,
             "scoreWasClipped": true,
+            "similarityWeight": 0.3281,
             "title": "Dangerous Beauty (1998)"
           },
           {
@@ -1655,19 +1755,22 @@
                 "contribution": 0.0811,
                 "residual": 1.898,
                 "similarity": 0.082,
-                "source": "Viewer 3475"
+                "source": "Viewer 3475",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0801,
                 "residual": 2.013,
                 "similarity": 0.0764,
-                "source": "Viewer 3620"
+                "source": "Viewer 3620",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0757,
                 "residual": 1.246,
                 "similarity": 0.1166,
-                "source": "Viewer 3600"
+                "source": "Viewer 3600",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1683,6 +1786,7 @@
             "rankScore": 4.9014,
             "ratingEstimate": 4.901,
             "scoreWasClipped": false,
+            "similarityWeight": 1.9186,
             "title": "Godfather, The (1972)"
           },
           {
@@ -1691,19 +1795,22 @@
                 "contribution": 0.1103,
                 "residual": 1.898,
                 "similarity": 0.082,
-                "source": "Viewer 3475"
+                "source": "Viewer 3475",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.103,
                 "residual": 1.246,
                 "similarity": 0.1166,
-                "source": "Viewer 3600"
+                "source": "Viewer 3600",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0996,
                 "residual": 2.36,
                 "similarity": 0.0595,
-                "source": "Viewer 746"
+                "source": "Viewer 746",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1717,6 +1824,7 @@
             "rankScore": 4.8682,
             "ratingEstimate": 4.868,
             "scoreWasClipped": false,
+            "similarityWeight": 1.4103,
             "title": "One Flew Over the Cuckoo's Nest (1975)"
           },
           {
@@ -1725,19 +1833,22 @@
                 "contribution": 0.152,
                 "residual": 2.122,
                 "similarity": 0.0551,
-                "source": "Viewer 3441"
+                "source": "Viewer 3441",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.1186,
                 "residual": 1.055,
                 "similarity": 0.0864,
-                "source": "Viewer 5920"
+                "source": "Viewer 5920",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.1127,
                 "residual": 1.8,
                 "similarity": 0.0481,
-                "source": "Viewer 970"
+                "source": "Viewer 970",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1751,6 +1862,7 @@
             "rankScore": 4.851,
             "ratingEstimate": 4.851,
             "scoreWasClipped": false,
+            "similarityWeight": 0.7684,
             "title": "Remember the Titans (2000)"
           },
           {
@@ -1759,19 +1871,22 @@
                 "contribution": 0.4063,
                 "residual": 2.282,
                 "similarity": 0.0519,
-                "source": "Viewer 1962"
+                "source": "Viewer 1962",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2411,
                 "residual": 1.261,
                 "similarity": 0.0557,
-                "source": "Viewer 1068"
+                "source": "Viewer 1068",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.19,
                 "residual": 1.266,
                 "similarity": 0.0437,
-                "source": "Viewer 3349"
+                "source": "Viewer 3349",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1785,6 +1900,7 @@
             "rankScore": 4.7894,
             "ratingEstimate": 4.789,
             "scoreWasClipped": false,
+            "similarityWeight": 0.2912,
             "title": "Mighty, The (1998)"
           },
           {
@@ -1793,19 +1909,22 @@
                 "contribution": 0.1621,
                 "residual": 1.823,
                 "similarity": 0.0758,
-                "source": "Viewer 531"
+                "source": "Viewer 531",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.1371,
                 "residual": 2.122,
                 "similarity": 0.0551,
-                "source": "Viewer 3441"
+                "source": "Viewer 3441",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.1263,
                 "residual": 1.502,
                 "similarity": 0.0716,
-                "source": "Viewer 5569"
+                "source": "Viewer 5569",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1819,6 +1938,7 @@
             "rankScore": 4.771,
             "ratingEstimate": 4.771,
             "scoreWasClipped": false,
+            "similarityWeight": 0.8521,
             "title": "Sound of Music, The (1965)"
           },
           {
@@ -1827,19 +1947,22 @@
                 "contribution": 0.0498,
                 "residual": 1.898,
                 "similarity": 0.082,
-                "source": "Viewer 3475"
+                "source": "Viewer 3475",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0465,
                 "residual": 1.246,
                 "similarity": 0.1166,
-                "source": "Viewer 3600"
+                "source": "Viewer 3600",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0449,
                 "residual": 2.36,
                 "similarity": 0.0595,
-                "source": "Viewer 746"
+                "source": "Viewer 746",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1855,6 +1978,7 @@
             "rankScore": 4.7708,
             "ratingEstimate": 4.771,
             "scoreWasClipped": false,
+            "similarityWeight": 3.1243,
             "title": "Braveheart (1995)"
           },
           {
@@ -1863,19 +1987,22 @@
                 "contribution": 0.4303,
                 "residual": 2.222,
                 "similarity": 0.0447,
-                "source": "Viewer 3476"
+                "source": "Viewer 3476",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3425,
                 "residual": 1.802,
                 "similarity": 0.0439,
-                "source": "Viewer 4140"
+                "source": "Viewer 4140",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2713,
                 "residual": 1.355,
                 "similarity": 0.0463,
-                "source": "Viewer 2592"
+                "source": "Viewer 2592",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1889,6 +2016,7 @@
             "rankScore": 4.7514,
             "ratingEstimate": 4.751,
             "scoreWasClipped": false,
+            "similarityWeight": 0.2311,
             "title": "High Noon (1952)"
           },
           {
@@ -1897,19 +2025,22 @@
                 "contribution": 0.1499,
                 "residual": 1.823,
                 "similarity": 0.0758,
-                "source": "Viewer 531"
+                "source": "Viewer 531",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.1267,
                 "residual": 2.122,
                 "similarity": 0.0551,
-                "source": "Viewer 3441"
+                "source": "Viewer 3441",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.1079,
                 "residual": 2.222,
                 "similarity": 0.0447,
-                "source": "Viewer 3476"
+                "source": "Viewer 3476",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1924,6 +2055,7 @@
             "rankScore": 4.7444,
             "ratingEstimate": 4.744,
             "scoreWasClipped": false,
+            "similarityWeight": 0.9218,
             "title": "Red Violin, The (Le Violon rouge) (1998)"
           },
           {
@@ -1932,19 +2064,22 @@
                 "contribution": 0.1935,
                 "residual": 1.898,
                 "similarity": 0.082,
-                "source": "Viewer 3475"
+                "source": "Viewer 3475",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.1034,
                 "residual": 1.546,
                 "similarity": 0.0538,
-                "source": "Viewer 5140"
+                "source": "Viewer 5140",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0883,
                 "residual": 1.551,
                 "similarity": 0.0457,
-                "source": "Viewer 1354"
+                "source": "Viewer 1354",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -1959,6 +2094,7 @@
             "rankScore": 4.7271,
             "ratingEstimate": 4.727,
             "scoreWasClipped": false,
+            "similarityWeight": 0.804,
             "title": "Much Ado About Nothing (1993)"
           }
         ]
@@ -2172,19 +2308,22 @@
                 "contribution": 0.6327,
                 "residual": 1.527,
                 "similarity": 0.0659,
-                "source": "Paths of Glory (1957)"
+                "source": "Paths of Glory (1957)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.4501,
                 "residual": 1.527,
                 "similarity": 0.0469,
-                "source": "Touch of Evil (1958)"
+                "source": "Touch of Evil (1958)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.4446,
                 "residual": 1.527,
                 "similarity": 0.0463,
-                "source": "Rear Window (1954)"
+                "source": "Rear Window (1954)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2199,6 +2338,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.1592,
             "title": "Purple Noon (1960)"
           },
           {
@@ -2207,19 +2347,22 @@
                 "contribution": 0.3768,
                 "residual": 1.527,
                 "similarity": 0.1252,
-                "source": "Seventh Seal, The (Sjunde inseglet, Det) (1957)"
+                "source": "Seventh Seal, The (Sjunde inseglet, Det) (1957)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.364,
                 "residual": 1.527,
                 "similarity": 0.121,
-                "source": "Paths of Glory (1957)"
+                "source": "Paths of Glory (1957)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2404,
                 "residual": 1.527,
                 "similarity": 0.0799,
-                "source": "Seven Samurai (The Magnificent Seven) (Shichinin no samurai) (1954)"
+                "source": "Seven Samurai (The Magnificent Seven) (Shichinin no samurai) (1954)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2233,6 +2376,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.5076,
             "title": "Pather Panchali (1955)"
           },
           {
@@ -2241,19 +2385,22 @@
                 "contribution": 0.4727,
                 "residual": 1.527,
                 "similarity": 0.302,
-                "source": "Apocalypse Now (1979)"
+                "source": "Apocalypse Now (1979)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.402,
                 "residual": 1.527,
                 "similarity": 0.2569,
-                "source": "Godfather, The (1972)"
+                "source": "Godfather, The (1972)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3398,
                 "residual": 1.527,
                 "similarity": 0.2171,
-                "source": "Raiders of the Lost Ark (1981)"
+                "source": "Raiders of the Lost Ark (1981)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2268,6 +2415,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.9758,
             "title": "Patton (1970)"
           },
           {
@@ -2276,13 +2424,15 @@
                 "contribution": 0.8257,
                 "residual": 1.527,
                 "similarity": 0.1255,
-                "source": "Shining, The (1980)"
+                "source": "Shining, The (1980)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.7017,
                 "residual": 1.527,
                 "similarity": 0.1067,
-                "source": "Nosferatu (Nosferatu, eine Symphonie des Grauens) (1922)"
+                "source": "Nosferatu (Nosferatu, eine Symphonie des Grauens) (1922)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2297,6 +2447,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.2322,
             "title": "Rosemary's Baby (1968)"
           },
           {
@@ -2305,13 +2456,15 @@
                 "contribution": 0.839,
                 "residual": 1.527,
                 "similarity": 0.0187,
-                "source": "Seventh Seal, The (Sjunde inseglet, Det) (1957)"
+                "source": "Seventh Seal, The (Sjunde inseglet, Det) (1957)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.6884,
                 "residual": 1.527,
                 "similarity": 0.0153,
-                "source": "Seven Samurai (The Magnificent Seven) (Shichinin no samurai) (1954)"
+                "source": "Seven Samurai (The Magnificent Seven) (Shichinin no samurai) (1954)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2325,6 +2478,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.034,
             "title": "School of Flesh, The (L' École de la chair) (1998)"
           },
           {
@@ -2333,19 +2487,22 @@
                 "contribution": 0.335,
                 "residual": 1.527,
                 "similarity": 0.1011,
-                "source": "Seventh Seal, The (Sjunde inseglet, Det) (1957)"
+                "source": "Seventh Seal, The (Sjunde inseglet, Det) (1957)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3224,
                 "residual": 1.527,
                 "similarity": 0.0973,
-                "source": "Yojimbo (1961)"
+                "source": "Yojimbo (1961)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3096,
                 "residual": 1.527,
                 "similarity": 0.0934,
-                "source": "Bonnie and Clyde (1967)"
+                "source": "Bonnie and Clyde (1967)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2359,6 +2516,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.4609,
             "title": "Jules and Jim (Jules et Jim) (1961)"
           },
           {
@@ -2367,13 +2525,15 @@
                 "contribution": 0.7673,
                 "residual": 1.527,
                 "similarity": 0.0941,
-                "source": "Big Night (1996)"
+                "source": "Big Night (1996)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.7601,
                 "residual": 1.527,
                 "similarity": 0.0932,
-                "source": "My Left Foot (1989)"
+                "source": "My Left Foot (1989)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2387,6 +2547,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.1874,
             "title": "Howards End (1992)"
           },
           {
@@ -2395,13 +2556,15 @@
                 "contribution": 0.9451,
                 "residual": 1.527,
                 "similarity": 0.0632,
-                "source": "Seventh Seal, The (Sjunde inseglet, Det) (1957)"
+                "source": "Seventh Seal, The (Sjunde inseglet, Det) (1957)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.5823,
                 "residual": 1.527,
                 "similarity": 0.039,
-                "source": "Seven Samurai (The Magnificent Seven) (Shichinin no samurai) (1954)"
+                "source": "Seven Samurai (The Magnificent Seven) (Shichinin no samurai) (1954)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2415,6 +2578,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.1022,
             "title": "Not One Less (Yi ge dou bu neng shao) (1999)"
           },
           {
@@ -2423,19 +2587,22 @@
                 "contribution": 0.3958,
                 "residual": 1.527,
                 "similarity": 0.0633,
-                "source": "Citizen Kane (1941)"
+                "source": "Citizen Kane (1941)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3878,
                 "residual": 1.527,
                 "similarity": 0.062,
-                "source": "Battleship Potemkin, The (Bronenosets Potyomkin) (1925)"
+                "source": "Battleship Potemkin, The (Bronenosets Potyomkin) (1925)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3808,
                 "residual": 1.527,
                 "similarity": 0.0609,
-                "source": "Paths of Glory (1957)"
+                "source": "Paths of Glory (1957)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2449,6 +2616,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.2441,
             "title": "Big Carnival, The (1951)"
           },
           {
@@ -2457,13 +2625,15 @@
                 "contribution": 1.0638,
                 "residual": 1.527,
                 "similarity": 0.0461,
-                "source": "Nosferatu (Nosferatu, eine Symphonie des Grauens) (1922)"
+                "source": "Nosferatu (Nosferatu, eine Symphonie des Grauens) (1922)",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.4636,
                 "residual": 1.527,
                 "similarity": 0.0201,
-                "source": "Monty Python and the Holy Grail (1974)"
+                "source": "Monty Python and the Holy Grail (1974)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2477,6 +2647,7 @@
             "rankScore": 5.0,
             "ratingEstimate": 5.0,
             "scoreWasClipped": false,
+            "similarityWeight": 0.0662,
             "title": "And God Created Woman (Et Dieu&#8230;Créa la Femme) (1956)"
           }
         ],
@@ -2649,19 +2820,22 @@
                 "contribution": 0.2424,
                 "residual": 1.933,
                 "similarity": 0.1423,
-                "source": "Viewer 3182"
+                "source": "Viewer 3182",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2424,
                 "residual": 1.937,
                 "similarity": 0.142,
-                "source": "Viewer 1019"
+                "source": "Viewer 1019",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2324,
                 "residual": 1.942,
                 "similarity": 0.1357,
-                "source": "Viewer 2288"
+                "source": "Viewer 2288",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2676,6 +2850,7 @@
             "rankScore": 4.9688,
             "ratingEstimate": 4.969,
             "scoreWasClipped": false,
+            "similarityWeight": 1.1341,
             "title": "Badlands (1973)"
           },
           {
@@ -2684,19 +2859,22 @@
                 "contribution": 0.2243,
                 "residual": 2.303,
                 "similarity": 0.1471,
-                "source": "Viewer 5788"
+                "source": "Viewer 5788",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.182,
                 "residual": 1.937,
                 "similarity": 0.142,
-                "source": "Viewer 1019"
+                "source": "Viewer 1019",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.1812,
                 "residual": 1.74,
                 "similarity": 0.1573,
-                "source": "Viewer 1447"
+                "source": "Viewer 1447",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2710,6 +2888,7 @@
             "rankScore": 4.9233,
             "ratingEstimate": 4.923,
             "scoreWasClipped": false,
+            "similarityWeight": 1.5103,
             "title": "Modern Times (1936)"
           },
           {
@@ -2718,19 +2897,22 @@
                 "contribution": 0.3849,
                 "residual": 1.937,
                 "similarity": 0.142,
-                "source": "Viewer 1019"
+                "source": "Viewer 1019",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3691,
                 "residual": 1.942,
                 "similarity": 0.1357,
-                "source": "Viewer 2288"
+                "source": "Viewer 2288",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.3522,
                 "residual": 1.803,
                 "similarity": 0.1395,
-                "source": "Viewer 6016"
+                "source": "Viewer 6016",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2745,6 +2927,7 @@
             "rankScore": 4.9152,
             "ratingEstimate": 4.915,
             "scoreWasClipped": false,
+            "similarityWeight": 0.7141,
             "title": "McCabe & Mrs. Miller (1971)"
           },
           {
@@ -2753,19 +2936,22 @@
                 "contribution": 0.041,
                 "residual": 2.483,
                 "similarity": 0.1582,
-                "source": "Viewer 2010"
+                "source": "Viewer 2010",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0377,
                 "residual": 1.694,
                 "similarity": 0.2131,
-                "source": "Viewer 4543"
+                "source": "Viewer 4543",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0357,
                 "residual": 1.97,
                 "similarity": 0.1733,
-                "source": "Viewer 5795"
+                "source": "Viewer 5795",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2781,6 +2967,7 @@
             "rankScore": 4.8665,
             "ratingEstimate": 4.867,
             "scoreWasClipped": false,
+            "similarityWeight": 9.5718,
             "title": "Godfather: Part II, The (1974)"
           },
           {
@@ -2789,19 +2976,22 @@
                 "contribution": 0.0569,
                 "residual": 2.381,
                 "similarity": 0.2206,
-                "source": "Viewer 5367"
+                "source": "Viewer 5367",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0453,
                 "residual": 2.132,
                 "similarity": 0.196,
-                "source": "Viewer 1449"
+                "source": "Viewer 1449",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0445,
                 "residual": 2.529,
                 "similarity": 0.1626,
-                "source": "Viewer 1010"
+                "source": "Viewer 1010",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2815,6 +3005,7 @@
             "rankScore": 4.8595,
             "ratingEstimate": 4.859,
             "scoreWasClipped": false,
+            "similarityWeight": 9.2329,
             "title": "One Flew Over the Cuckoo's Nest (1975)"
           },
           {
@@ -2823,19 +3014,22 @@
                 "contribution": 0.263,
                 "residual": 1.513,
                 "similarity": 0.1823,
-                "source": "Viewer 1980"
+                "source": "Viewer 1980",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2618,
                 "residual": 1.901,
                 "similarity": 0.1444,
-                "source": "Viewer 5530"
+                "source": "Viewer 5530",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.2597,
                 "residual": 1.818,
                 "similarity": 0.1498,
-                "source": "Viewer 5636"
+                "source": "Viewer 5636",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2849,6 +3043,7 @@
             "rankScore": 4.7848,
             "ratingEstimate": 4.785,
             "scoreWasClipped": false,
+            "similarityWeight": 1.0489,
             "title": "Jean de Florette (1986)"
           },
           {
@@ -2857,19 +3052,22 @@
                 "contribution": 0.109,
                 "residual": 2.132,
                 "similarity": 0.196,
-                "source": "Viewer 1449"
+                "source": "Viewer 1449",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.1072,
                 "residual": 2.529,
                 "similarity": 0.1626,
-                "source": "Viewer 1010"
+                "source": "Viewer 1010",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0941,
                 "residual": 1.694,
                 "similarity": 0.2131,
-                "source": "Viewer 4543"
+                "source": "Viewer 4543",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2883,6 +3081,7 @@
             "rankScore": 4.7711,
             "ratingEstimate": 4.771,
             "scoreWasClipped": false,
+            "similarityWeight": 3.8358,
             "title": "Hustler, The (1961)"
           },
           {
@@ -2891,19 +3090,22 @@
                 "contribution": 0.0592,
                 "residual": 2.381,
                 "similarity": 0.2206,
-                "source": "Viewer 5367"
+                "source": "Viewer 5367",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0471,
                 "residual": 2.132,
                 "similarity": 0.196,
-                "source": "Viewer 1449"
+                "source": "Viewer 1449",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0464,
                 "residual": 2.529,
                 "similarity": 0.1626,
-                "source": "Viewer 1010"
+                "source": "Viewer 1010",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2918,6 +3120,7 @@
             "rankScore": 4.769,
             "ratingEstimate": 4.769,
             "scoreWasClipped": false,
+            "similarityWeight": 8.8679,
             "title": "Taxi Driver (1976)"
           },
           {
@@ -2926,19 +3129,22 @@
                 "contribution": 0.0691,
                 "residual": 1.694,
                 "similarity": 0.2131,
-                "source": "Viewer 4543"
+                "source": "Viewer 4543",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0653,
                 "residual": 1.97,
                 "similarity": 0.1733,
-                "source": "Viewer 5795"
+                "source": "Viewer 5795",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0612,
                 "residual": 1.684,
                 "similarity": 0.1899,
-                "source": "Viewer 3507"
+                "source": "Viewer 3507",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2953,6 +3159,7 @@
             "rankScore": 4.7659,
             "ratingEstimate": 4.766,
             "scoreWasClipped": false,
+            "similarityWeight": 5.2254,
             "title": "Lawrence of Arabia (1962)"
           },
           {
@@ -2961,19 +3168,22 @@
                 "contribution": 0.111,
                 "residual": 2.381,
                 "similarity": 0.2206,
-                "source": "Viewer 5367"
+                "source": "Viewer 5367",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.0869,
                 "residual": 2.529,
                 "similarity": 0.1626,
-                "source": "Viewer 1010"
+                "source": "Viewer 1010",
+                "sourceRating": 5.0
               },
               {
                 "contribution": 0.083,
                 "residual": 2.483,
                 "similarity": 0.1582,
-                "source": "Viewer 2010"
+                "source": "Viewer 2010",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
@@ -2988,6 +3198,7 @@
             "rankScore": 4.7485,
             "ratingEstimate": 4.749,
             "scoreWasClipped": false,
+            "similarityWeight": 4.7339,
             "title": "Great Escape, The (1963)"
           }
         ]

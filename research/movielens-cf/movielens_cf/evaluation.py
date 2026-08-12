@@ -61,6 +61,56 @@ def user_bootstrap_interval(
     return [float(value) for value in np.quantile(means, [0.025, 0.975])]
 
 
+def paired_bootstrap_interval(
+    candidate: pd.DataFrame,
+    baseline: pd.DataFrame,
+    column: str,
+    seed: int = 42,
+    samples: int = 1_000,
+) -> dict:
+    """Bootstrap a paired user-level candidate-minus-baseline difference."""
+    paired = candidate[["user_id", column]].merge(
+        baseline[["user_id", column]], on="user_id", suffixes=("_candidate", "_baseline")
+    )
+    differences = (
+        paired[f"{column}_candidate"] - paired[f"{column}_baseline"]
+    ).to_numpy(dtype=float)
+    if len(differences) == 0:
+        return {"users": 0, "meanDifference": 0.0, "confidence95": [0.0, 0.0]}
+    rng = np.random.default_rng(seed)
+    means = np.empty(samples, dtype=float)
+    for index in range(samples):
+        means[index] = rng.choice(differences, size=len(differences), replace=True).mean()
+    return {
+        "users": int(len(differences)),
+        "meanDifference": float(differences.mean()),
+        "confidence95": [float(value) for value in np.quantile(means, [0.025, 0.975])],
+    }
+
+
+def ranking_tie_stats(recommendations: dict[int, list[float]]) -> dict:
+    """Summarize exact score ties within recommendation lists."""
+    if not recommendations:
+        return {"lists": 0, "fullyTiedListShare": 0.0, "entriesInExactTieShare": 0.0, "largestTieGroup": 0}
+    fully_tied = 0
+    tied_entries = 0
+    total_entries = 0
+    largest = 0
+    for scores in recommendations.values():
+        values, counts = np.unique(np.asarray(scores, dtype=float), return_counts=True)
+        del values
+        total_entries += len(scores)
+        tied_entries += int(counts[counts > 1].sum())
+        largest = max(largest, int(counts.max()) if len(counts) else 0)
+        fully_tied += int(len(scores) > 1 and len(counts) == 1)
+    return {
+        "lists": int(len(recommendations)),
+        "fullyTiedListShare": fully_tied / len(recommendations),
+        "entriesInExactTieShare": tied_entries / total_entries if total_entries else 0.0,
+        "largestTieGroup": largest,
+    }
+
+
 def recommendation_stats(
     recommendations: dict[int, list[int]], item_counts: pd.Series, catalog_size: int
 ) -> dict:
