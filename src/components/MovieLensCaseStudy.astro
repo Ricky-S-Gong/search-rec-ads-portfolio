@@ -1,0 +1,181 @@
+---
+import { Code } from 'astro:components';
+import KatexMath from './KatexMath.astro';
+import MovieLensExplorer from './MovieLensExplorer';
+import { href, type Lang } from '../data/site';
+import metrics from '../../public/artifacts/movielens/metrics.json';
+import profileArtifact from '../../public/artifacts/movielens/profile.json';
+import comparisons from '../../public/artifacts/movielens/comparisons.json';
+import samples from '../../public/artifacts/movielens/samples.json';
+
+const { lang } = Astro.props as { lang: Lang };
+const zh = lang === 'zh';
+const profile = profileArtifact.profile;
+const user = metrics.models.find((model) => model.key === 'user-cf')!;
+const item = metrics.models.find((model) => model.key === 'item-cf')!;
+const popularity = metrics.baselines.bayesianPopularity;
+const userValidation = comparisons.validation.find((entry) => entry.mode === 'user')!;
+const itemValidation = comparisons.validation.find((entry) => entry.mode === 'item')!;
+const paired = metrics.diagnostics.pairedUserCfMinusPopularity.ndcgAt10;
+const head = metrics.diagnostics.relevantItemHeadConcentration;
+const itemTieStats = item.system.rankingTieStats!;
+const itemFiveStarOnlyShare = item.system.top10FiveStarOnlyEvidenceShare ?? 0;
+const pct = (value: number, digits = 1) => `${(value * 100).toFixed(digits)}%`;
+const signedPoints = (value: number, digits = 2) => `${value >= 0 ? '+' : ''}${(value * 100).toFixed(digits)} pp`;
+const year = (timestamp: number) => new Date(timestamp * 1000).getUTCFullYear();
+const nav = zh
+  ? ['业务问题','数据','探索性数据分析','信号表示与归一化','算法选择','候选方法对比','结果：离线代理与用户结果','评估与下一步','交互实验台']
+  : ['Business problem','Data','Exploratory data analysis','Signal representation and normalization','Algorithm selection','Candidate method comparison','Results: offline proxies vs user outcomes','Evaluation and next steps','Interactive experiment lab'];
+const copy = zh ? {
+  problemTitle:'1. 业务问题：从历史评分生成个性化候选',
+  problem:'设想一个电影流媒体平台：当用户已经留下评分时，首页需要从尚未评分的完整目录中选择 10 部候选。热门榜可以服务所有人，却不能利用个人偏好；本项目比较它与两类邻域协同过滤。',
+  objective:'离线目标：在每位用户未来给出 4–5 星的电影中，让相关候选尽量靠前，同时审计目录覆盖和长尾曝光。MovieLens 没有曝光、点击或观看日志，因此不能测量 CTR、观看时长、留存、收入或因果增量。',
+  dataTitle:'2. 数据：可用信号与边界',
+  data:'MovieLens 1M 是 GroupLens 发布的稳定基准。每行表示一位用户在某个时间对一部电影给出的 1–5 星评分；电影表还提供标题与类型。实验只用评分与时间学习协同关系，类型仅用于解释和未来内容模型。',
+  edaTitle:'3. 探索性数据分析：稀疏性决定模型与评估',
+  eda:'只保留会改变建模决策的证据：评分倾向、用户与电影活跃度、矩阵稀疏性和热门度集中。',
+  representationTitle:'4. 信号表示与归一化',
+  representation:'评分已经共享 1–5 的量纲，因此不需要 Spotify 项目中的 StandardScaler 或 MinMaxScaler。真正需要校正的是用户打分习惯、低支持度相似度和缺失值的语义。',
+  algorithmTitle:'5. 算法选择',
+  algorithm:'方法范围由当前显式评分信号与 Top-10 学习目标决定。热门度用于最低成本基线与兜底；User-CF 和 Item-CF 分别比较矩阵的行与列；偏置模型只诊断评分误差。',
+  comparisonTitle:'6. 候选方法对比',
+  comparison:'训练、验证、相关性阈值、完整目录候选和 K=10 保持一致。k、最小支持度和收缩系数以成组候选配置比较，因此表格不能解释单个参数的因果作用。',
+  resultTitle:'7. 结果：离线代理指标与用户结果分离',
+  result:'下表报告历史评分上的离线排序代理、目录分布指标与工程测量。它们不是线上用户效果。',
+  evaluationTitle:'8. 评估、限制与下一步',
+  evaluation:'每位用户按时间排序后采用 80/10/10 切分：训练集拟合候选配置，验证集选参，训练加验证重拟合，最终测试只评一次。评分 ≥4 视为相关，候选为训练目录中所有未见电影。',
+  labTitle:'9. 交互实验台',
+  lab:'选择固定的低、中、高活跃用户，对比三种方法的 Top-5；需要时展开 Top-10。所有列表、命中、邻居证据和相似电影均来自完整实验的预计算产物。',
+} : {
+  problemTitle:'1. Business problem: generate personalized candidates from ratings',
+  problem:'Consider a movie-streaming homepage. Once a viewer has rating history, the system must select ten candidates from the full catalog they have not rated. Popularity can serve everyone, but it cannot use individual taste; this study compares it with two neighborhood collaborative-filtering methods.',
+  objective:'Offline objective: rank movies the viewer later rates 4–5 stars near the top, while auditing catalog coverage and long-tail exposure. MovieLens has no impression, click, or watch log, so it cannot measure CTR, watch time, retention, revenue, or causal lift.',
+  dataTitle:'2. Data: available signals and boundaries',
+  data:'MovieLens 1M is a stable GroupLens benchmark. Each row is a 1–5 star rating from one user for one movie at one timestamp; movie metadata adds titles and genres. The experiment uses ratings and time to learn collaborative relations. Genres support explanation and a future content model, not the current scores.',
+  edaTitle:'3. Exploratory data analysis: sparsity shapes modeling and evaluation',
+  eda:'The audit keeps only evidence that changes a decision: rating tendency, user and movie activity, matrix sparsity, and popularity concentration.',
+  representationTitle:'4. Signal representation and normalization',
+  representation:'Ratings already share a 1–5 unit, so the StandardScaler and MinMaxScaler used in the Spotify project are not appropriate here. The required corrections concern rating habits, low-support similarity, and the meaning of missing entries.',
+  algorithmTitle:'5. Algorithm selection',
+  algorithm:'Method scope follows the explicit-rating signal and the Top-10 learning objective. Popularity is the lowest-cost baseline and fallback; User-CF and Item-CF compare matrix rows and columns; the bias model diagnoses rating error only.',
+  comparisonTitle:'6. Candidate method comparison',
+  comparison:'Training data, validation data, relevance threshold, full-catalog candidates, and K=10 stay fixed. Because k, minimum support, and shrinkage move together, these are candidate configurations—not isolated causal parameter tests.',
+  resultTitle:'7. Results: offline proxies versus user outcomes',
+  result:'The evidence below contains offline ranking proxies, catalog-distribution metrics, and engineering measurements from historical ratings. None is an online user effect.',
+  evaluationTitle:'8. Evaluation, limitations, and next steps',
+  evaluation:'Ratings are ordered within each user and split 80/10/10: train fits candidate configurations, validation selects them, train plus validation is refit, and final test is evaluated once. Ratings ≥4 are relevant; candidates are every unseen movie in the fitted catalog.',
+  labTitle:'9. Interactive experiment lab',
+  lab:'Choose fixed low-, medium-, and high-activity users and compare three Top-5 lists; expand to Top-10 when needed. Every list, hit, neighbor explanation, and related movie comes from precomputed full-experiment artifacts.',
+};
+const inspectCode = `ratings, movies = load_movielens(data_dir)
+train, validation, test = per_user_temporal_split(ratings)
+# One rating row: user_id, movie_id, rating, timestamp`;
+const normalizationCode = `centered = rating - user_mean
+similarity = cosine(centered_vectors)
+shrunk = similarity * support / (support + shrinkage)
+# Missing ratings stay missing; they are never filled with zero.`;
+const evaluationCode = `relevant = test.rating >= 4
+candidates = fitted_catalog - seen_movies
+validation -> select configuration
+train + validation -> refit -> test once`;
+const userFormula = String.raw`\hat r_{ui}=\bar r_u+\frac{\sum_{v\in N_k(u,i)}s(u,v)(r_{vi}-\bar r_v)}{\sum_{v\in N_k(u,i)}|s(u,v)|}`;
+const itemFormula = String.raw`\hat r_{ui}=\bar r_u+\frac{\sum_{j\in N_k(i,u)}s(i,j)(r_{uj}-\bar r_u)}{\sum_{j\in N_k(i,u)}|s(i,j)|}`;
+const commands = `.venv/bin/python research/run_python_tests.py
+npm test
+MPLCONFIGDIR=/tmp/movielens-mpl .venv/bin/python research/movielens-cf/run_experiment.py --smoke --output /tmp/movielens-smoke
+MPLCONFIGDIR=/tmp/movielens-mpl .venv/bin/python research/movielens-cf/run_experiment.py
+npm run check
+npm run build`;
+---
+
+<nav class="case-nav" aria-label={zh ? 'MovieLens 项目章节' : 'MovieLens case-study sections'}>{nav.map((label,index)=><a href={`#ml-${index+1}`}>{index+1}. {label}</a>)}</nav>
+<div class="case-study">
+  <section id="ml-1" class="case-step">
+    <p class="step-label">Step 1</p><h2>{copy.problemTitle}</h2><p>{copy.problem}</p>
+    <aside><h3>{zh ? '决策对象' : 'Decision surface'}</h3><p>{zh ? '目标用户是已有评分历史的回访用户；产品输出是首页个性化候选，不是最终播放概率。' : 'The target is a returning viewer with rating history; the output is a personalized homepage candidate set, not a watch probability.'}</p></aside>
+    <div class="output"><strong>{zh ? '成功标准与边界' : 'Success criteria and boundary'}</strong><p>{copy.objective}</p></div>
+  </section>
+
+  <section id="ml-2" class="case-step">
+    <p class="step-label">Step 2</p><h2>{copy.dataTitle}</h2><p>{copy.data}</p>
+    <div class="code-block"><Code code={inspectCode} lang="python" theme="github-dark" /></div>
+    <div class="output"><strong>{zh ? '数据审计结果' : 'Data audit result'}</strong><p>{profile.ratings.toLocaleString()} {zh ? '条评分，' : 'ratings, '}{profile.users.toLocaleString()} {zh ? '位用户，' : 'users, '}{profile.ratedMovies.toLocaleString()} {zh ? `部有评分电影；时间覆盖 ${year(profile.timestampRange[0])}–${year(profile.timestampRange[1])}。` : `rated movies, spanning ${year(profile.timestampRange[0])}–${year(profile.timestampRange[1])}.`}</p></div>
+    <dl class="field-grid"><div><dt>rating</dt><dd>{zh ? '主动给出的显式反馈；不是观看或点击。' : 'Self-selected explicit feedback, not a view or click.'}</dd></div><div><dt>timestamp</dt><dd>{zh ? '用于过去预测未来的时间切分。' : 'Supports past-to-future evaluation.'}</dd></div><div><dt>genres</dt><dd>{zh ? '用于解释；不进入当前 CF 分数。' : 'Used for explanation, not current CF scores.'}</dd></div><div><dt>{zh ? '缺失单元格' : 'missing cell'}</dt><dd>{zh ? '表示未观察，不代表不喜欢，也不填 0。' : 'Means unobserved—not disliked—and stays missing.'}</dd></div><div><dt>{zh ? '显式 vs 隐式' : 'explicit vs implicit'}</dt><dd>{zh ? '本数据有星级评分，没有曝光、点击或观看。' : 'Stars exist; impressions, clicks, and watches do not.'}</dd></div><div><dt>{zh ? '数据年代' : 'dataset age'}</dt><dd>{zh ? '2003 年发布；不含现代设备、会话或实时上下文。' : 'Released in 2003; no modern device, session, or live context.'}</dd></div></dl>
+  </section>
+
+  <section id="ml-3" class="case-step">
+    <p class="step-label">Step 3</p><h2>{copy.edaTitle}</h2><p>{copy.eda}</p>
+    <figure><img src={href('/artifacts/movielens/eda-overview.svg')} width="960" height="288" loading="lazy" alt={zh ? 'MovieLens 评分分布、每用户评分数和每电影评分数' : 'MovieLens rating distribution and user and movie activity histograms'} /><figcaption><strong>{zh ? '观察：' : 'Observation: '}</strong>{zh ? `评分集中在 3–5 星；用户评分中位数为 ${profile.ratingsPerUser.median}，电影评分中位数为 ${profile.ratingsPerMovie.median}，矩阵仍有 ${pct(profile.sparsity)} 为空。` : `Ratings concentrate at 3–5 stars; median activity is ${profile.ratingsPerUser.median} ratings per user and ${profile.ratingsPerMovie.median} per movie, while ${pct(profile.sparsity)} of the matrix remains empty.`}<br/><strong>{zh ? '影响：' : 'Implication: '}</strong>{zh ? '不能把缺失值当负例；邻域需要共同评分支持度、收缩和共享兜底。' : 'Missing values cannot become negatives; neighborhoods need co-rating support, shrinkage, and a shared fallback.'}</figcaption></figure>
+    <figure><img src={href('/artifacts/movielens/popularity-long-tail.svg')} width="720" height="396" loading="lazy" alt={zh ? '按训练热门度排序的电影评分次数长尾曲线' : 'Long-tail curve of movie interaction counts ordered by fitted popularity'} /><figcaption><strong>{zh ? '观察：' : 'Observation: '}</strong>{zh ? `训练加验证交互数定义热门度；最热门 20% 电影包含测试 cohort 中 ${head.relevantTestRatings.toLocaleString()} 条相关评分的 ${pct(head.top20PercentShare)}。` : `Popularity is defined by train-plus-validation interaction count; the top 20% of movies contain ${pct(head.top20PercentShare)} of ${head.relevantTestRatings.toLocaleString()} relevant test ratings in the ranking cohort.`}<br/><strong>{zh ? '决定：' : 'Decision: '}</strong>{zh ? '保留热门基线，并同时报告覆盖与长尾比例，避免只优化头部命中。' : 'Keep popularity as a baseline and report coverage and long-tail share so head-item hits are not the only objective.'}</figcaption></figure>
+  </section>
+
+  <section id="ml-4" class="case-step">
+    <p class="step-label">Step 4</p><h2>{copy.representationTitle}</h2><p>{copy.representation}</p>
+    <div class="matrix" role="region" aria-label={zh ? '中心化评分示例' : 'Mean-centering example'}><table><thead><tr><th>{zh ? '用户' : 'User'}</th><th>Film A</th><th>Film B</th><th>{zh ? '均值' : 'Mean'}</th><th>{zh ? '中心化后' : 'Centered'}</th></tr></thead><tbody><tr><th>Alice</th><td>5</td><td>3</td><td>4</td><td>+1, −1</td></tr><tr><th>Bob</th><td>4</td><td>2</td><td>3</td><td>+1, −1</td></tr></tbody></table></div>
+    <p class="symbol-guide">{zh ? '两人的绝对评分不同，但相对偏好相同。User-CF 比较中心化后的用户行；Item-CF 在共同评分用户内减去各自均值后比较电影列。' : 'The absolute scores differ, but the relative preference is identical. User-CF compares centered user rows; Item-CF compares movie columns after removing each co-rater’s mean.'}</p>
+    <div class="code-block"><Code code={normalizationCode} lang="python" theme="github-dark" /></div>
+    <div class="scaling-formulas"><div class="formula-card"><h3>{zh ? '支持度门槛' : 'Minimum support'}</h3><p>{zh ? '共同评分不足的相似关系直接过滤，避免一两次巧合主导结果。' : 'Discard similarities with too few co-ratings so one or two coincidences cannot dominate.'}</p></div><div class="formula-card"><h3>{zh ? '相似度收缩' : 'Similarity shrinkage'}</h3><KatexMath latex={String.raw`s'=s\frac{n}{n+\lambda}`} display /><p>{zh ? 'n 是共同评分数，λ 是收缩强度；证据越少，越靠近 0。' : 'n is co-rating support and λ is shrinkage; weaker evidence moves closer to zero.'}</p></div></div>
+    <aside><h3>{zh ? '排序分与展示评分' : 'Rank score versus display rating'}</h3><p>{zh ? 'Top-N 使用未截断的原始估计排序；RMSE、MAE 与界面评分限制在 1–5。这样不会让高于 5 的不同分数过早并列。' : 'Top-N uses raw estimates. RMSE, MAE, and displayed ratings use the 1–5 scale, preventing distinct scores above five from collapsing before ranking.'}</p></aside>
+  </section>
+
+  <section id="ml-5" class="case-step">
+    <p class="step-label">Step 5</p><h2>{copy.algorithmTitle}</h2><p>{copy.algorithm}</p>
+    <div class="method-cards">
+      <article class="method-card"><div class="method-copy"><h3>Bayesian popularity</h3><ul class="card-points"><li>{zh ? '输入：每部电影的评分数与平均分。' : 'Input: movie rating count and mean.'}</li><li>{zh ? '作用：非个性化基线；邻居证据不足时兜底。' : 'Role: non-personalized baseline and sparse-evidence fallback.'}</li><li>{zh ? '局限：所有用户几乎相同，覆盖集中在头部。' : 'Limit: nearly identical across users and concentrated on head items.'}</li></ul></div></article>
+      <article class="method-card"><div class="method-copy"><h3>User-Based Collaborative Filtering</h3><p>{zh ? '先找中心化评分走势相近的用户，再聚合他们对候选电影的评分残差。' : 'Find users with similar centered rating patterns, then aggregate their residual ratings for a candidate.'}</p><KatexMath latex={userFormula} display /><p>{zh ? 'u 是目标用户，i 是候选电影，v 是邻居，s 是收缩相似度，Nₖ 是最多 k 位评过 i 的邻居。例：用户均值 3.0，两个邻居的权重/残差为 0.8/1.5 与 0.4/0.5，预测为 4.17。' : 'u is the target user, i the candidate, v a neighbor, s shrunk similarity, and Nₖ up to k neighbors who rated i. With user mean 3.0 and weight/residual pairs 0.8/1.5 and 0.4/0.5, the estimate is 4.17.'}</p><a href={href(`/${lang}/algorithms/user-based-cf/`)}>{zh ? '查看通用算法页 →' : 'Open the general algorithm page →'}</a></div></article>
+      <article class="method-card"><div class="method-copy"><h3>Item-Based Collaborative Filtering</h3><p>{zh ? '先学习共同用户以相似方式评分的电影关系，再聚合用户已评分电影的残差。' : 'Learn movie relationships from shared rating patterns, then aggregate residuals from movies the user rated.'}</p><KatexMath latex={itemFormula} display /><p>{zh ? 'j 是用户已评分的邻居电影。若用户均值为 3.0，且所有有效来源评分都是 5 星，则每个残差都为 2.0，原始估计会精确等于 5.0；相同分数按 movie ID 确定性排序。' : 'j is a neighboring movie already rated by the user. If the user mean is 3.0 and every contributing source rating is five stars, each residual is 2.0 and the raw estimate is exactly 5.0; exact ties resolve deterministically by movie ID.'}</p><a href={href(`/${lang}/algorithms/item-based-cf/`)}>{zh ? '查看通用算法页 →' : 'Open the general algorithm page →'}</a></div></article>
+    </div>
+    <aside><h3>{zh ? '未加入的方法' : 'Methods not added'}</h3><p>{zh ? '偏置模型仅报告评分误差。矩阵分解需要独立的模型化 CF 决策问题；类型内容模型与混合模型需要新的公平协议。ALS、BPR、LightFM 面向不同的隐式反馈目标。' : 'The bias model reports rating error only. Matrix factorization needs a separate model-based CF decision question; genre content and hybrid methods need a new fair protocol. ALS, BPR, and LightFM target a different implicit-feedback objective.'}</p></aside>
+  </section>
+
+  <section id="ml-6" class="case-step">
+    <p class="step-label">Step 6</p><h2>{copy.comparisonTitle}</h2><p>{copy.comparison}</p>
+    <div class="validation-grid">{[userValidation,itemValidation].map((group)=><article><h3>{group.mode==='user'?'User-CF':'Item-CF'}</h3><div class="method-table" role="region" tabindex="0"><table><thead><tr><th>k</th><th>{zh?'支持度':'support'}</th><th>{zh?'收缩':'shrinkage'}</th><th>NDCG@10</th><th>Recall@10</th></tr></thead><tbody>{group.candidates.map((candidate)=><tr class:list={{selected:candidate.params.k===group.selected.k&&candidate.params.min_support===group.selected.min_support}}><td>{candidate.params.k}</td><td>{candidate.params.min_support}</td><td>{candidate.params.shrinkage}</td><td>{pct(candidate.metrics.ndcg_at_10,2)}</td><td>{pct(candidate.metrics.recall_at_10,2)}</td></tr>)}</tbody></table></div></article>)}</div>
+    <div class="method-table" role="region" tabindex="0"><table><thead><tr><th>{zh?'维度':'Dimension'}</th><th>User-CF</th><th>Item-CF</th></tr></thead><tbody><tr><th>{zh?'表示':'Representation'}</th><td>{zh?'中心化用户行':'centered user rows'}</td><td>{zh?'adjusted-cosine 电影列':'adjusted-cosine movie columns'}</td></tr><tr><th>{zh?'最终配置':'Selected configuration'}</th><td>k=80 · support=10 · shrinkage=50 · min neighbors=5</td><td>k=20 · support=5 · shrinkage=10 · min neighbors=2</td></tr><tr><th>{zh?'服务与解释':'Serving / explanation'}</th><td>{zh?'邻域随用户变化；解释为相似用户':'neighborhood changes by user; similar-user evidence'}</td><td>{zh?'电影邻居可离线预计算；解释为来源电影':'movie neighbors can be precomputed; source-movie evidence'}</td></tr><tr><th>{zh?'冷启动':'Cold start'}</th><td>{zh?'新用户和新电影都弱':'weak for new users and movies'}</td><td>{zh?'新电影弱；用户需要初始评分':'new movies weak; users need initial ratings'}</td></tr></tbody></table></div>
+  </section>
+
+  <section id="ml-7" class="case-step wide-step">
+    <p class="step-label">Step 7</p><h2>{copy.resultTitle}</h2><p>{copy.result}</p>
+    <div class="code-block narrow"><Code code={evaluationCode} lang="python" theme="github-dark" /></div>
+    <div class="output"><strong>{zh ? '共同评估框架' : 'Shared evaluation frame'}</strong><p>{metrics.evaluationPopulation.rankingUsers.toLocaleString()} {zh ? `位有未来相关电影的用户；时间切分；K=${metrics.k}；每位用户在完整未见目录上排序。更高的 NDCG、Recall、覆盖率和长尾比例代表对应问题上的提升，但各指标不能互相替代。` : `users with future relevant movies; temporal split; K=${metrics.k}; full unseen-catalog ranking per user. Higher NDCG, recall, coverage, and long-tail share improve their respective questions, but the metrics are not interchangeable.`}</p></div>
+    <div class="result-cards">
+      <article><h3>NDCG@10 ↑</h3><div class="paired-values"><div><span>Popularity</span><strong>{pct(popularity.test.ndcg_at_10,2)}</strong></div><div><span>User-CF</span><strong>{pct(user.test.ndcg_at_10,2)}</strong></div></div><ul class="card-points"><li>{zh?'问题：相关电影是否更靠前。':'Question: are relevant movies near the top?'}</li><li>{zh?`配对差值为 ${signedPoints(paired.meanDifference)}，95% CI ${signedPoints(paired.confidence95[0])} 至 ${signedPoints(paired.confidence95[1])}；User-CF 明确低于热门基线，不再称为“接近”。`:`Paired difference is ${signedPoints(paired.meanDifference)}, 95% CI ${signedPoints(paired.confidence95[0])} to ${signedPoints(paired.confidence95[1])}; User-CF is lower, so the page no longer calls it “close.”`}</li><li>{zh?'限制：离线显式评分代理，不是观看概率。':'Limit: an offline explicit-rating proxy, not watch probability.'}</li></ul></article>
+      <article><h3>Recall@10 ↑</h3><div class="paired-values"><div><span>Popularity</span><strong>{pct(popularity.test.recall_at_10,2)}</strong></div><div><span>User-CF</span><strong>{pct(user.test.recall_at_10,2)}</strong></div></div><ul class="card-points"><li>{zh?'问题：十个位置找回多少未来相关电影。':'Question: how many future relevant movies fit in ten slots?'}</li><li>{zh?`Item-CF 为 ${pct(item.test.recall_at_10,2)}。完整目录与有限 K 使绝对值较低。`:`Item-CF reaches ${pct(item.test.recall_at_10,2)}. Full-catalog ranking and limited K keep absolute values low.`}</li><li>{zh?'限制：未曝光电影的缺失评分不是负例。':'Limit: missing ratings for unexposed movies are not negatives.'}</li></ul></article>
+      <article><h3>{zh?'目录分布 ↑':'Catalog distribution ↑'}</h3><div class="paired-values"><div><span>User-CF</span><strong>{pct(user.beyondAccuracy.catalog_coverage)}</strong><small>{pct(user.beyondAccuracy.long_tail_share)} {zh?'长尾':'tail'}</small></div><div><span>Item-CF</span><strong>{pct(item.beyondAccuracy.catalog_coverage)}</strong><small>{pct(item.beyondAccuracy.long_tail_share)} {zh?'长尾':'tail'}</small></div></div><ul class="card-points"><li>{zh?`热门基线覆盖仅 ${pct(popularity.beyondAccuracy.catalog_coverage)}。个性化方法分散更多目录曝光。`:`Popularity covers only ${pct(popularity.beyondAccuracy.catalog_coverage)}. Personalized methods distribute candidates across more of the catalog.`}</li><li>{zh?'限制：更多覆盖或长尾不证明用户更满意。':'Limit: more coverage or tail exposure does not prove satisfaction.'}</li></ul></article>
+      <article><h3>{zh?'工程与分数诊断':'Engineering and score diagnostics'}</h3><ul class="card-points"><li>User-CF: {user.system.recommendSeconds.toFixed(2)} s · {user.system.usersPerSecond.toFixed(0)} {zh?'用户/秒':'users/s'} · {user.system.neighborArtifactMiB.toFixed(2)} MiB</li><li>Item-CF: {item.system.recommendSeconds.toFixed(2)} s · {item.system.usersPerSecond.toFixed(0)} {zh?'用户/秒':'users/s'} · {item.system.neighborArtifactMiB.toFixed(2)} MiB</li><li>{zh?`Item-CF 有 ${pct(itemTieStats.fullyTiedListShare)} 的个性化列表 Top-10 原始分完全并列；${pct(itemFiveStarOnlyShare)} 的条目只由 5 星历史贡献。`:`Item-CF has fully tied raw Top-10 scores in ${pct(itemTieStats.fullyTiedListShare)} of personalized lists; ${pct(itemFiveStarOnlyShare)} of entries receive evidence only from five-star history.`}</li><li>{zh?`上下文：${metrics.runtime.platform}，Python ${metrics.runtime.python}，单进程离线批处理；计时包含打分、过滤已见物品与 Top-10 选择，不含拟合、加载和写产物。未强制 BLAS 线程数，不能解释为线上请求延迟。`:`Context: ${metrics.runtime.platform}, Python ${metrics.runtime.python}, single-process offline batch. Timing includes scoring, seen-item removal, and Top-10 selection; it excludes fit, load, and artifact writes. BLAS threads were not forced, so this is not online request latency.`}</li></ul></article>
+    </div>
+    <figure><img src={href('/artifacts/movielens/model-ranking.svg')} width="720" height="396" loading="lazy" alt={zh?'三种 MovieLens 方法的 NDCG 和 Recall 柱状图':'NDCG and recall bars for three MovieLens methods'} /><figcaption>{zh?'观察：热门基线的排序代理最高；User-CF 以较低 NDCG 换取更高覆盖，Item-CF 覆盖最高但排序代理最低。该结果支持多目标取舍，不支持宣布个性化模型获胜。':'Observation: popularity has the strongest ranking proxy; User-CF trades lower NDCG for broader coverage, while Item-CF reaches the most catalog with the weakest ranking proxy. This supports a multi-objective trade-off, not a claim that personalization won.'}</figcaption></figure>
+  </section>
+
+  <section id="ml-8" class="case-step">
+    <p class="step-label">Step 8</p><h2>{copy.evaluationTitle}</h2><p>{copy.evaluation}</p>
+    <h3>{zh?'证据支持的结论':'What the evidence supports'}</h3><ul><li>{zh?'热门度是当前协议中最强的排序基线，也是稀疏历史的合理兜底。':'Popularity is the strongest ranking baseline under this protocol and a reasonable sparse-history fallback.'}</li><li>{zh?'User-CF 的 NDCG 较低，但目录覆盖明显更高；是否值得部署需要预先定义多目标规则。':'User-CF has lower NDCG and substantially higher coverage; deployment needs a predefined multi-objective rule.'}</li><li>{zh?'Item-CF 可离线预计算并提供来源电影解释，因此是相关电影候选的工程方案；本实验没有验证该产品页面的用户效果。':'Item-CF can be precomputed and explained through source movies, making it an engineering candidate for related items; this experiment did not validate user impact on that surface.'}</li></ul>
+    <aside><h3>{zh?'主要限制':'Primary limitations'}</h3><p>{zh?'评分是自选择且受曝光影响；缺失并非随机。纯 CF 无法处理没有交互的新用户或新电影。MovieLens 1M 年代较早、领域单一，并缺少会话和实时上下文。bootstrap 描述当前用户 cohort 的抽样不确定性，不证明因果效果。':'Ratings are self-selected and exposure-dependent, so missingness is not random. Pure CF cannot solve new-user or new-item cold start. MovieLens 1M is old, single-domain, and lacks session or real-time context. Bootstrap intervals describe sampling uncertainty for this cohort, not causal impact.'}</p></aside>
+    <h3>{zh?'排序后的下一步':'Ranked next steps'}</h3><ol><li>{zh?'保留当前并列诊断与证据强度展示；若改变 Item-CF 打分，必须重新走验证选择。':'Keep tie diagnostics and evidence strength visible; any Item-CF scoring change must return to validation selection.'}</li><li>{zh?'在同一时间协议下测试明确的类型内容 + CF 混合规则，并预先定义 NDCG/覆盖取舍。':'Test a defined genre-content plus CF hybrid under the same temporal protocol, with a predeclared NDCG/coverage rule.'}</li><li>{zh?'把 SVD 作为单独的模型化 CF 决策实验，而不是当前页面的附加模型。':'Evaluate SVD as a separate model-based CF decision study, not an extra model on this page.'}</li><li>{zh?'线上按用户随机分流，预先定义播放开始、有效观看、留存、延迟和长尾曝光护栏。':'Run a user-randomized online test with predefined play-start, qualified watch, retention, latency, and tail-exposure guardrails.'}</li></ol>
+    <div class="bridge"><a href={href(`/${lang}/projects/spotify-content-recommender/`)}>{zh?'对照 Spotify 内容推荐 →':'Compare with Spotify content recommendation →'}</a></div>
+    <details class="reproduction"><summary>{zh?'复现实验与测试命令':'Reproduction and test commands'}</summary><pre><code>{commands}</code></pre><p>{zh?'标准 pytest 启动器在当前桌面运行环境中会在收集前挂起；仓库提供的确定性 fallback runner 执行同一组现有测试函数。CI 仍保留标准 uv run pytest。':'The standard pytest launcher hangs before collection in the current desktop runtime. The checked-in deterministic fallback runner executes the same existing test functions. CI retains standard uv run pytest.'}</p></details>
+  </section>
+
+  <section id="ml-9" class="case-step wide-step">
+    <p class="step-label">Step 9</p><h2>{copy.labTitle}</h2><p>{copy.lab}</p>
+    <MovieLensExplorer client:visible lang={lang} samples={samples} />
+  </section>
+</div>
+
+<style>
+  .case-nav{position:sticky;top:68px;z-index:5;display:flex;gap:.35rem;width:min(calc(100% - 2 * var(--page-gutter)),var(--max));margin:0 auto 2rem;padding:.65rem;overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:rgba(7,17,31,.94)}.case-nav a{flex:0 0 auto;padding:.35rem .55rem;color:var(--muted);font:.7rem 'IBM Plex Mono',monospace;text-decoration:none}.case-nav a:hover{color:var(--starlight)}
+  .case-study{width:min(calc(100% - 2 * var(--page-gutter)),var(--reading-max));margin-inline:auto}.case-step{display:grid;gap:1.15rem;padding:4.5rem 0;border-top:1px solid var(--line);scroll-margin-top:130px}.case-step h2{font:600 var(--title-step-size)/1.15 var(--title-font);letter-spacing:-.03em}.case-step h3{margin-top:.8rem;font-size:1.15rem}.case-step>p,.case-step li{color:var(--muted);font-size:1.02rem}.step-label{color:var(--rec)!important;font:.72rem 'IBM Plex Mono',monospace!important;text-transform:uppercase}
+  aside,.output{padding:1.1rem 1.2rem;border-left:3px solid var(--search);background:rgba(53,208,226,.06)}aside h3,.output strong{display:block;margin:0 0 .35rem}aside p,.output p{color:var(--muted)}.output{border-left-color:var(--complete);background:rgba(85,217,139,.06)}
+  .code-block{overflow:hidden;border:1px solid var(--line);border-radius:14px}.code-block :global(pre){margin:0!important;padding:1rem!important;overflow-x:auto;font-size:.83rem}.code-block.narrow{max-width:720px}
+  .field-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin:0;border:1px solid var(--line);background:var(--line)}.field-grid div{padding:.85rem;background:var(--deep)}.field-grid dt{color:var(--starlight);font:.76rem 'IBM Plex Mono',monospace}.field-grid dd{margin:.35rem 0 0;color:var(--muted);font-size:.86rem}
+  figure{margin:.4rem 0 0;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:var(--deep)}figure img{display:block;width:100%;height:auto}figcaption{padding:.9rem 1rem;color:var(--muted);border-top:1px solid var(--line);font-size:.88rem}
+  .matrix,.method-table{overflow-x:auto;border:1px solid var(--line);border-radius:14px}.matrix table{min-width:620px}.matrix td:last-child{color:var(--rec);font-family:'IBM Plex Mono',monospace}.symbol-guide{color:var(--muted);font-size:.92rem}.scaling-formulas{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.formula-card{display:grid;align-content:start;gap:.75rem;padding:1rem;border:1px solid var(--line);border-radius:14px;background:rgba(12,27,48,.58)}.formula-card h3{margin:0}.formula-card>p{color:var(--muted)}
+  .method-cards{display:grid;gap:1rem}.method-card{display:grid;gap:1rem;padding:1rem;border:1px solid var(--line);border-radius:16px;background:rgba(12,27,48,.6)}.method-copy{display:grid;align-content:start;gap:.75rem}.method-copy h3{margin:0}.method-copy>p{color:var(--muted)}.method-copy>a,.bridge a{justify-self:start;color:var(--search)}
+  .validation-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.validation-grid article{min-width:0;padding:1rem;border:1px solid var(--line);border-radius:16px;background:rgba(12,27,48,.6)}.validation-grid h3{margin:0 0 .8rem}.selected{background:rgba(85,217,139,.08);box-shadow:inset 3px 0 var(--complete)}
+  table{width:100%;min-width:680px;border-collapse:collapse}th,td{padding:.8rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:.85rem}thead th{color:var(--muted);font:.68rem 'IBM Plex Mono',monospace;text-transform:uppercase}tbody tr:last-child th,tbody tr:last-child td{border-bottom:0}
+  .result-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.result-cards>article{display:grid;align-content:start;gap:1rem;min-height:340px;padding:1.2rem;border:1px solid var(--line);border-radius:16px;background:var(--deep)}.result-cards h3{margin:0;font:600 1.12rem var(--title-font)}.paired-values{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}.paired-values>div{display:grid;gap:.25rem;padding:.75rem;border:1px solid var(--line);border-radius:10px}.paired-values span,.paired-values small{color:var(--muted);font:.64rem 'IBM Plex Mono',monospace}.paired-values strong{font:600 clamp(1.45rem,3vw,2.15rem) var(--title-font);font-variant-numeric:tabular-nums}
+  ul,ol{margin:0;padding-left:1.2rem}li+li{margin-top:.45rem}.reproduction{padding:1rem;border:1px solid var(--line);border-radius:14px;background:var(--deep)}.reproduction summary{cursor:pointer;font-weight:600}.reproduction pre{margin:1rem 0;padding:1rem;overflow:auto;border:1px solid var(--line);border-radius:12px;background:#050d18}.reproduction p{color:var(--muted);font-size:.86rem}.bridge{display:flex}
+  @media(max-width:760px){.result-cards,.scaling-formulas,.validation-grid{grid-template-columns:1fr}.result-cards>article{min-height:0}}
+  @media(max-width:650px){.field-grid{grid-template-columns:1fr 1fr}.case-step{padding-block:3.5rem}}
+  @media(max-width:430px){.field-grid{grid-template-columns:1fr}}
+</style>

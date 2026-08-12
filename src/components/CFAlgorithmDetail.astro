@@ -1,0 +1,45 @@
+---
+import KatexMath from './KatexMath.astro';
+import { href, type Lang } from '../data/site';
+const { lang, mode } = Astro.props as { lang: Lang; mode: 'user' | 'item' };
+const zh = lang === 'zh';
+const user = mode === 'user';
+const copy = user ? (zh ? {
+  name: '基于用户的协同过滤', summary: '先寻找评分习惯相似的人，再用邻居对候选电影的意见预测当前用户的偏好。',
+  problem: '只有用户—物品交互、没有可靠内容特征时，如何把“口味相近的人喜欢什么”转成个性化候选？',
+  intuition: '把评分矩阵按行观察：每一行是一位用户。共同评分电影越多、去均值后的评分走势越一致，两个用户越相似。',
+  steps: ['减去每位用户的平均评分，避免宽松评分者天然显得更相似。', '只在共同评分的电影上计算余弦相似度，并用支持度与收缩降低小样本噪声。', '选 Top-K 正相似邻居，对其评分残差加权；邻居不足时回退热门基线。'],
+  limit: '用户邻域会随行为快速变化，在线计算成本也会随用户规模和稀疏度上升；新用户与新电影都缺乏交互。'
+} : {
+  name: 'User-based collaborative filtering', summary: 'Find people with similar rating patterns, then use their opinions on a candidate to estimate the current user’s preference.',
+  problem: 'When user–item interactions exist but content features do not, how can “people with taste like yours” become personalized candidates?',
+  intuition: 'Read the rating matrix by rows: each row is a person. Two users are stronger neighbors when they co-rated enough movies and their mean-centered rating patterns agree.',
+  steps: ['Subtract each user’s mean so generous raters are not automatically similar.', 'Measure cosine similarity only on co-rated movies, then use support and shrinkage to reduce small-sample noise.', 'Keep Top-K positive neighbors and weight their residual ratings; fall back to popularity when evidence is insufficient.'],
+  limit: 'User neighborhoods change with behavior and serving cost grows with the user population and sparsity. Both new users and new movies lack interaction evidence.'
+}) : (zh ? {
+  name: '基于物品的协同过滤', summary: '先从共同评分行为中学习电影之间的稳定关系，再根据用户已评分电影为候选打分。',
+  problem: '如何把“评过 A 的人也怎样评价 B”预计算为稳定的物品关系，并快速服务相似电影或个性化候选？',
+  intuition: '把评分矩阵按列观察：每一列是一部电影。对每位共同评分用户减去其平均分后，两个电影的评分走势越一致，就越相似。',
+  steps: ['按用户均值中心化评分，削弱用户评分尺度差异。', '在共同评分用户上计算 adjusted cosine，再用支持度门槛与收缩控制偶然共现。', '将用户对相似已看电影的评分残差加权，邻居不足时回退热门基线。'],
+  limit: '新电影没有共同评分，热门电影也更容易产生共现。稳定目录中服务较快，但持续涌入的新库存需要内容或混合信号。'
+} : {
+  name: 'Item-based collaborative filtering', summary: 'Learn stable movie-to-movie relationships from shared rating behavior, then score candidates from the movies a user already rated.',
+  problem: 'How can “people who rated A also evaluated B this way” become precomputed item relationships for fast related-item and personalized serving?',
+  intuition: 'Read the matrix by columns: each column is a movie. After removing each co-rater’s average, two movies are similar when their rating patterns move together.',
+  steps: ['Center ratings by each user’s mean to reduce rating-scale differences.', 'Compute adjusted cosine over co-raters, then apply minimum support and shrinkage to control accidental overlap.', 'Weight residuals from similar movies the user rated; use popularity when too few neighbors remain.'],
+  limit: 'A new movie has no co-rating evidence, while popular items create more overlap. Serving is efficient for stable catalogs, but fast-changing inventory needs content or hybrid signals.'
+});
+const formula = user
+  ? String.raw`\hat r_{ui}=\bar r_u+\frac{\sum_{v\in N_k(u,i)}s(u,v)(r_{vi}-\bar r_v)}{\sum_{v\in N_k(u,i)}|s(u,v)|}`
+  : String.raw`\hat r_{ui}=\bar r_u+\frac{\sum_{j\in N_k(i,u)}s(i,j)(r_{uj}-\bar r_u)}{\sum_{j\in N_k(i,u)}|s(i,j)|}`;
+---
+<article class="section reading-container algorithm-page">
+  <header><p class="eyebrow">{zh ? '推荐 · 邻域协同过滤' : 'Recommendation · neighborhood CF'}</p><h1>{copy.name}</h1><p>{copy.summary}</p></header>
+  <section><span>01</span><h2>{zh ? '问题' : 'Problem'}</h2><p>{copy.problem}</p></section>
+  <section><span>02</span><h2>{zh ? '直觉：同一矩阵，两种视角' : 'Intuition: one matrix, two lenses'}</h2><p>{copy.intuition}</p><div class="matrix" aria-label={zh ? '示例评分矩阵' : 'Example rating matrix'}><b></b><b>Moon</b><b>Dune</b><b>Heat</b><strong>Alice</strong><i>5</i><i>4</i><i>?</i><strong>Bob</strong><i>5</i><i>3</i><i>4</i><strong>Carol</strong><i>1</i><i>2</i><i>5</i></div></section>
+  <section><span>03</span><h2>{zh ? '算法步骤' : 'Algorithm steps'}</h2><ol>{copy.steps.map((step) => <li>{step}</li>)}</ol><KatexMath latex={formula} display label={zh ? '协同过滤预测公式' : 'Collaborative-filtering prediction formula'} /><p class="symbols">{zh ? '其中 r 是评分，r̄ 是用户均值，s 是收缩后的相似度，Nₖ 是拥有候选证据的 Top-K 邻居。排序使用未截断预测分；只有评分误差与展示值限制在 1–5。' : 'Here r is a rating, r̄ a user mean, s the shrunk similarity, and Nₖ the Top-K neighbors with candidate evidence. Ranking uses the raw estimate; only rating-error evaluation and display values are clipped to 1–5.'}</p></section>
+  <section><span>04</span><h2>{zh ? '何时使用，何时不用' : 'Use it—and know its boundary'}</h2><p>{copy.limit}</p><div class="links"><a class="button" href={href(`/${lang}/projects/movielens-collaborative-filtering/#ml-5`)}>{zh ? '在 MovieLens 实验中查看' : 'See it in the MovieLens experiment'}</a><a href={href(`/${lang}/algorithms/${user ? 'item-based-cf' : 'user-based-cf'}/`)}>{zh ? `切换到${user ? '物品' : '用户'}视角 →` : `Switch to the ${user ? 'item' : 'user'} lens →`}</a></div></section>
+</article>
+<style>
+  .algorithm-page{display:grid}.algorithm-page header{display:grid;gap:1.2rem;padding-bottom:3.5rem}.algorithm-page h1{font-size:var(--title-page-size)}header>p:last-child,section p,li{max-width:800px;color:var(--muted);font-size:clamp(1rem,1.2vw,1.08rem)}section{display:grid;gap:1rem;padding:3rem 0;border-top:1px solid var(--line)}section>span{color:var(--rec);font:var(--meta-title-size) 'IBM Plex Mono',monospace}section h2{font-size:var(--title-step-size)}ol{display:grid;gap:.8rem;padding-left:1.3rem}.matrix{display:grid;grid-template-columns:1.4fr repeat(3,1fr);max-width:560px;border:1px solid var(--line);border-radius:14px;overflow:hidden}.matrix>*{padding:.75rem;border-right:1px solid var(--line);border-bottom:1px solid var(--line);text-align:center}.matrix b{color:var(--rec)}.matrix strong{text-align:left}.matrix i{font-style:normal}.symbols{font-size:.9rem}.links{display:flex;gap:1rem;align-items:center;flex-wrap:wrap}.links>a:not(.button){color:var(--starlight)}
+</style>

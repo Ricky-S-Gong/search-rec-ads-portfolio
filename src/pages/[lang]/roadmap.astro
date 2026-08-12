@@ -1,6 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import { copy, domainNames, languages, roadmapTracks, type Domain, type Lang, type ProjectStatus } from '../../data/site';
+import { copy, domainNames, href, languages, roadmapTracks, type Domain, type Lang, type ProjectStatus } from '../../data/site';
 
 export const getStaticPaths = () => languages.map((lang) => ({ params: { lang } }));
 const lang = Astro.params.lang as Lang;
@@ -32,7 +32,7 @@ const statusLabel = (status: ProjectStatus) => status === 'complete' ? t.complet
             {track.stages.map((stage, index) => (
               <li>
                 <div class="stage-number"><span>{lang === 'en' ? 'Stage' : '阶段'}</span><strong>{String(index + 1).padStart(2, '0')}</strong></div>
-                <div class="stage-copy"><h2>{stage.title[lang]}</h2><p>{stage.topics[lang]}</p><small>{stage.project[lang]}</small></div>
+                <div class="stage-copy"><h2>{stage.title[lang]}</h2><p>{stage.topics[lang]}</p>{stage.href ? <a href={href(`/${lang}${stage.href}`)}>{stage.project[lang]} →</a> : <small>{stage.project[lang]}</small>}</div>
                 <div class="stage-meta"><span class={`status status-${stage.status}`}><i></i>{statusLabel(stage.status)}</span><strong>{stage.compute}</strong></div>
               </li>
             ))}
@@ -83,6 +83,7 @@ const statusLabel = (status: ProjectStatus) => status === 'complete' ? t.complet
   .stage-copy h2 { font-size: clamp(1.3rem, 2.5vw, 1.9rem); }
   .stage-copy p { color: var(--muted); }
   .stage-copy small { color: var(--starlight); font: .72rem/1.5 'IBM Plex Mono', monospace; }
+  .stage-copy a { justify-self: start; color: var(--starlight); font: .72rem/1.5 'IBM Plex Mono', monospace; }
   .stage-meta { display: grid; justify-items: end; gap: .55rem; }
   .stage-meta > strong { color: var(--search); font: .7rem 'IBM Plex Mono', monospace; }
   .status { display: inline-flex; align-items: center; gap: .4rem; color: var(--status-color); font: .68rem 'IBM Plex Mono', monospace; text-transform: uppercase; }

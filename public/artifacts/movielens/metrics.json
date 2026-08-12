@@ -1,0 +1,256 @@
+{
+  "archiveMd5": "c4d9eecfca2ab87c1945afe126590906",
+  "baselines": {
+    "bayesianPopularity": {
+      "beyondAccuracy": {
+        "catalog_coverage": 0.020906869399945696,
+        "long_tail_share": 0.0411340206185567,
+        "novelty": 9.762310870901947
+      },
+      "confidence95": {
+        "ndcgAt10": [
+          0.024805113257160043,
+          0.028757103100805946
+        ],
+        "recallAt10": [
+          0.020555205389785454,
+          0.024413107108684523
+        ]
+      },
+      "test": {
+        "ndcg_at_10": 0.026763659448595423,
+        "recall_at_10": 0.022470338645343507,
+        "users": 5820
+      }
+    },
+    "biasRating": {
+      "mae": 0.7275964255199722,
+      "ratings": 102729,
+      "rmse": 0.9244483853111238
+    }
+  },
+  "candidatePolicy": "Full fitted catalog minus seen movies",
+  "dataset": "MovieLens 1M",
+  "datasetUrl": "https://grouplens.org/datasets/movielens/1m/",
+  "diagnostics": {
+    "pairedUserCfMinusPopularity": {
+      "ndcgAt10": {
+        "confidence95": [
+          -0.004796458515707379,
+          -0.0012535056833216662
+        ],
+        "meanDifference": -0.0030844240334072528,
+        "users": 5820
+      },
+      "recallAt10": {
+        "confidence95": [
+          -0.0034243391479636368,
+          0.0005196508469063929
+        ],
+        "meanDifference": -0.0014814702527552882,
+        "users": 5820
+      }
+    },
+    "rankingCorrection": "Top-N uses raw neighborhood estimates; rating RMSE/MAE uses estimates clipped to [1, 5].",
+    "relevantItemHeadConcentration": {
+      "definition": "Movies ranked by train+validation interaction count; head is the top 20% of fitted catalog items; denominator is relevant test ratings for the ranking cohort.",
+      "relevantTestRatings": 53025,
+      "top10PercentShare": 0.41934936350777935,
+      "top20PercentShare": 0.6306459217350306
+    }
+  },
+  "evaluationPopulation": {
+    "rankingUsers": 5820,
+    "testRatings": 102759,
+    "trainingRatings": 897450
+  },
+  "experimentCodeVersion": "movielens-cf-v2",
+  "generatedAtUtc": "2026-08-12T05:48:13+00:00",
+  "k": 10,
+  "metricCaveat": "Offline explicit-rating results; they do not measure CTR, watch time, retention, revenue, or causal lift.",
+  "models": [
+    {
+      "beyondAccuracy": {
+        "catalog_coverage": 0.2747759978278577,
+        "long_tail_share": 0.4201202749140893,
+        "novelty": 10.85093117552417
+      },
+      "confidence95": {
+        "ndcgAt10": [
+          0.021916216373674195,
+          0.025583977415813516
+        ],
+        "recallAt10": [
+          0.018994201440393065,
+          0.02299346183378501
+        ]
+      },
+      "hyperparameters": {
+        "k": 80,
+        "min_neighbors": 5,
+        "min_support": 10,
+        "shrinkage": 50.0
+      },
+      "key": "user-cf",
+      "label": "User-CF",
+      "mode": "user",
+      "rating": {
+        "coverage": 0.9997080547689253,
+        "mae": 0.7206060779980348,
+        "ratings": 102729,
+        "rmse": 0.9313128616404239
+      },
+      "segments": [
+        {
+          "ndcgAt10": 0.016906492533784897,
+          "recallAt10": 0.028751431844215348,
+          "segment": "sparse",
+          "trainingRatingsMedian": 27.0,
+          "users": 1455
+        },
+        {
+          "ndcgAt10": 0.012904545562469939,
+          "recallAt10": 0.017497954508263785,
+          "segment": "light",
+          "trainingRatingsMedian": 60.0,
+          "users": 1455
+        },
+        {
+          "ndcgAt10": 0.020806731585795248,
+          "recallAt10": 0.019325153312577906,
+          "segment": "active",
+          "trainingRatingsMedian": 127.0,
+          "users": 1455
+        },
+        {
+          "ndcgAt10": 0.04409917197870261,
+          "recallAt10": 0.01838093390529584,
+          "segment": "power",
+          "trainingRatingsMedian": 320.0,
+          "users": 1455
+        }
+      ],
+      "similarity": "Mean-centered cosine",
+      "system": {
+        "fallbackShare": 0.06032646048109966,
+        "fitSeconds": 5.109758625039831,
+        "neighborArtifactMiB": 3.682170867919922,
+        "rankingTieStats": {
+          "entriesInExactTieShare": 0.0004571303187112582,
+          "fullyTiedListShare": 0.00017562346329469617,
+          "largestTieGroup": 4,
+          "lists": 5694
+        },
+        "recommendSeconds": 2.0719592499081045,
+        "retainedNeighbors": 479609,
+        "top10ClippedShare": 0.44952367020790285,
+        "top10RawAboveRatingMaxShare": 0.44952367020790285,
+        "usersPerSecond": 2808.9355523078593
+      },
+      "test": {
+        "ndcg_at_10": 0.02367923541518817,
+        "recall_at_10": 0.02098886839258822,
+        "users": 5820
+      }
+    },
+    {
+      "beyondAccuracy": {
+        "catalog_coverage": 0.737170784686397,
+        "long_tail_share": 0.5688659793814433,
+        "novelty": 12.273735817952069
+      },
+      "confidence95": {
+        "ndcgAt10": [
+          0.009400512107528151,
+          0.01191019093868861
+        ],
+        "recallAt10": [
+          0.01101660184396661,
+          0.01430132593607678
+        ]
+      },
+      "hyperparameters": {
+        "k": 20,
+        "min_neighbors": 2,
+        "min_support": 5,
+        "shrinkage": 10.0
+      },
+      "key": "item-cf",
+      "label": "Item-CF",
+      "mode": "item",
+      "rating": {
+        "coverage": 0.9997080547689253,
+        "mae": 0.7444802164884384,
+        "ratings": 102729,
+        "rmse": 0.9652141249530877
+      },
+      "segments": [
+        {
+          "ndcgAt10": 0.01448741535658204,
+          "recallAt10": 0.02487972508591065,
+          "segment": "sparse",
+          "trainingRatingsMedian": 27.0,
+          "users": 1455
+        },
+        {
+          "ndcgAt10": 0.010316449889268477,
+          "recallAt10": 0.0139049800905471,
+          "segment": "light",
+          "trainingRatingsMedian": 60.0,
+          "users": 1455
+        },
+        {
+          "ndcgAt10": 0.006584514205072588,
+          "recallAt10": 0.006411547204451995,
+          "segment": "active",
+          "trainingRatingsMedian": 127.0,
+          "users": 1455
+        },
+        {
+          "ndcgAt10": 0.010874605446441869,
+          "recallAt10": 0.0048996459072488474,
+          "segment": "power",
+          "trainingRatingsMedian": 320.0,
+          "users": 1455
+        }
+      ],
+      "similarity": "Adjusted cosine",
+      "system": {
+        "fallbackShare": 0.02281786941580756,
+        "fitSeconds": 2.360638999962248,
+        "neighborArtifactMiB": 0.5184860229492188,
+        "rankingTieStats": {
+          "entriesInExactTieShare": 0.8757209171472781,
+          "fullyTiedListShare": 0.7789291882556131,
+          "largestTieGroup": 10,
+          "lists": 5790
+        },
+        "recommendSeconds": 1.2956520000007004,
+        "retainedNeighbors": 66117,
+        "top10ClippedShare": 0.0001758334505556337,
+        "top10FiveStarOnlyEvidenceShare": 0.8786045857363904,
+        "top10RawAboveRatingMaxShare": 0.0001758334505556337,
+        "usersPerSecond": 4491.9469116682985
+      },
+      "test": {
+        "ndcg_at_10": 0.010565746224341244,
+        "recall_at_10": 0.01252397457203965,
+        "users": 5820
+      }
+    }
+  ],
+  "relevance": "rating >= 4",
+  "runtime": {
+    "compute": "CPU",
+    "numpy": "2.5.1",
+    "pandas": "3.0.5",
+    "platform": "macOS-13.0-x86_64-i386-64bit",
+    "python": "3.12.2",
+    "scikitLearn": "1.9.0",
+    "scipy": "1.18.0",
+    "timingContext": "One single-process offline batch over the full ranking cohort; recommendSeconds includes candidate scoring, seen-item removal, and Top-10 selection, but excludes fitting, data loading, and artifact writing. BLAS thread count was not forced."
+  },
+  "seed": 42,
+  "split": "Per-user temporal 80/10/10; refit train+validation for final test",
+  "version": "movielens-cf-v2"
+}

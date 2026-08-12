@@ -1,0 +1,115 @@
+{
+  "archiveMd5": "c4d9eecfca2ab87c1945afe126590906",
+  "candidatePolicy": "Full fitted catalog minus seen movies",
+  "dataset": "MovieLens 1M",
+  "datasetUrl": "https://grouplens.org/datasets/movielens/1m/",
+  "experimentCodeVersion": "movielens-cf-v2",
+  "generatedAtUtc": "2026-08-12T05:48:13+00:00",
+  "k": 10,
+  "profile": {
+    "density": 0.044684,
+    "genres": {
+      "count": 18,
+      "top": [
+        [
+          "Drama",
+          1603
+        ],
+        [
+          "Comedy",
+          1200
+        ],
+        [
+          "Action",
+          503
+        ],
+        [
+          "Thriller",
+          492
+        ],
+        [
+          "Romance",
+          471
+        ],
+        [
+          "Horror",
+          343
+        ],
+        [
+          "Adventure",
+          283
+        ],
+        [
+          "Sci-Fi",
+          276
+        ]
+      ]
+    },
+    "moviesInMetadata": 3883,
+    "popularity": {
+      "moviesBelow10Ratings": 446,
+      "top10PercentShare": 0.444541,
+      "top1PercentShare": 0.087312
+    },
+    "ratedMovies": 3706,
+    "ratingDistribution": {
+      "1": {
+        "count": 56174,
+        "share": 0.056162
+      },
+      "2": {
+        "count": 107557,
+        "share": 0.107535
+      },
+      "3": {
+        "count": 261197,
+        "share": 0.261142
+      },
+      "4": {
+        "count": 348971,
+        "share": 0.348898
+      },
+      "5": {
+        "count": 226310,
+        "share": 0.226263
+      }
+    },
+    "ratingScale": [
+      1,
+      5
+    ],
+    "ratings": 1000209,
+    "ratingsPerMovie": {
+      "maximum": 3428,
+      "mean": 269.9,
+      "median": 123.5,
+      "minimum": 1
+    },
+    "ratingsPerUser": {
+      "maximum": 2314,
+      "mean": 165.6,
+      "median": 96.0,
+      "minimum": 20
+    },
+    "sparsity": 0.955316,
+    "timestampRange": [
+      956703932,
+      1046454590
+    ],
+    "users": 6040
+  },
+  "relevance": "rating >= 4",
+  "runtime": {
+    "compute": "CPU",
+    "numpy": "2.5.1",
+    "pandas": "3.0.5",
+    "platform": "macOS-13.0-x86_64-i386-64bit",
+    "python": "3.12.2",
+    "scikitLearn": "1.9.0",
+    "scipy": "1.18.0",
+    "timingContext": "One single-process offline batch over the full ranking cohort; recommendSeconds includes candidate scoring, seen-item removal, and Top-10 selection, but excludes fitting, data loading, and artifact writing. BLAS thread count was not forced."
+  },
+  "seed": 42,
+  "split": "Per-user temporal 80/10/10; refit train+validation for final test",
+  "version": "movielens-cf-v2"
+}

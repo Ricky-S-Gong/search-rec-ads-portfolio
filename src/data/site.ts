@@ -55,6 +55,7 @@ export interface RoadmapTrack {
     project: Localized;
     status: ProjectStatus;
     compute: string;
+    href?: string;
   }>;
 }
 
@@ -86,7 +87,7 @@ export const copy = {
     heroBody: 'SAR stands for Search, Advertising, and Recommendation. This technical portfolio shows how the algorithms work, how they are implemented and evaluated, and where they fit in real systems.',
     domainCtas: { search: 'View Search projects', ads: 'View Ads projects', recommendation: 'View Recommendation projects' },
     algorithmCtas: { search: 'View Search algorithms', ads: 'View Ads algorithms', recommendation: 'View Recommendation algorithms' },
-    explore: 'Read the Spotify case study',
+    explore: 'Explore recommendation case studies',
     compare: 'Compare algorithm families',
     projectsTitle: 'Projects by domain',
     projectsIntro: 'Projects focus on Search, Advertising, and Recommendation. Every completed project includes reproducible code and real experiment results.',
@@ -103,7 +104,7 @@ export const copy = {
     heroBody: '这是一个围绕搜索、广告与推荐算法构建的技术作品集，展示不同算法的原理、代码实现、实验过程与应用场景。',
     domainCtas: { search: '查看搜索项目', ads: '查看广告项目', recommendation: '查看推荐项目' },
     algorithmCtas: { search: '查看搜索算法', ads: '查看广告算法', recommendation: '查看推荐算法' },
-    explore: '阅读 Spotify 项目',
+    explore: '探索推荐系统项目',
     compare: '比较算法类别',
     projectsTitle: '按方向查看项目',
     projectsIntro: '项目主要聚焦搜索、广告与推荐。每个已完成项目都提供可复现代码和真实实验结果。',
@@ -146,13 +147,14 @@ export const projects: ProjectMeta[] = [
     },
   },
   {
-    slug: 'movielens-collaborative-filtering', domain: 'recommendation', status: 'planned', compute: 'CPU',
-    algorithms: ['UserCF', 'ItemCF', 'Matrix factorization'], dataset: 'MovieLens · user-item interactions',
+    slug: 'movielens-collaborative-filtering', domain: 'recommendation', status: 'complete', compute: 'CPU',
+    algorithms: ['Bayesian popularity', 'User-CF', 'Item-CF'], dataset: 'MovieLens 1M · 1,000,209 ratings',
     authors: ['Ricky Gong', 'Ziqi Xu'],
+    sourceUrl: 'https://grouplens.org/datasets/movielens/1m/',
     title: { en: 'MovieLens collaborative filtering', zh: 'MovieLens 协同过滤' },
     summary: {
-      en: 'The next recommendation project adds user-item interactions so personalization and ranking metrics can be evaluated correctly.',
-      zh: '下一项推荐项目引入真实用户—物品交互，正确评估个性化与排序指标。',
+      en: 'A reproducible User-CF and Item-CF study with temporal evaluation, full-catalog Top-10 ranking, coverage analysis, and CPU serving evidence.',
+      zh: '可复现的 User-CF 与 Item-CF 实验，包含时间切分、全目录 Top-10、覆盖率分析与 CPU 服务证据。',
     },
   },
 ];
@@ -260,23 +262,23 @@ export const roadmapTracks: RoadmapTrack[] = [
         title: { en: 'Content signals and item cold start', zh: '内容信号与新物品冷启动' },
         topics: { en: 'Audio features · cosine · KNN · candidate retrieval', zh: '音频特征 · 余弦 · KNN · 候选召回' },
         project: { en: 'Spotify content recommender', zh: 'Spotify 内容推荐' },
-        status: 'complete', compute: 'CPU',
+        status: 'complete', compute: 'CPU', href: '/projects/spotify-content-recommender/',
       },
       {
         title: { en: 'Collaborative signals', zh: '协同信号' },
-        topics: { en: 'UserCF · ItemCF · matrix factorization', zh: 'UserCF · ItemCF · 矩阵分解' },
+        topics: { en: 'Popularity · User-CF · Item-CF · temporal evaluation', zh: '热门基线 · User-CF · Item-CF · 时间切分评估' },
         project: { en: 'MovieLens collaborative filtering', zh: 'MovieLens 协同过滤' },
-        status: 'planned', compute: 'CPU',
+        status: 'complete', compute: 'CPU', href: '/projects/movielens-collaborative-filtering/',
       },
       {
-        title: { en: 'Implicit feedback and retrieval', zh: '隐式反馈与召回排序' },
-        topics: { en: 'Negative sampling · ranking · Two-Tower', zh: '负采样 · 排序 · Two-Tower' },
-        project: { en: 'Implicit ranking benchmark', zh: '隐式反馈排序基准' },
+        title: { en: 'Model-based recommendation', zh: '模型化推荐' },
+        topics: { en: 'Matrix factorization · implicit feedback · negative sampling', zh: '矩阵分解 · 隐式反馈 · 负采样' },
+        project: { en: 'Latent-factor ranking benchmark', zh: '隐因子排序基准' },
         status: 'planned', compute: 'CPU → GPU',
       },
       {
-        title: { en: 'Sequential and multi-objective systems', zh: '序列与多目标系统' },
-        topics: { en: 'Sequences · real time · fairness · diversity', zh: '序列模型 · 实时推荐 · 公平性 · 多样性' },
+        title: { en: 'Retrieval, ranking, and online systems', zh: '召回、排序与在线系统' },
+        topics: { en: 'Two-Tower · reranking · hybrid signals · online experiments', zh: '双塔 · 重排 · 混合信号 · 在线实验' },
         project: { en: 'Real-time multi-objective study', zh: '实时多目标推荐实验' },
         status: 'planned', compute: 'GPU recommended',
       },

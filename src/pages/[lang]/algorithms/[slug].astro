@@ -2,11 +2,12 @@
 import { Code } from 'astro:components';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import KatexMath from '../../../components/KatexMath.astro';
+import CFAlgorithmDetail from '../../../components/CFAlgorithmDetail.astro';
 import { algorithms, copy, domainNames, href, languages, type Lang } from '../../../data/site';
 
 export const getStaticPaths = () => {
-  const algorithm = algorithms.find((item) => item.slug === 'content-based-filtering')!;
-  return languages.map((lang) => ({ params: { lang, slug: algorithm.slug }, props: { algorithm } }));
+  const detailSlugs = new Set(['content-based-filtering', 'user-based-cf', 'item-based-cf']);
+  return languages.flatMap((lang) => algorithms.filter((item) => detailSlugs.has(item.slug)).map((algorithm) => ({ params: { lang, slug: algorithm.slug }, props: { algorithm } })));
 };
 
 const lang = Astro.params.lang as Lang;
@@ -79,7 +80,7 @@ const page = zh ? {
 ---
 
 <BaseLayout lang={lang} title={`${algorithm.name[lang]} — ${t.siteName}`} description={page.summary} path={`/algorithms/${algorithm.slug}/`}>
-  <article class="section reading-container algorithm-page">
+  {algorithm.slug !== 'content-based-filtering' ? <CFAlgorithmDetail lang={lang} mode={algorithm.slug === 'user-based-cf' ? 'user' : 'item'} /> : <article class="section reading-container algorithm-page">
     <header><p class="eyebrow">{domainNames[algorithm.domain][lang]} · {algorithm.family[lang]}</p><h1>{algorithm.name[lang]}</h1><p>{page.summary}</p></header>
     <section><span>01</span><h2>{page.problemTitle}</h2><p>{page.problem}</p></section>
     <section><span>02</span><h2>{page.intuitionTitle}</h2><p>{page.intuition}</p></section>
@@ -92,7 +93,7 @@ const page = zh ? {
     <section><span>05</span><h2>{page.codeTitle}</h2><p>{page.codeIntro}</p><div class="code-block"><Code code={code} lang="python" theme="github-dark" /></div></section>
     <section><span>06</span><h2>{page.limitsTitle}</h2><ul class="card-points">{page.limits.map((limit) => <li>{limit}</li>)}</ul></section>
     <a class="button" href={href(`/${lang}/projects/spotify-content-recommender/`)}>{page.project}</a>
-  </article>
+  </article>}
 </BaseLayout>
 
 <style>

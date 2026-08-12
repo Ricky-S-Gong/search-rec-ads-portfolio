@@ -360,6 +360,7 @@ const fields = zh ? [
     <p class="step-label">Step 8</p><h2>{copy.evaluationTitle}</h2><p>{copy.evaluationBody}</p>
     <h3>{copy.onlineTitle}</h3><ul>{copy.onlineItems.map((item) => <li>{item}</li>)}</ul>
     <aside><h3>{copy.improveTitle}</h3><p>{copy.improveBody}</p></aside>
+    <a class="button" href={href(`/${lang}/projects/movielens-collaborative-filtering/#ml-5`)}>{zh ? '下一步：用 MovieLens 学习协同信号' : 'Next: learn collaborative signals with MovieLens'}</a>
   </section>
 
   <section id="step-9" class="case-step wide-step">
