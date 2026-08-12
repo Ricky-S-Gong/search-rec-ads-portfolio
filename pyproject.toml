@@ -6,11 +6,12 @@ dependencies = [
   "matplotlib>=3.9",
   "numpy>=2.0",
   "pandas>=2.2",
+  "scipy>=1.14",
   "scikit-learn>=1.5",
 ]
 
 [dependency-groups]
-dev = ["pytest>=8.3"]
+dev = ["pytest>=8.3,<9"]
 
 [tool.pytest.ini_options]
-testpaths = ["research/spotify-music/tests"]
+testpaths = ["research/spotify-music/tests", "research/movielens-cf/tests"]

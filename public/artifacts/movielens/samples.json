@@ -1,0 +1,832 @@
+{
+  "relatedItems": [
+    {
+      "neighbors": [
+        {
+          "similarity": 0.4976,
+          "title": "Toy Story 2 (1999)"
+        },
+        {
+          "similarity": 0.2879,
+          "title": "Raiders of the Lost Ark (1981)"
+        },
+        {
+          "similarity": 0.2814,
+          "title": "Bug's Life, A (1998)"
+        },
+        {
+          "similarity": 0.2646,
+          "title": "Star Wars: Episode V - The Empire Strikes Back (1980)"
+        },
+        {
+          "similarity": 0.2634,
+          "title": "Star Wars: Episode IV - A New Hope (1977)"
+        }
+      ],
+      "seed": "Toy Story (1995)"
+    },
+    {
+      "neighbors": [
+        {
+          "similarity": 0.4033,
+          "title": "Star Wars: Episode IV - A New Hope (1977)"
+        },
+        {
+          "similarity": 0.3879,
+          "title": "Star Wars: Episode V - The Empire Strikes Back (1980)"
+        },
+        {
+          "similarity": 0.377,
+          "title": "Terminator 2: Judgment Day (1991)"
+        },
+        {
+          "similarity": 0.3568,
+          "title": "Raiders of the Lost Ark (1981)"
+        },
+        {
+          "similarity": 0.3277,
+          "title": "Terminator, The (1984)"
+        }
+      ],
+      "seed": "Matrix, The (1999)"
+    },
+    {
+      "neighbors": [
+        {
+          "similarity": 0.3821,
+          "title": "Pulp Fiction (1994)"
+        },
+        {
+          "similarity": 0.3561,
+          "title": "Usual Suspects, The (1995)"
+        },
+        {
+          "similarity": 0.3222,
+          "title": "GoodFellas (1990)"
+        },
+        {
+          "similarity": 0.3129,
+          "title": "L.A. Confidential (1997)"
+        },
+        {
+          "similarity": 0.3054,
+          "title": "Silence of the Lambs, The (1991)"
+        }
+      ],
+      "seed": "Fargo (1996)"
+    }
+  ],
+  "users": [
+    {
+      "activity": 24,
+      "history": [
+        {
+          "rating": 5.0,
+          "title": "Jurassic Park (1993)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Men in Black (1997)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Magnolia (1999)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Airplane! (1980)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Braveheart (1995)"
+        }
+      ],
+      "itemCf": [
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Clear and Present Danger (1994)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Lion King, The (1994)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 3,
+          "score": 5.0,
+          "title": "Speed (1994)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Schindler's List (1993)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Tombstone (1993)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Groundhog Day (1993)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Back to the Future (1985)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Indiana Jones and the Last Crusade (1989)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Scream (1996)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Better Living Through Circuitry (1999)"
+        }
+      ],
+      "user": "Viewer 427",
+      "userCf": [
+        {
+          "fallback": false,
+          "neighbors": 29,
+          "score": 5.0,
+          "title": "Toy Story (1995)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 5,
+          "score": 5.0,
+          "title": "Glengarry Glen Ross (1992)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 27,
+          "score": 5.0,
+          "title": "Monty Python and the Holy Grail (1974)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 45,
+          "score": 5.0,
+          "title": "Star Wars: Episode V - The Empire Strikes Back (1980)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 36,
+          "score": 5.0,
+          "title": "Princess Bride, The (1987)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 36,
+          "score": 5.0,
+          "title": "Raiders of the Lost Ark (1981)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 42,
+          "score": 5.0,
+          "title": "Star Wars: Episode VI - Return of the Jedi (1983)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 23,
+          "score": 5.0,
+          "title": "GoodFellas (1990)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 17,
+          "score": 5.0,
+          "title": "Psycho (1960)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 20,
+          "score": 5.0,
+          "title": "Godfather: Part II, The (1974)"
+        }
+      ]
+    },
+    {
+      "activity": 45,
+      "history": [
+        {
+          "rating": 5.0,
+          "title": "Exorcist, The (1973)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Day the Earth Stood Still, The (1951)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Toy Story 2 (1999)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Babe: Pig in the City (1998)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Three Kings (1999)"
+        }
+      ],
+      "itemCf": [
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Beautiful Girls (1996)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 3,
+          "score": 5.0,
+          "title": "Fantasia (1940)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 3,
+          "score": 5.0,
+          "title": "Ben-Hur (1959)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Wolf Man, The (1941)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Thing From Another World, The (1951)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "War of the Worlds, The (1953)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Being John Malkovich (1999)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 3,
+          "score": 5.0,
+          "title": "Mister Roberts (1955)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Trading Places (1983)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Stand and Deliver (1987)"
+        }
+      ],
+      "user": "Viewer 450",
+      "userCf": [
+        {
+          "fallback": false,
+          "neighbors": 51,
+          "score": 5.0,
+          "title": "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb (1963)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 64,
+          "score": 5.0,
+          "title": "Godfather, The (1972)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 25,
+          "score": 5.0,
+          "title": "Roman Holiday (1953)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 22,
+          "score": 5.0,
+          "title": "Mr. Smith Goes to Washington (1939)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 16,
+          "score": 5.0,
+          "title": "Wrong Trousers, The (1993)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 34,
+          "score": 5.0,
+          "title": "Lawrence of Arabia (1962)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 54,
+          "score": 5.0,
+          "title": "Godfather: Part II, The (1974)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 9,
+          "score": 5.0,
+          "title": "How Green Was My Valley (1941)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 5,
+          "score": 5.0,
+          "title": "Dreamlife of Angels, The (La Vie rêvée des anges) (1998)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 7,
+          "score": 5.0,
+          "title": "Fantasia 2000 (1999)"
+        }
+      ]
+    },
+    {
+      "activity": 86,
+      "history": [
+        {
+          "rating": 5.0,
+          "title": "Excalibur (1981)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Tender Mercies (1983)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Blues Brothers, The (1980)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Chariots of Fire (1981)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Poltergeist (1982)"
+        }
+      ],
+      "itemCf": [
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Ran (1985)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Day the Earth Stood Still, The (1951)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Evil Dead II (Dead By Dawn) (1987)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Forbidden Planet (1956)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Education of Little Tree, The (1997)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Planet of the Apes (1968)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "War of the Worlds, The (1953)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Citizen's Band (a.k.a. Handle with Care) (1977)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Dreaming of Joseph Lees (1998)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "What Lies Beneath (2000)"
+        }
+      ],
+      "user": "Viewer 4746",
+      "userCf": [
+        {
+          "fallback": false,
+          "neighbors": 5,
+          "score": 4.768,
+          "title": "Big Sleep, The (1946)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 55,
+          "score": 4.721,
+          "title": "Schindler's List (1993)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 10,
+          "score": 4.591,
+          "title": "Henry V (1989)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 9,
+          "score": 4.591,
+          "title": "Man for All Seasons, A (1966)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 39,
+          "score": 4.523,
+          "title": "Usual Suspects, The (1995)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 28,
+          "score": 4.51,
+          "title": "Casablanca (1942)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 12,
+          "score": 4.492,
+          "title": "12 Angry Men (1957)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 7,
+          "score": 4.49,
+          "title": "Inherit the Wind (1960)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 45,
+          "score": 4.487,
+          "title": "Godfather, The (1972)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 21,
+          "score": 4.481,
+          "title": "Maltese Falcon, The (1941)"
+        }
+      ]
+    },
+    {
+      "activity": 155,
+      "history": [
+        {
+          "rating": 5.0,
+          "title": "Casablanca (1942)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Grapes of Wrath, The (1940)"
+        },
+        {
+          "rating": 5.0,
+          "title": "African Queen, The (1951)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Night of the Living Dead (1968)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Lolita (1962)"
+        }
+      ],
+      "itemCf": [
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Ciao, Professore! (Io speriamo che me la cavo ) (1993)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Crossfire (1947)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 5,
+          "score": 5.0,
+          "title": "Doctor Zhivago (1965)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 3,
+          "score": 5.0,
+          "title": "Night Porter, The (Il Portiere di notte) (1974)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 4,
+          "score": 5.0,
+          "title": "Brief Encounter (1946)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 4,
+          "score": 5.0,
+          "title": "Gold Rush, The (1925)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 3,
+          "score": 5.0,
+          "title": "Dancer in the Dark (2000)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 6,
+          "score": 4.839,
+          "title": "City Lights (1931)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 6,
+          "score": 4.839,
+          "title": "Wizard of Oz, The (1939)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 4,
+          "score": 4.812,
+          "title": "Out of the Past (1947)"
+        }
+      ],
+      "user": "Viewer 2978",
+      "userCf": [
+        {
+          "fallback": false,
+          "neighbors": 73,
+          "score": 4.941,
+          "title": "Godfather, The (1972)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 6,
+          "score": 4.936,
+          "title": "Circus, The (1928)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 6,
+          "score": 4.889,
+          "title": "Pather Panchali (1955)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 32,
+          "score": 4.834,
+          "title": "Paths of Glory (1957)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 35,
+          "score": 4.827,
+          "title": "Seven Samurai (The Magnificent Seven) (Shichinin no samurai) (1954)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 24,
+          "score": 4.765,
+          "title": "Grand Illusion (Grande illusion, La) (1937)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 70,
+          "score": 4.752,
+          "title": "Godfather: Part II, The (1974)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 50,
+          "score": 4.746,
+          "title": "Raging Bull (1980)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 51,
+          "score": 4.738,
+          "title": "Manchurian Candidate, The (1962)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 12,
+          "score": 4.717,
+          "title": "Creature Comforts (1990)"
+        }
+      ]
+    },
+    {
+      "activity": 360,
+      "history": [
+        {
+          "rating": 5.0,
+          "title": "Birds, The (1963)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Seven Samurai (The Magnificent Seven) (Shichinin no samurai) (1954)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Pink Floyd - The Wall (1982)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Red Violin, The (Le Violon rouge) (1998)"
+        },
+        {
+          "rating": 5.0,
+          "title": "Name of the Rose, The (1986)"
+        }
+      ],
+      "itemCf": [
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Journey of August King, The (1995)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Underground (1995)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Sabrina (1954)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Roman Holiday (1953)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "If.... (1968)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Peeping Tom (1960)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Wolf Man, The (1941)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Kid, The (1921)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 2,
+          "score": 5.0,
+          "title": "Man with the Golden Arm, The (1955)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 7,
+          "score": 4.981,
+          "title": "Saltmen of Tibet, The (1997)"
+        }
+      ],
+      "user": "Viewer 696",
+      "userCf": [
+        {
+          "fallback": false,
+          "neighbors": 11,
+          "score": 5.0,
+          "title": "Paths of Glory (1957)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 6,
+          "score": 5.0,
+          "title": "Hamlet (1948)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 13,
+          "score": 4.956,
+          "title": "Nosferatu (Nosferatu, eine Symphonie des Grauens) (1922)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 41,
+          "score": 4.934,
+          "title": "Manchurian Candidate, The (1962)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 22,
+          "score": 4.915,
+          "title": "Streetcar Named Desire, A (1951)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 7,
+          "score": 4.894,
+          "title": "Drunken Master (Zui quan) (1979)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 47,
+          "score": 4.887,
+          "title": "One Flew Over the Cuckoo's Nest (1975)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 42,
+          "score": 4.862,
+          "title": "Bridge on the River Kwai, The (1957)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 22,
+          "score": 4.858,
+          "title": "It's a Wonderful Life (1946)"
+        },
+        {
+          "fallback": false,
+          "neighbors": 42,
+          "score": 4.852,
+          "title": "Graduate, The (1967)"
+        }
+      ]
+    }
+  ],
+  "version": "movielens-samples-v1"
+}

@@ -1,0 +1,99 @@
+---
+import { Code } from 'astro:components';
+import KatexMath from './KatexMath.astro';
+import MovieLensExplorer from './MovieLensExplorer';
+import { href, type Lang } from '../data/site';
+import metrics from '../../public/artifacts/movielens/metrics.json';
+import profileArtifact from '../../public/artifacts/movielens/profile.json';
+import samples from '../../public/artifacts/movielens/samples.json';
+
+const { lang } = Astro.props as { lang: Lang };
+const zh = lang === 'zh';
+const profile = profileArtifact.profile;
+const user = metrics.models.find((model) => model.key === 'user-cf')!;
+const item = metrics.models.find((model) => model.key === 'item-cf')!;
+const popularity = metrics.baselines.bayesianPopularity;
+const pct = (value: number, digits = 1) => `${(value * 100).toFixed(digits)}%`;
+const copy = zh ? {
+  nav: ['问题', '数据矩阵', '切分', 'User-CF', 'Item-CF', '评估', '决策', '系统', '演示'],
+  problem: '1. 业务问题：用共同评分建立个性化候选',
+  problemBody: '内容属性告诉我们电影是什么，协同过滤则从人们共同喜欢和不喜欢的模式中学习。本项目回答：在不使用画像或文本特征时，能否为每位已有评分历史的用户生成可解释的 Top-10 候选？',
+  data: '2. 数据：一个高度稀疏的用户—物品矩阵',
+  split: '3. 实验设计：只用过去预测未来',
+  user: '4. User-CF：向兴趣相近的人借证据',
+  item: '5. Item-CF：沿着共同评分连接电影',
+  evaluation: '6. 离线结果：准确性之外还要看覆盖',
+  decision: '7. 产品决策：没有单一赢家',
+  system: '8. 上线架构、限制与升级路径',
+  demo: '9. 预计算推荐浏览器',
+} : {
+  nav: ['Problem', 'User–item matrix', 'Split', 'User-CF', 'Item-CF', 'Evaluation', 'Decision', 'System', 'Explorer'],
+  problem: '1. Business problem: personalize candidates from shared ratings',
+  problemBody: 'Content attributes describe what a movie is; collaborative filtering learns from patterns in what people jointly like and dislike. This project asks whether explainable Top-10 candidates can be generated for each established user without profiles or text features.',
+  data: '2. Data: a highly sparse user–item matrix',
+  split: '3. Experiment design: use the past to predict the future',
+  user: '4. User-CF: borrow evidence from similar tastes',
+  item: '5. Item-CF: connect movies through shared raters',
+  evaluation: '6. Offline results: coverage matters alongside accuracy',
+  decision: '7. Product decision: there is no single winner',
+  system: '8. Serving architecture, limits, and upgrade path',
+  demo: '9. Precomputed recommendation explorer',
+};
+const userCode = `centered = ratings - user_means
+similarity = cosine_similarity(centered_users)
+similarity *= support / (support + shrinkage)
+score = user_mean + weighted_neighbor_residuals`;
+const itemCode = `adjusted = ratings - user_means
+similarity = cosine_similarity(adjusted_items)
+similarity *= support / (support + shrinkage)
+score = weighted_sum(similarity, observed_ratings)`;
+---
+<nav class="case-nav" aria-label={zh ? '项目章节' : 'Case-study sections'}>{copy.nav.map((label, i) => <a href={`#ml-${i + 1}`}>{label}</a>)}</nav>
+<div class="case-study">
+  <section id="ml-1" class="case-step"><p class="step-label">Collaborative filtering</p><h2>{copy.problem}</h2><p>{copy.problemBody}</p>
+    <div class="objective"><span>{zh ? '离线目标' : 'Offline objective'}</span><strong>{zh ? '从完整未看目录中排序 Top-10；相关定义为未来评分 ≥ 4。' : 'Rank Top-10 from the full unseen catalog; relevance is a future rating ≥ 4.'}</strong></div>
+    <aside><strong>{zh ? '边界' : 'Boundary'}</strong><p>{zh ? '这是显式评分数据，没有曝光、点击、观看时长或收益。离线 NDCG 不能被解释为线上增长。' : 'These are explicit ratings, with no impressions, clicks, watch time, or revenue. Offline NDCG must not be read as online growth.'}</p></aside>
+  </section>
+
+  <section id="ml-2" class="case-step"><p class="step-label">MovieLens 1M</p><h2>{copy.data}</h2><p>{zh ? `官方数据包含 ${profile.users.toLocaleString()} 位用户、${profile.ratedMovies.toLocaleString()} 部有评分电影和 ${profile.ratings.toLocaleString()} 条评分。矩阵稀疏度为 ${pct(profile.sparsity, 2)}，所以不能构造密集的用户×电影表。` : `The official data contains ${profile.users.toLocaleString()} users, ${profile.ratedMovies.toLocaleString()} rated movies, and ${profile.ratings.toLocaleString()} ratings. At ${pct(profile.sparsity, 2)} sparsity, a dense user × movie table is the wrong representation.`}</p>
+    <div class="matrix" role="img" aria-label={zh ? '稀疏用户电影评分矩阵示意图' : 'Illustration of a sparse user–movie rating matrix'}><div class="axis y">{zh ? '用户' : 'users'} ↑</div><div class="cells">{Array.from({length: 48}, (_, i) => <i class:list={{rated: [1,5,10,14,22,23,31,39,43].includes(i)}}>{[1,5,10,14,22,23,31,39,43].includes(i) ? '★' : ''}</i>)}</div><div class="axis x">{zh ? '电影 →' : 'movies →'}</div></div>
+    <div class="stat-grid"><article><span>{zh ? '用户评分中位数' : 'Median/user'}</span><strong>{profile.ratingsPerUser.median}</strong></article><article><span>{zh ? '电影评分中位数' : 'Median/movie'}</span><strong>{profile.ratingsPerMovie.median}</strong></article><article><span>{zh ? '头部 10% 评分占比' : 'Top 10% share'}</span><strong>{pct(profile.popularity.top10PercentShare)}</strong></article></div>
+  </section>
+
+  <section id="ml-3" class="case-step"><p class="step-label">No leakage</p><h2>{copy.split}</h2><p>{zh ? '每位用户按时间排序：最早 80% 用于训练，之后 10% 用于参数选择，最后 10% 只用于一次最终测试。选好参数后用训练+验证重新拟合；候选是完整已评分电影目录减去用户已看电影，不抽样负例。' : 'Interactions are ordered within each user: the earliest 80% trains, the next 10% selects parameters, and the final 10% is touched once for testing. After selection, train and validation are refit together. Candidates are the full rated catalog minus seen movies—no sampled negatives.'}</p>
+    <div class="timeline"><b>80% <small>train</small></b><b>10% <small>validation</small></b><b>10% <small>test</small></b></div><p class="fine">Seed 42 · relevance ≥ 4 · K=10 · {metrics.evaluationPopulation.rankingUsers.toLocaleString()} {zh ? '位有相关测试电影的用户' : 'users with relevant test movies'}</p>
+  </section>
+
+  <section id="ml-4" class="case-step"><p class="step-label">Mean-centered cosine</p><h2>{copy.user}</h2><KatexMath display latex={String.raw`\hat r_{ui}=\bar r_u+\frac{\sum_{v\in N_k(u,i)}s(u,v)(r_{vi}-\bar r_v)}{\sum_{v\in N_k(u,i)}|s(u,v)|}`} /><p>{zh ? '先减去每位用户的平均分，避免“宽松打分者”天然相似；只保留共同评分支持度足够的正邻居，并用 shrinkage 压低偶然共现。最终参数来自验证集，而不是测试集。' : 'Centering removes lenient-versus-strict rating scale effects. Only positive neighbors with sufficient co-rating support survive, and shrinkage discounts coincidences. Final parameters come from validation, not the test set.'}</p><div class="code-block"><Code code={userCode} lang="python" theme="github-dark" /></div><p class="fine">k={user.hyperparameters.k} · min support={user.hyperparameters.min_support} · shrinkage={user.hyperparameters.shrinkage} · fallback {pct(user.system.fallbackShare)}</p></section>
+
+  <section id="ml-5" class="case-step"><p class="step-label">Adjusted cosine</p><h2>{copy.item}</h2><KatexMath display latex={String.raw`s(i,j)=\frac{\sum_{u\in U_{ij}}(r_{ui}-\bar r_u)(r_{uj}-\bar r_u)}{\sqrt{\sum_{u\in U_{ij}}(r_{ui}-\bar r_u)^2}\sqrt{\sum_{u\in U_{ij}}(r_{uj}-\bar r_u)^2}}`} /><p>{zh ? 'Adjusted cosine 同样先消除用户打分尺度，再比较电影。物品关系通常比用户关系更稳定，也可直接解释为“因为你喜欢 X”；当证据不足时共享 Bayesian popularity 兜底。' : 'Adjusted cosine also removes user rating scales before comparing movies. Item relationships are often more stable and support a direct “because you liked X” explanation. Insufficient evidence uses the shared Bayesian-popularity fallback.'}</p><div class="code-block"><Code code={itemCode} lang="python" theme="github-dark" /></div><p class="fine">k={item.hyperparameters.k} · min support={item.hyperparameters.min_support} · shrinkage={item.hyperparameters.shrinkage} · fallback {pct(item.system.fallbackShare)}</p></section>
+
+  <section id="ml-6" class="case-step wide"><p class="step-label">Full-catalog test</p><h2>{copy.evaluation}</h2><div class="metric-table" role="region" tabindex="0"><table><thead><tr><th>{zh ? '方法' : 'Method'}</th><th>NDCG@10</th><th>Recall@10</th><th>{zh ? '目录覆盖率' : 'Catalog coverage'}</th><th>{zh ? '长尾占比' : 'Long-tail share'}</th></tr></thead><tbody>
+    <tr><th>Bayesian popularity</th><td>{pct(popularity.test.ndcg_at_10,2)}</td><td>{pct(popularity.test.recall_at_10,2)}</td><td>{pct(popularity.beyondAccuracy.catalog_coverage,1)}</td><td>{pct(popularity.beyondAccuracy.long_tail_share,1)}</td></tr>
+    <tr><th>User-CF</th><td>{pct(user.test.ndcg_at_10,2)}</td><td>{pct(user.test.recall_at_10,2)}</td><td>{pct(user.beyondAccuracy.catalog_coverage,1)}</td><td>{pct(user.beyondAccuracy.long_tail_share,1)}</td></tr>
+    <tr><th>Item-CF</th><td>{pct(item.test.ndcg_at_10,2)}</td><td>{pct(item.test.recall_at_10,2)}</td><td>{pct(item.beyondAccuracy.catalog_coverage,1)}</td><td>{pct(item.beyondAccuracy.long_tail_share,1)}</td></tr>
+  </tbody></table></div>
+    <figure><img src={href('/artifacts/movielens/model-ranking.svg')} width="900" height="500" loading="lazy" alt={zh ? '三种方法的 NDCG@10 与 Recall@10 柱状图' : 'Bar chart comparing NDCG@10 and Recall@10 for three methods'} /><figcaption>{zh ? `User-CF NDCG@10 的用户级 bootstrap 95% 区间为 ${pct(user.confidence95.ndcgAt10[0],2)}–${pct(user.confidence95.ndcgAt10[1],2)}。Bias baseline 的 RMSE 为 ${metrics.baselines.biasRating.rmse.toFixed(3)}；评分误差是次要诊断，不用于选择 Top-N 模型。` : `User-CF’s user-level bootstrap 95% interval for NDCG@10 is ${pct(user.confidence95.ndcgAt10[0],2)}–${pct(user.confidence95.ndcgAt10[1],2)}. The bias baseline RMSE is ${metrics.baselines.biasRating.rmse.toFixed(3)}; rating error is a secondary diagnostic, not the Top-N selection metric.`}</figcaption></figure>
+  </section>
+
+  <section id="ml-7" class="case-step"><p class="step-label">Trade-offs</p><h2>{copy.decision}</h2><div class="decision-grid"><article><span>{zh ? '排序目标' : 'Ranking objective'}</span><h3>Bayesian popularity</h3><p>{zh ? '在 NDCG 与 Recall 上略胜，但只覆盖 2.1% 目录；适合作为冷启动兜底，不能作为个性化终点。' : 'Slightly leads NDCG and Recall but exposes only 2.1% of the catalog. Use it for cold-start fallback, not as the personalization endpoint.'}</p></article><article><span>{zh ? '默认个性化' : 'Default personalization'}</span><h3>User-CF</h3><p>{zh ? '排序质量最接近热门基线，同时把覆盖扩大到 31.8%；适合作为可解释候选层。' : 'Comes closest to popularity on ranking while expanding coverage to 31.8%; a useful explainable candidate layer.'}</p></article><article><span>{zh ? '探索与解释' : 'Exploration & explanation'}</span><h3>Item-CF</h3><p>{zh ? '排序较弱，却覆盖 74.4% 目录、速度更快、fallback 更少；适合“相似电影”和多样化候选。' : 'Ranks worse, yet reaches 74.4% coverage, serves faster, and falls back less; useful for related movies and candidate diversity.'}</p></article></div>
+    <aside><strong>{zh ? '推荐策略' : 'Recommendation'}</strong><p>{zh ? '以 User-CF 为主候选，混入 Item-CF 扩展目录，Bayesian popularity 处理新用户；上线前必须通过 A/B 测试验证点击、观看与留存。' : 'Lead with User-CF candidates, blend Item-CF for catalog reach, and reserve Bayesian popularity for cold users. Validate clicks, viewing, and retention in an A/B test before launch.'}</p></aside>
+  </section>
+
+  <section id="ml-8" class="case-step"><p class="step-label">Production thinking</p><h2>{copy.system}</h2><div class="architecture"><span>{zh ? '评分事件' : 'rating events'}</span><b>→</b><span>{zh ? '定时稀疏训练' : 'scheduled sparse fit'}</span><b>→</b><span>{zh ? 'Top-K 邻居产物' : 'Top-K neighbor artifact'}</span><b>→</b><span>{zh ? '候选服务 + 兜底' : 'candidate API + fallback'}</span></div><ul><li>{zh ? `CPU 拟合：User-CF ${user.system.fitSeconds.toFixed(2)} 秒，Item-CF ${item.system.fitSeconds.toFixed(2)} 秒；邻居产物分别为 ${user.system.neighborArtifactMiB.toFixed(2)} MiB 与 ${item.system.neighborArtifactMiB.toFixed(2)} MiB。` : `CPU fit: ${user.system.fitSeconds.toFixed(2)}s for User-CF and ${item.system.fitSeconds.toFixed(2)}s for Item-CF; neighbor artifacts are ${user.system.neighborArtifactMiB.toFixed(2)} MiB and ${item.system.neighborArtifactMiB.toFixed(2)} MiB.`}</li><li>{zh ? '限制：2003 年前后的显式评分、选择偏差、缺少曝光日志；新用户和新电影仍需要兜底或内容信号。' : 'Limits: historical explicit ratings, selection bias, and no impression log; new users and new movies still require fallback or content signals.'}</li><li>{zh ? '升级：加入时间衰减、隐式反馈与混合召回，再用学习排序器统一打分；规模扩大后分块/近似 Top-K 并增量更新。' : 'Upgrade: add time decay, implicit feedback, and hybrid retrieval, then unify candidates with a learned ranker; at larger scale use blocked/approximate Top-K and incremental updates.'}</li></ul>
+    <div class="interview-grid"><details open><summary>{zh ? '为什么时间切分而不是随机切分？' : 'Why temporal instead of random splitting?'}</summary><p>{zh ? '推荐在真实系统中总是用过去预测未来；随机切分会让较晚兴趣泄漏进训练，得到过于乐观的指标。' : 'Recommendation always uses past behavior to predict future behavior; random splits leak later taste into training and overstate quality.'}</p></details><details><summary>{zh ? '为什么热门基线能赢排序指标？' : 'Why can popularity win ranking metrics?'}</summary><p>{zh ? '评分行为集中在头部，且完整目录里每位用户只有很少未来正例；热门电影更容易命中，但代价是覆盖率和新颖度。' : 'Ratings concentrate in the head and each user has few future positives in a full catalog. Popular movies are easier hits, at the cost of coverage and novelty.'}</p></details><details><summary>{zh ? '如何处理冷启动？' : 'How is cold start handled?'}</summary><p>{zh ? '未知用户使用带先验平滑的热门排序；新电影需要内容特征或编辑规则，纯协同过滤无法凭空学习。' : 'Unknown users receive prior-smoothed popularity. New movies need content features or editorial rules; pure CF cannot learn without interactions.'}</p></details></div>
+    <figure><img src={href('/artifacts/movielens/popularity-long-tail.svg')} width="900" height="500" loading="lazy" alt={zh ? '电影评分数量的长尾分布' : 'Long-tail distribution of movie rating counts'} /><figcaption>{zh ? '训练交互呈明显长尾；只优化准确率会自然把曝光集中到头部。' : 'Training interactions have a pronounced long tail; optimizing accuracy alone naturally concentrates exposure in the head.'}</figcaption></figure>
+  </section>
+
+  <section id="ml-9" class="case-step wide"><p class="step-label">Static, auditable artifacts</p><h2>{copy.demo}</h2><p>{zh ? '选择不同活动量的固定用户，比较两个模型的 Top-10。浏览器只读取压缩后的 JSON；原始 MovieLens 数据和完整相似度矩阵不会进入前端包。' : 'Choose fixed users at different activity levels and compare both Top-10 lists. The browser reads compact JSON only; raw MovieLens data and full similarity matrices never enter the frontend bundle.'}</p><MovieLensExplorer client:visible lang={lang} samples={samples} /></section>
+</div>
+
+<style>
+  .case-nav{position:sticky;top:68px;z-index:5;display:flex;gap:.3rem;width:min(calc(100% - 2 * var(--page-gutter)),var(--max));margin:0 auto 2rem;padding:.65rem;overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:rgba(7,17,31,.95)}.case-nav a{flex:0 0 auto;padding:.35rem .55rem;color:var(--muted);font:.68rem 'IBM Plex Mono',monospace;text-decoration:none}.case-nav a:hover{color:var(--rec)}
+  .case-study{width:min(calc(100% - 2 * var(--page-gutter)),var(--reading-max));margin-inline:auto}.case-step{display:grid;gap:1.15rem;padding:4.5rem 0;border-top:1px solid var(--line);scroll-margin-top:130px}.case-step h2{font:600 var(--title-step-size)/1.15 var(--title-font);letter-spacing:-.03em}.case-step>p,.case-step li{color:var(--muted);font-size:1.02rem}.step-label{color:var(--rec)!important;font:.72rem 'IBM Plex Mono',monospace!important;text-transform:uppercase}.objective,aside{padding:1.15rem;border-left:3px solid var(--search);background:rgba(53,208,226,.06)}.objective{display:grid;gap:.3rem}.objective span,.decision-grid span{color:var(--search);font:.67rem 'IBM Plex Mono',monospace;text-transform:uppercase}aside p{margin:.35rem 0 0;color:var(--muted)}
+  .matrix{display:grid;grid-template-columns:auto 1fr;gap:.6rem;max-width:620px;padding:1.2rem;border:1px solid var(--line);border-radius:18px;background:radial-gradient(circle at 70% 20%,rgba(167,139,250,.14),transparent 48%),var(--deep)}.cells{display:grid;grid-template-columns:repeat(8,1fr);gap:.35rem}.cells i{display:grid;place-items:center;aspect-ratio:1;border:1px solid rgba(153,178,209,.13);border-radius:4px;color:var(--rec);font-style:normal;background:rgba(255,255,255,.02)}.cells i.rated{border-color:rgba(167,139,250,.5);background:rgba(167,139,250,.16);box-shadow:0 0 16px rgba(167,139,250,.12)}.axis{color:var(--muted);font:.68rem 'IBM Plex Mono',monospace}.axis.y{writing-mode:vertical-rl;transform:rotate(180deg)}.axis.x{grid-column:2}.stat-grid,.decision-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}.stat-grid article,.decision-grid article{padding:1rem;border:1px solid var(--line);border-radius:14px;background:var(--deep)}.stat-grid span{display:block;color:var(--muted);font:.67rem 'IBM Plex Mono',monospace}.stat-grid strong{display:block;margin-top:.45rem;color:var(--rec);font:600 1.7rem var(--title-font)}
+  .timeline{display:grid;grid-template-columns:8fr 1fr 1fr;overflow:hidden;border:1px solid var(--line);border-radius:12px}.timeline b{display:grid;gap:.15rem;padding:.8rem;color:var(--deep);background:var(--search)}.timeline b:nth-child(2){background:var(--rec)}.timeline b:nth-child(3){background:var(--ads)}.timeline small{font:.62rem 'IBM Plex Mono',monospace}.fine{font:.82rem!important}.code-block{overflow:hidden;border:1px solid var(--line);border-radius:14px}.code-block :global(pre){margin:0!important;padding:1rem!important;overflow:auto;font-size:.82rem}.metric-table{overflow:auto;border:1px solid var(--line);border-radius:14px}table{width:100%;min-width:700px;border-collapse:collapse}th,td{padding:.85rem;border-bottom:1px solid var(--line);text-align:left;font-size:.82rem}thead th{color:var(--muted);font:.66rem 'IBM Plex Mono',monospace;text-transform:uppercase}tbody tr:last-child>*{border:0}tbody td{font-variant-numeric:tabular-nums}
+  figure{margin:0;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:var(--deep)}figure img{display:block;width:100%;height:auto}figcaption{padding:.9rem 1rem;color:var(--muted);border-top:1px solid var(--line);font-size:.85rem}.decision-grid h3{margin:.55rem 0}.decision-grid p{margin:0;color:var(--muted);font-size:.9rem}.architecture{display:flex;align-items:center;gap:.6rem;overflow-x:auto}.architecture span{flex:1 0 150px;padding:.8rem;border:1px solid var(--line);border-radius:10px;text-align:center;font:.7rem 'IBM Plex Mono',monospace}.architecture b{color:var(--rec)}
+  .interview-grid{display:grid;gap:.6rem}.interview-grid details{padding:.85rem 1rem;border:1px solid var(--line);border-radius:12px;background:var(--deep)}.interview-grid summary{cursor:pointer;color:var(--starlight);font-weight:600}.interview-grid p{margin:.6rem 0 0;color:var(--muted);font-size:.9rem}
+  @media(max-width:720px){.stat-grid,.decision-grid{grid-template-columns:1fr}.case-step{padding-block:3.5rem}.timeline{grid-template-columns:6fr 1.5fr 1.5fr}}
+</style>

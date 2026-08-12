@@ -146,13 +146,14 @@ export const projects: ProjectMeta[] = [
     },
   },
   {
-    slug: 'movielens-collaborative-filtering', domain: 'recommendation', status: 'planned', compute: 'CPU',
-    algorithms: ['UserCF', 'ItemCF', 'Matrix factorization'], dataset: 'MovieLens · user-item interactions',
+    slug: 'movielens-collaborative-filtering', domain: 'recommendation', status: 'complete', compute: 'CPU',
+    algorithms: ['Bayesian popularity', 'User-CF', 'Item-CF'], dataset: 'MovieLens 1M · 1,000,209 ratings',
     authors: ['Ricky Gong', 'Ziqi Xu'],
+    sourceUrl: 'https://grouplens.org/datasets/movielens/1m/',
     title: { en: 'MovieLens collaborative filtering', zh: 'MovieLens 协同过滤' },
     summary: {
-      en: 'The next recommendation project adds user-item interactions so personalization and ranking metrics can be evaluated correctly.',
-      zh: '下一项推荐项目引入真实用户—物品交互，正确评估个性化与排序指标。',
+      en: 'A reproducible User-CF and Item-CF study with temporal evaluation, full-catalog Top-10 ranking, coverage analysis, and CPU serving evidence.',
+      zh: '可复现的 User-CF 与 Item-CF 实验，包含时间切分、全目录 Top-10、覆盖率分析与 CPU 服务证据。',
     },
   },
 ];
