@@ -97,7 +97,7 @@ export const copy = {
   },
   zh: {
     siteName: '搜广推宇宙实验室',
-    byline: 'Ricky Gong、Ziqi Xu 与饶宇韬的联合技术作品集',
+    byline: 'Ricky Gong、Ziqi Xu 与 Yutao Rao 的联合技术作品集',
     nav: { home: '首页', projects: '项目', compare: '算法对比', roadmap: '路线图', about: '关于我们' },
     language: 'English',
     heroTitle: '搜广推宇宙实验室',
@@ -183,9 +183,9 @@ export const profiles: ProfileMeta[] = [
     email: 'xuziqi2003@gmail.com',
   },
   {
-    name: { en: 'Yutao Rao', zh: '饶宇韬' },
+    name: { en: 'Yutao Rao', zh: 'Yutao Rao' },
     photo: '/images/people/yutao-rao.jpg',
-    photoAlt: { en: 'Portrait of Yutao Rao by a lakeside', zh: '湖畔的饶宇韬' },
+    photoAlt: { en: 'Portrait of Yutao Rao by a lakeside', zh: '湖畔的 Yutao Rao' },
     school: { en: 'Stanford University', zh: '斯坦福大学' },
     major: { en: 'MS in Management Science and Engineering', zh: '管理科学与工程硕士' },
     industryRole: { en: 'Quantitative Development Intern at 平方和投资', zh: '平方和投资量化开发实习生' },
