@@ -35,13 +35,13 @@ export interface AlgorithmMeta {
 }
 
 export interface ProfileMeta {
-  name: string;
+  name: Localized;
   photo: string;
   photoAlt: Localized;
   school: Localized;
   major: Localized;
   industryRole: Localized;
-  linkedin: string;
+  linkedin?: string;
   github: string;
   email: string;
 }
@@ -80,7 +80,7 @@ export const domainNames: Record<Domain, Localized> = {
 export const copy = {
   en: {
     siteName: 'SAR Cosmos Lab',
-    byline: 'A joint technical portfolio by Ricky Gong & Ziqi Xu',
+    byline: 'A joint technical portfolio by Ricky Gong, Ziqi Xu & Yutao Rao',
     nav: { home: 'Home', projects: 'Projects', compare: 'Algorithms', roadmap: 'Roadmap', about: 'About' },
     language: '中文',
     heroTitle: 'SAR Cosmos Lab',
@@ -97,7 +97,7 @@ export const copy = {
   },
   zh: {
     siteName: '搜广推宇宙实验室',
-    byline: 'Ricky Gong 与 Ziqi Xu 的联合技术作品集',
+    byline: 'Ricky Gong、Ziqi Xu 与饶宇韬的联合技术作品集',
     nav: { home: '首页', projects: '项目', compare: '算法对比', roadmap: '路线图', about: '关于我们' },
     language: 'English',
     heroTitle: '搜广推宇宙实验室',
@@ -161,7 +161,7 @@ export const projects: ProjectMeta[] = [
 
 export const profiles: ProfileMeta[] = [
   {
-    name: 'Ricky Gong',
+    name: { en: 'Ricky Gong', zh: 'Ricky Gong' },
     photo: '/images/people/ricky-gong.jpg',
     photoAlt: { en: 'Ricky Gong under cherry blossoms', zh: '樱花树下的 Ricky Gong' },
     school: { en: 'University of Pennsylvania', zh: '宾夕法尼亚大学' },
@@ -172,7 +172,7 @@ export const profiles: ProfileMeta[] = [
     email: 'sgong.recruiting@gmail.com',
   },
   {
-    name: 'Ziqi Xu',
+    name: { en: 'Ziqi Xu', zh: 'Ziqi Xu' },
     photo: '/images/people/ziqi-xu.jpg',
     photoAlt: { en: 'Ziqi Xu on an oak-lined path', zh: '林荫小路上的 Ziqi Xu' },
     school: { en: 'University of Illinois Urbana-Champaign', zh: '伊利诺伊大学厄巴纳-香槟分校' },
@@ -181,6 +181,17 @@ export const profiles: ProfileMeta[] = [
     linkedin: 'https://www.linkedin.com/in/ziqi12/',
     github: 'https://github.com/ziqixu22',
     email: 'xuziqi2003@gmail.com',
+  },
+  {
+    name: { en: 'Yutao Rao', zh: '饶宇韬' },
+    photo: '/images/people/yutao-rao.jpg',
+    photoAlt: { en: 'Portrait of Yutao Rao by a lakeside', zh: '湖畔的饶宇韬' },
+    school: { en: 'Stanford University', zh: '斯坦福大学' },
+    major: { en: 'MS in Management Science and Engineering', zh: '管理科学与工程硕士' },
+    industryRole: { en: 'Quantitative Development Intern at 平方和投资', zh: '平方和投资量化开发实习生' },
+    linkedin: 'https://www.linkedin.com/in/yutao-rao-88527628b/',
+    github: 'https://github.com/yutaor2',
+    email: 'yutaorao004@gmail.com',
   },
 ];
 
