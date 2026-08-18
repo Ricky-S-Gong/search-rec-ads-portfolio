@@ -8,6 +8,10 @@
         "novelty": 9.762310870901947
       },
       "confidence95": {
+        "hitRateAt10": [
+          0.1438144329896907,
+          0.16151202749140894
+        ],
         "ndcgAt10": [
           0.024805113257160043,
           0.028757103100805946
@@ -17,7 +21,28 @@
           0.024413107108684523
         ]
       },
+      "examples": [
+        {
+          "movieId": 578,
+          "ratingCount": 1,
+          "ratingMean": 5.0,
+          "score": 3.6542490812448354,
+          "support": "low",
+          "title": "Hour of the Pig, The (1993)"
+        },
+        {
+          "movieId": 2858,
+          "ratingCount": 3279,
+          "ratingMean": 4.32845401763916,
+          "score": 4.322945278435585,
+          "support": "high",
+          "title": "American Beauty (1999)"
+        }
+      ],
+      "globalMean": 3.600419044494629,
+      "priorWeight": 25.0,
       "test": {
+        "hit_rate_at_10": 0.1527491408934708,
         "ndcg_at_10": 0.026763659448595423,
         "recall_at_10": 0.022470338645343507,
         "users": 5820
@@ -32,17 +57,21 @@
   "candidatePolicy": "Full fitted catalog minus seen movies",
   "dataset": "MovieLens 1M",
   "datasetUrl": "https://grouplens.org/datasets/movielens/1m/",
-  "experimentCodeVersion": "movielens-cf-v2",
-  "generatedAtUtc": "2026-08-12T05:48:13+00:00",
+  "experimentCodeVersion": "movielens-cf-v3",
+  "generatedAtUtc": "2026-08-18T01:05:43+00:00",
   "k": 10,
   "models": [
     {
       "beyondAccuracy": {
         "catalog_coverage": 0.2747759978278577,
         "long_tail_share": 0.4201202749140893,
-        "novelty": 10.85093117552417
+        "novelty": 10.850931616106356
       },
       "confidence95": {
+        "hitRateAt10": [
+          0.13092353951890034,
+          0.1479381443298969
+        ],
         "ndcgAt10": [
           0.021916216373674195,
           0.025583977415813516
@@ -63,12 +92,13 @@
       "mode": "user",
       "rating": {
         "coverage": 0.9997080547689253,
-        "mae": 0.7206060779980348,
+        "mae": 0.7206060777810352,
         "ratings": 102729,
-        "rmse": 0.9313128616404239
+        "rmse": 0.931312861568884
       },
       "segments": [
         {
+          "hitRateAt10": 0.06941580756013746,
           "ndcgAt10": 0.016906492533784897,
           "recallAt10": 0.028751431844215348,
           "segment": "sparse",
@@ -76,6 +106,7 @@
           "users": 1455
         },
         {
+          "hitRateAt10": 0.08109965635738832,
           "ndcgAt10": 0.012904545562469939,
           "recallAt10": 0.017497954508263785,
           "segment": "light",
@@ -83,6 +114,7 @@
           "users": 1455
         },
         {
+          "hitRateAt10": 0.12852233676975944,
           "ndcgAt10": 0.020806731585795248,
           "recallAt10": 0.019325153312577906,
           "segment": "active",
@@ -90,6 +122,7 @@
           "users": 1455
         },
         {
+          "hitRateAt10": 0.27835051546391754,
           "ndcgAt10": 0.04409917197870261,
           "recallAt10": 0.01838093390529584,
           "segment": "power",
@@ -100,21 +133,22 @@
       "similarity": "Mean-centered cosine",
       "system": {
         "fallbackShare": 0.06032646048109966,
-        "fitSeconds": 5.109758625039831,
-        "neighborArtifactMiB": 3.682170867919922,
+        "fitSeconds": 5.129637542006094,
+        "neighborArtifactMiB": 3.6821861267089844,
         "rankingTieStats": {
           "entriesInExactTieShare": 0.0004571303187112582,
           "fullyTiedListShare": 0.00017562346329469617,
           "largestTieGroup": 4,
           "lists": 5694
         },
-        "recommendSeconds": 2.0719592499081045,
-        "retainedNeighbors": 479609,
+        "recommendSeconds": 2.2069052500010002,
+        "retainedNeighbors": 479611,
         "top10ClippedShare": 0.44952367020790285,
         "top10RawAboveRatingMaxShare": 0.44952367020790285,
-        "usersPerSecond": 2808.9355523078593
+        "usersPerSecond": 2637.1771058124777
       },
       "test": {
+        "hit_rate_at_10": 0.1393470790378007,
         "ndcg_at_10": 0.02367923541518817,
         "recall_at_10": 0.02098886839258822,
         "users": 5820
@@ -123,10 +157,14 @@
     {
       "beyondAccuracy": {
         "catalog_coverage": 0.737170784686397,
-        "long_tail_share": 0.5688659793814433,
-        "novelty": 12.273735817952069
+        "long_tail_share": 0.5689347079037801,
+        "novelty": 12.274109234371032
       },
       "confidence95": {
+        "hitRateAt10": [
+          0.06047680412371134,
+          0.07320017182130584
+        ],
         "ndcgAt10": [
           0.009400512107528151,
           0.01191019093868861
@@ -147,12 +185,13 @@
       "mode": "item",
       "rating": {
         "coverage": 0.9997080547689253,
-        "mae": 0.7444802164884384,
+        "mae": 0.744480216279562,
         "ratings": 102729,
-        "rmse": 0.9652141249530877
+        "rmse": 0.9652141249082046
       },
       "segments": [
         {
+          "hitRateAt10": 0.06323024054982818,
           "ndcgAt10": 0.01448741535658204,
           "recallAt10": 0.02487972508591065,
           "segment": "sparse",
@@ -160,6 +199,7 @@
           "users": 1455
         },
         {
+          "hitRateAt10": 0.061168384879725084,
           "ndcgAt10": 0.010316449889268477,
           "recallAt10": 0.0139049800905471,
           "segment": "light",
@@ -167,6 +207,7 @@
           "users": 1455
         },
         {
+          "hitRateAt10": 0.05429553264604811,
           "ndcgAt10": 0.006584514205072588,
           "recallAt10": 0.006411547204451995,
           "segment": "active",
@@ -174,6 +215,7 @@
           "users": 1455
         },
         {
+          "hitRateAt10": 0.0879725085910653,
           "ndcgAt10": 0.010874605446441869,
           "recallAt10": 0.0048996459072488474,
           "segment": "power",
@@ -184,22 +226,23 @@
       "similarity": "Adjusted cosine",
       "system": {
         "fallbackShare": 0.02281786941580756,
-        "fitSeconds": 2.360638999962248,
+        "fitSeconds": 2.263160667003831,
         "neighborArtifactMiB": 0.5184860229492188,
         "rankingTieStats": {
-          "entriesInExactTieShare": 0.8757209171472781,
-          "fullyTiedListShare": 0.7789291882556131,
+          "entriesInExactTieShare": 0.8757736671824448,
+          "fullyTiedListShare": 0.7796200345423143,
           "largestTieGroup": 10,
           "lists": 5790
         },
-        "recommendSeconds": 1.2956520000007004,
+        "recommendSeconds": 1.3077038330084179,
         "retainedNeighbors": 66117,
-        "top10ClippedShare": 0.0001758334505556337,
+        "top10ClippedShare": 0.00010550007033338022,
         "top10FiveStarOnlyEvidenceShare": 0.8786045857363904,
-        "top10RawAboveRatingMaxShare": 0.0001758334505556337,
-        "usersPerSecond": 4491.9469116682985
+        "top10RawAboveRatingMaxShare": 0.00010550007033338022,
+        "usersPerSecond": 4450.549010482663
       },
       "test": {
+        "hit_rate_at_10": 0.06666666666666667,
         "ndcg_at_10": 0.010565746224341244,
         "recall_at_10": 0.01252397457203965,
         "users": 5820
@@ -211,19 +254,26 @@
     "compute": "CPU",
     "numpy": "2.5.1",
     "pandas": "3.0.5",
-    "platform": "macOS-13.0-x86_64-i386-64bit",
-    "python": "3.12.2",
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "python": "3.12.12",
     "scikitLearn": "1.9.0",
     "scipy": "1.18.0",
     "timingContext": "One single-process offline batch over the full ranking cohort; recommendSeconds includes candidate scoring, seen-item removal, and Top-10 selection, but excludes fitting, data loading, and artifact writing. BLAS thread count was not forced."
   },
   "seed": 42,
   "split": "Per-user temporal 80/10/10; refit train+validation for final test",
+  "splitCounts": {
+    "fittedRatings": 897450,
+    "testRatings": 102759,
+    "trainRatings": 797758,
+    "validationRatings": 99692
+  },
   "validation": [
     {
       "candidates": [
         {
           "metrics": {
+            "hit_rate_at_10": 0.13145621005354985,
             "ndcg_at_10": 0.0219836340008431,
             "recall_at_10": 0.01929243431543997,
             "users": 5789
@@ -236,23 +286,24 @@
           },
           "system": {
             "fallbackShare": 0.06284332354465365,
-            "fitSeconds": 4.6863758330000564,
-            "neighborArtifactMiB": 3.6335792541503906,
+            "fitSeconds": 4.720389916008571,
+            "neighborArtifactMiB": 3.633594512939453,
             "rankingTieStats": {
-              "entriesInExactTieShare": 0.0012534100125341002,
+              "entriesInExactTieShare": 0.0012165450121654502,
               "fullyTiedListShare": 0.0,
               "largestTieGroup": 5,
               "lists": 5656
             },
-            "recommendSeconds": 2.0708753750659525,
-            "retainedNeighbors": 473240,
+            "recommendSeconds": 2.302272417000495,
+            "retainedNeighbors": 473242,
             "top10ClippedShare": 0.4517805795178058,
             "top10RawAboveRatingMaxShare": 0.4517805795178058,
-            "usersPerSecond": 2795.4362052403244
+            "usersPerSecond": 2514.4722046152
           }
         },
         {
           "metrics": {
+            "hit_rate_at_10": 0.11228191397477975,
             "ndcg_at_10": 0.015351802358275306,
             "recall_at_10": 0.01564512148251557,
             "users": 5789
@@ -265,7 +316,7 @@
           },
           "system": {
             "fallbackShare": 0.04316807738814994,
-            "fitSeconds": 4.766442458028905,
+            "fitSeconds": 4.738701666996349,
             "neighborArtifactMiB": 0.9440650939941406,
             "rankingTieStats": {
               "entriesInExactTieShare": 0.15249769818201514,
@@ -273,15 +324,16 @@
               "largestTieGroup": 9,
               "lists": 5735
             },
-            "recommendSeconds": 1.1809973750496283,
+            "recommendSeconds": 1.128438665997237,
             "retainedNeighbors": 120720,
             "top10ClippedShare": 0.6852557274647506,
             "top10RawAboveRatingMaxShare": 0.6852557274647506,
-            "usersPerSecond": 4901.789049071114
+            "usersPerSecond": 5130.097163840161
           }
         },
         {
           "metrics": {
+            "hit_rate_at_10": 0.05907756089134566,
             "ndcg_at_10": 0.007450646890787907,
             "recall_at_10": 0.007082226798034974,
             "users": 5789
@@ -294,19 +346,19 @@
           },
           "system": {
             "fallbackShare": 0.027034030057004665,
-            "fitSeconds": 4.75472054106649,
+            "fitSeconds": 4.634066541999346,
             "neighborArtifactMiB": 1.8650856018066406,
             "rankingTieStats": {
-              "entriesInExactTieShare": 0.07618286728806037,
+              "entriesInExactTieShare": 0.07621837549933422,
               "fullyTiedListShare": 0.0,
               "largestTieGroup": 6,
               "lists": 5754
             },
-            "recommendSeconds": 1.5200061249779537,
+            "recommendSeconds": 1.565486208011862,
             "retainedNeighbors": 241440,
             "top10ClippedShare": 0.6866400355082113,
             "top10RawAboveRatingMaxShare": 0.6866400355082113,
-            "usersPerSecond": 3808.537284732299
+            "usersPerSecond": 3697.89268686814
           }
         }
       ],
@@ -322,8 +374,9 @@
       "candidates": [
         {
           "metrics": {
-            "ndcg_at_10": 0.012637845273727,
-            "recall_at_10": 0.014858689829131869,
+            "hit_rate_at_10": 0.07013301088270858,
+            "ndcg_at_10": 0.012588160293641643,
+            "recall_at_10": 0.014830699323511375,
             "users": 5789
           },
           "params": {
@@ -334,24 +387,25 @@
           },
           "system": {
             "fallbackShare": 0.027707721540853342,
-            "fitSeconds": 2.403501542052254,
+            "fitSeconds": 2.068914167000912,
             "neighborArtifactMiB": 0.5109786987304688,
             "rankingTieStats": {
-              "entriesInExactTieShare": 0.8815158298688839,
-              "fullyTiedListShare": 0.784197702749739,
+              "entriesInExactTieShare": 0.8815513626834381,
+              "fullyTiedListShare": 0.7845457709711103,
               "largestTieGroup": 10,
               "lists": 5746
             },
-            "recommendSeconds": 1.262814208981581,
+            "recommendSeconds": 1.2190878750116099,
             "retainedNeighbors": 65141,
-            "top10ClippedShare": 0.00010659844366272253,
+            "top10ClippedShare": 5.329922183136126e-05,
             "top10FiveStarOnlyEvidenceShare": 0.8840741925167892,
-            "top10RawAboveRatingMaxShare": 0.00010659844366272253,
-            "usersPerSecond": 4584.205624886532
+            "top10RawAboveRatingMaxShare": 5.329922183136126e-05,
+            "usersPerSecond": 4748.632250931762
           }
         },
         {
           "metrics": {
+            "hit_rate_at_10": 0.03523924684746934,
             "ndcg_at_10": 0.005155197278299012,
             "recall_at_10": 0.006368846635220992,
             "users": 5789
@@ -364,26 +418,27 @@
           },
           "system": {
             "fallbackShare": 0.10238383140438763,
-            "fitSeconds": 2.1904909160220996,
+            "fitSeconds": 1.992482082976494,
             "neighborArtifactMiB": 1.7691116333007812,
             "rankingTieStats": {
-              "entriesInExactTieShare": 0.2801223947809018,
-              "fullyTiedListShare": 0.1775179856115108,
+              "entriesInExactTieShare": 0.2801801281681196,
+              "fullyTiedListShare": 0.1776978417266187,
               "largestTieGroup": 10,
               "lists": 5560
             },
-            "recommendSeconds": 1.8295803749933839,
+            "recommendSeconds": 1.847195666981861,
             "retainedNeighbors": 230047,
-            "top10ClippedShare": 0.0001732001616534842,
+            "top10ClippedShare": 0.0002116890864653696,
             "top10FiveStarOnlyEvidenceShare": 0.2916690722244674,
-            "top10RawAboveRatingMaxShare": 0.0001732001616534842,
-            "usersPerSecond": 3164.113519757739
+            "top10RawAboveRatingMaxShare": 0.0002116890864653696,
+            "usersPerSecond": 3133.9397896372643
           }
         },
         {
           "metrics": {
-            "ndcg_at_10": 0.004266090941661463,
-            "recall_at_10": 0.004637768857473817,
+            "hit_rate_at_10": 0.02694765935394714,
+            "ndcg_at_10": 0.004228071980476789,
+            "recall_at_10": 0.0046334503223209415,
             "users": 5789
           },
           "params": {
@@ -394,20 +449,20 @@
           },
           "system": {
             "fallbackShare": 0.012316462256002764,
-            "fitSeconds": 2.179741790983826,
+            "fitSeconds": 2.0348522909916937,
             "neighborArtifactMiB": 0.9975814819335938,
             "rankingTieStats": {
-              "entriesInExactTieShare": 0.8634415936477955,
-              "fullyTiedListShare": 0.77683223341438,
+              "entriesInExactTieShare": 0.8634066145478076,
+              "fullyTiedListShare": 0.7759638763459534,
               "largestTieGroup": 10,
               "lists": 5758
             },
-            "recommendSeconds": 1.4782719580689445,
+            "recommendSeconds": 1.4426547499897424,
             "retainedNeighbors": 128921,
-            "top10ClippedShare": 6.995819997551463e-05,
+            "top10ClippedShare": 0.00017489549993878658,
             "top10FiveStarOnlyEvidenceShare": 0.8662049425468282,
-            "top10RawAboveRatingMaxShare": 6.995819997551463e-05,
-            "usersPerSecond": 3916.058860753962
+            "top10RawAboveRatingMaxShare": 0.00017489549993878658,
+            "usersPerSecond": 4012.7410941815156
           }
         }
       ],
@@ -420,5 +475,5 @@
       }
     }
   ],
-  "version": "movielens-cf-v2"
+  "version": "movielens-cf-v3"
 }

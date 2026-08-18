@@ -34,12 +34,25 @@ def ranking_metrics(
         dcg = sum(hit / math.log2(rank + 2) for rank, hit in enumerate(hits))
         ideal_hits = min(k, len(relevant))
         idcg = sum(1 / math.log2(rank + 2) for rank in range(ideal_hits))
-        rows.append({"user_id": user_id, "recall_at_10": recall, "ndcg_at_10": dcg / idcg})
-    per_user = pd.DataFrame(rows, columns=["user_id", "recall_at_10", "ndcg_at_10"])
+        rows.append({
+            "user_id": user_id,
+            "hit_at_10": int(any(hits)),
+            "recall_at_10": recall,
+            "ndcg_at_10": dcg / idcg,
+        })
+    per_user = pd.DataFrame(
+        rows, columns=["user_id", "hit_at_10", "recall_at_10", "ndcg_at_10"]
+    )
     if per_user.empty:
-        return {"users": 0, "recall_at_10": 0.0, "ndcg_at_10": 0.0}, per_user
+        return {
+            "users": 0,
+            "hit_rate_at_10": 0.0,
+            "recall_at_10": 0.0,
+            "ndcg_at_10": 0.0,
+        }, per_user
     return {
         "users": int(len(per_user)),
+        "hit_rate_at_10": float(per_user["hit_at_10"].mean()),
         "recall_at_10": float(per_user["recall_at_10"].mean()),
         "ndcg_at_10": float(per_user["ndcg_at_10"].mean()),
     }, per_user

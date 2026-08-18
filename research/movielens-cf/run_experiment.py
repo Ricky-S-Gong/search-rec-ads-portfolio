@@ -155,6 +155,7 @@ def segment_metrics(
             "segment": str(segment),
             "users": int(len(group)),
             "trainingRatingsMedian": float(group["trainingRatings"].median()),
+            "hitRateAt10": float(group["hit_at_10"].mean()),
             "ndcgAt10": float(group["ndcg_at_10"].mean()),
             "recallAt10": float(group["recall_at_10"].mean()),
         }
@@ -325,20 +326,29 @@ def sample_payload(
 
 
 def make_figures(profile: dict, models: list[dict], fitted: pd.DataFrame, output: Path) -> None:
+    def save_svg(fig, path: Path) -> None:
+        fig.savefig(path, facecolor=fig.get_facecolor())
+        path.write_text(
+            "\n".join(line.rstrip() for line in path.read_text(encoding="utf-8").splitlines()) + "\n",
+            encoding="utf-8",
+        )
+
     plt.style.use("dark_background")
     colors = ["#35d0e2", "#a78bfa", "#f7b955"]
     labels = [model["label"] for model in models]
     ndcg = [model["test"]["ndcg_at_10"] for model in models]
     recall = [model["test"]["recall_at_10"] for model in models]
+    hit_rate = [model["test"]["hit_rate_at_10"] for model in models]
     fig, ax = plt.subplots(figsize=(9, 5), facecolor="#07111f")
     ax.set_facecolor("#07111f")
-    x = np.arange(len(labels)); width = 0.34
-    ax.bar(x - width / 2, ndcg, width, label="NDCG@10", color=colors)
-    ax.bar(x + width / 2, recall, width, label="Recall@10", color=colors, alpha=0.48)
-    ax.set_xticks(x, labels); ax.set_ylim(0, max(ndcg + recall) * 1.25)
+    x = np.arange(len(labels)); width = 0.24
+    ax.bar(x - width, ndcg, width, label="NDCG@10", color=colors)
+    ax.bar(x, recall, width, label="Recall@10", color=colors, alpha=0.55)
+    ax.bar(x + width, hit_rate, width, label="Hit Rate@10", color=colors, alpha=0.3)
+    ax.set_xticks(x, labels); ax.set_ylim(0, max(ndcg + recall + hit_rate) * 1.25)
     ax.set_ylabel("Higher is better"); ax.legend(frameon=False)
     ax.spines[["top", "right"]].set_visible(False); fig.tight_layout()
-    fig.savefig(output / "model-ranking.svg", facecolor=fig.get_facecolor()); plt.close(fig)
+    save_svg(fig, output / "model-ranking.svg"); plt.close(fig)
 
     counts = fitted.groupby("movie_id", observed=True).size().sort_values(ascending=False).to_numpy()
     fig, ax = plt.subplots(figsize=(9, 5), facecolor="#07111f")
@@ -347,7 +357,7 @@ def make_figures(profile: dict, models: list[dict], fitted: pd.DataFrame, output
     ax.fill_between(np.arange(1, len(counts) + 1), counts, color="#a78bfa", alpha=0.15)
     ax.set_yscale("log"); ax.set_xlabel("Movies ordered by training popularity")
     ax.set_ylabel("Ratings (log scale)"); ax.spines[["top", "right"]].set_visible(False)
-    fig.tight_layout(); fig.savefig(output / "popularity-long-tail.svg", facecolor=fig.get_facecolor()); plt.close(fig)
+    fig.tight_layout(); save_svg(fig, output / "popularity-long-tail.svg"); plt.close(fig)
 
     fig, axes = plt.subplots(1, 3, figsize=(12, 3.6), facecolor="#07111f")
     for ax in axes:
@@ -367,7 +377,7 @@ def make_figures(profile: dict, models: list[dict], fitted: pd.DataFrame, output
     axes[2].set_title("Ratings per movie", color="#edf5ff")
     axes[2].set_xlabel("Training interactions", color="#9cb0c8")
     fig.tight_layout()
-    fig.savefig(output / "eda-overview.svg", facecolor=fig.get_facecolor())
+    save_svg(fig, output / "eda-overview.svg")
     plt.close(fig)
 
 
@@ -417,6 +427,7 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
                 "system": system,
                 "segments": segment_metrics(per_user, fitted),
                 "confidence95": {
+                    "hitRateAt10": user_bootstrap_interval(per_user, "hit_at_10"),
                     "ndcgAt10": user_bootstrap_interval(per_user, "ndcg_at_10"),
                     "recallAt10": user_bootstrap_interval(per_user, "recall_at_10"),
                 },
@@ -427,14 +438,33 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
     popularity = BayesianPopularity().fit(fitted)
     popular_recs = popularity_recommendations(popularity, fitted, list(truth))
     popular_rank, popular_per_user = ranking_metrics(truth, popular_recs, k=K)
+    movie_titles = movies.set_index("movie_id")["title"].astype(str).to_dict()
+    bayesian_rows = fitted.groupby("movie_id", observed=True)["rating"].agg(["count", "mean"])
+    low_id = int(bayesian_rows.sort_values(["count", "mean"], ascending=[True, False]).index[0])
+    high_id = int(bayesian_rows.sort_values(["count", "mean"], ascending=[False, False]).index[0])
+    bayesian_examples = [
+        {
+            "support": label,
+            "movieId": movie_id,
+            "title": movie_titles.get(movie_id, str(movie_id)),
+            "ratingCount": int(bayesian_rows.loc[movie_id, "count"]),
+            "ratingMean": float(bayesian_rows.loc[movie_id, "mean"]),
+            "score": float(popularity.scores[movie_id]),
+        }
+        for label, movie_id in (("low", low_id), ("high", high_id))
+    ]
     bias = BiasBaseline().fit(fitted)
     predictable = test.loc[test["user_id"].isin(bias.user_bias) & test["movie_id"].isin(bias.item_bias)]
     bias_predictions = [bias.predict(int(row.user_id), int(row.movie_id)) for row in predictable.itertuples(index=False)]
     baselines = {
         "bayesianPopularity": {
+            "priorWeight": popularity.prior_weight,
+            "globalMean": popularity.global_mean,
+            "examples": bayesian_examples,
             "test": popular_rank,
             "beyondAccuracy": recommendation_stats(popular_recs, item_counts, len(item_counts)),
             "confidence95": {
+                "hitRateAt10": user_bootstrap_interval(popular_per_user, "hit_at_10"),
                 "ndcgAt10": user_bootstrap_interval(popular_per_user, "ndcg_at_10"),
                 "recallAt10": user_bootstrap_interval(popular_per_user, "recall_at_10"),
             },
@@ -455,8 +485,8 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
         "timingContext": "One single-process offline batch over the full ranking cohort; recommendSeconds includes candidate scoring, seen-item removal, and Top-10 selection, but excludes fitting, data loading, and artifact writing. BLAS thread count was not forced.",
     }
     metadata = {
-        "version": "movielens-cf-v2",
-        "experimentCodeVersion": "movielens-cf-v2",
+        "version": "movielens-cf-v3",
+        "experimentCodeVersion": "movielens-cf-v3",
         "generatedAtUtc": datetime.now(UTC).isoformat(timespec="seconds"),
         "dataset": "MovieLens 1M smoke subset" if smoke else "MovieLens 1M",
         "datasetUrl": "https://grouplens.org/datasets/movielens/1m/",
@@ -467,6 +497,12 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
         "candidatePolicy": "Full fitted catalog minus seen movies",
         "k": K,
         "runtime": runtime,
+        "splitCounts": {
+            "trainRatings": int(len(train)),
+            "validationRatings": int(len(validation)),
+            "fittedRatings": int(len(fitted)),
+            "testRatings": int(len(test)),
+        },
     }
     metrics = {
         **metadata,
@@ -474,6 +510,7 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
             "rankingUsers": len(truth),
             "testRatings": int(len(test)),
             "trainingRatings": int(len(fitted)),
+            "fittedCatalogMovies": int(len(item_counts)),
         },
         "baselines": baselines,
         "models": final_models,
@@ -499,6 +536,9 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
                 "recallAt10": paired_bootstrap_interval(
                     final_per_user["user"], popular_per_user, "recall_at_10"
                 ),
+                "hitRateAt10": paired_bootstrap_interval(
+                    final_per_user["user"], popular_per_user, "hit_at_10"
+                ),
             },
             "rankingCorrection": "Top-N uses raw neighborhood estimates; rating RMSE/MAE uses estimates clipped to [1, 5].",
         },
@@ -514,7 +554,7 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
         popular_recs,
         final_recommendations,
     )
-    validate_frontend_artifacts(metrics, samples)
+    validate_frontend_artifacts(metrics, samples, profile)
     write_json(output / "profile.json", {**metadata, "profile": profile})
     write_json(output / "metrics.json", metrics)
     write_json(output / "comparisons.json", {**metadata, "validation": validation_results, "models": final_models, "baselines": baselines})

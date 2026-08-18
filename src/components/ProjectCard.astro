@@ -2,7 +2,7 @@
 import { copy, domainNames, href, type Lang, type ProjectMeta } from '../data/site';
 const { project, lang } = Astro.props as { project: ProjectMeta; lang: Lang };
 const t = copy[lang];
-const projectHref = project.status === 'complete' ? href(`/${lang}/projects/${project.slug}/`) : href(`/${lang}/roadmap/`);
+const projectHref = project.status === 'planned' ? href(`/${lang}/roadmap/`) : href(`/${lang}/projects/${project.slug}/`);
 const statusLabel = project.status === 'complete' ? t.complete : project.status === 'in-progress' ? t.inProgress : t.planned;
 ---
 <article class={`project domain-${project.domain}`}>

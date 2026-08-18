@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from movielens_cf.data import load_movielens, validate_ratings
+from movielens_cf.data import dataset_profile, load_movielens, validate_ratings
 
 
 def test_load_movielens_parses_official_double_colon_files(tmp_path: Path):
@@ -24,6 +24,19 @@ def test_load_movielens_parses_official_double_colon_files(tmp_path: Path):
         "timestamp": 100,
     }
     assert movies.loc[movies["movie_id"] == 10, "genres"].item() == "Drama|Romance"
+
+    fields = dataset_profile(ratings, movies)["fields"]
+    assert [(field["table"], field["name"]) for field in fields] == [
+        ("ratings", "user_id"),
+        ("ratings", "movie_id"),
+        ("ratings", "rating"),
+        ("ratings", "timestamp"),
+        ("movies", "movie_id"),
+        ("movies", "title"),
+        ("movies", "genres"),
+    ]
+    assert fields[0]["dtype"] == "int32"
+    assert fields[0]["example"] == 1
 
 
 def test_validate_ratings_rejects_duplicate_user_movie_pairs():

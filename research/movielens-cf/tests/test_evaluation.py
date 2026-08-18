@@ -21,8 +21,20 @@ def test_ranking_metrics_measure_recall_and_discount_rank():
     expected_user_one = (1 + 1 / math.log2(4)) / (1 + 1 / math.log2(3))
     expected_user_two = (1 / math.log2(3)) / 1
     assert metrics["recall_at_10"] == 1.0
+    assert metrics["hit_rate_at_10"] == 1.0
     assert metrics["ndcg_at_10"] == pytest.approx((expected_user_one + expected_user_two) / 2)
-    assert set(per_user.columns) == {"user_id", "recall_at_10", "ndcg_at_10"}
+    assert set(per_user.columns) == {"user_id", "hit_at_10", "recall_at_10", "ndcg_at_10"}
+
+
+def test_ranking_metrics_separate_hit_rate_from_recall():
+    truth = {1: {10, 20}, 2: {30, 40}}
+    recommendations = {1: [10, 99], 2: [98, 97]}
+
+    metrics, per_user = ranking_metrics(truth, recommendations, k=2)
+
+    assert metrics["hit_rate_at_10"] == 0.5
+    assert metrics["recall_at_10"] == 0.25
+    assert per_user.set_index("user_id")["hit_at_10"].to_dict() == {1: 1, 2: 0}
 
 
 def test_rating_metrics_return_rmse_and_mae():

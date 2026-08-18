@@ -1,0 +1,20 @@
+---
+const { type, lang } = Astro.props as { type: 'evaluation' | 'user' | 'item'; lang: 'en' | 'zh' };
+const zh = lang === 'zh';
+const data = type === 'evaluation'
+  ? { label: zh ? '时间评估流程' : 'Temporal evaluation flow', nodes: [zh ? '原始用户–电影评分\n按用户排序' : 'Raw user–movie ratings\nsort within user', zh ? '80% Train\n拟合候选' : '80% Train\nfit candidates', zh ? '10% Validation\n选择 k、支持度、收缩' : '10% Validation\nselect k, support, shrinkage', zh ? 'Train + Validation\n重拟合最终模型' : 'Train + Validation\nrefit final model', zh ? '10% Test\n只评估一次' : '10% Test\nevaluate once'] }
+  : type === 'user'
+    ? { label: 'User-CF flow', nodes: [zh ? '训练评分\n中心化' : 'Training ratings\nmean-center', zh ? '共同评分\n余弦 + 收缩' : 'Co-ratings\ncosine + shrinkage', zh ? '相似用户\n加权残差' : 'Similar users\nweighted residuals', zh ? '排除已看\n完整目录 Top-10' : 'Remove seen\nfull-catalog Top-10', zh ? '展示推荐\n证据与命中' : 'Present recommendations\nevidence and hits'] }
+    : { label: 'Item-CF flow', nodes: [zh ? '训练评分\n按用户中心化' : 'Training ratings\ncenter by user', zh ? '共同用户\nadjusted cosine' : 'Co-raters\nadjusted cosine', zh ? '相似电影\n加权残差' : 'Similar items\nweighted residuals', zh ? '排除已看\n完整目录 Top-10' : 'Remove seen\nfull-catalog Top-10', zh ? '展示推荐\n来源电影证据' : 'Present recommendations\nsource-item evidence'] };
+---
+
+<figure class="flow" aria-label={data.label}>
+  <figcaption>{data.label}</figcaption>
+  <ol>
+    {data.nodes.map((node, index) => <li><span>{String(index + 1).padStart(2, '0')}</span><strong>{node.split('\n').map((line) => <>{line}<br /></>)}</strong></li>)}
+  </ol>
+</figure>
+
+<style>
+  .flow{display:grid;gap:.8rem;margin:0;padding:1.05rem;border:1px solid var(--line);border-radius:16px;background:linear-gradient(135deg,rgba(167,139,250,.12),rgba(12,27,48,.76))}.flow figcaption{padding:0;border:0;color:var(--starlight);font:600 .88rem 'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.06em}.flow ol{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:.55rem;margin:0;padding:0;list-style:none;overflow-x:auto}.flow li{position:relative;display:grid;gap:.45rem;min-height:102px;padding:.75rem;border:1px solid color-mix(in srgb,var(--rec) 36%,var(--line));border-radius:11px;background:rgba(7,17,31,.7)}.flow li:not(:last-child)::after{content:'→';position:absolute;z-index:1;right:-.68rem;top:50%;translate:0 -50%;color:var(--rec);font-size:1.25rem}.flow li>span{color:var(--rec);font:.65rem 'IBM Plex Mono',monospace}.flow li strong{font-size:.83rem;line-height:1.35}@media(max-width:720px){.flow ol{grid-template-columns:repeat(5,155px)}.flow li{min-height:92px}}
+</style>

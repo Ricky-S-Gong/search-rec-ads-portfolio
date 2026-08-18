@@ -17,6 +17,10 @@ const descriptions: Record<Domain, Record<Lang, string>> = {
     zh: '研究个性化与物品到物品推荐，帮助用户发现相关内容。',
   },
 };
+const empty = {
+  en: 'No project has been selected for this domain yet.',
+  zh: '该方向尚未选定项目。',
+};
 const initialDomain: Domain = 'recommendation';
 ---
 
@@ -50,7 +54,9 @@ const initialDomain: Domain = 'recommendation';
     >
       <p class="domain-description">{descriptions[domain][lang]}</p>
       <div class="project-list">
-        {projects.filter((project) => project.domain === domain).map((project) => <ProjectCard project={project} lang={lang} />)}
+        {projects.some((project) => project.domain === domain)
+          ? projects.filter((project) => project.domain === domain).map((project) => <ProjectCard project={project} lang={lang} />)
+          : <p class="empty-state">{empty[lang]}</p>}
       </div>
     </section>
   ))}
@@ -99,6 +105,7 @@ const initialDomain: Domain = 'recommendation';
   .tab-panel { padding-top: 1.2rem; }
   .domain-description { max-width: 720px; margin-bottom: 1rem; color: var(--muted); }
   .project-list { border-bottom: 1px solid var(--line); }
+  .empty-state { padding: 1.35rem 0; border-top: 1px solid var(--line); color: var(--muted); }
   @media (max-width: 600px) {
     .tab-list button { min-height: 58px; padding-inline: .7rem; font-size: .86rem; }
     .tab-list small { display: none; }
