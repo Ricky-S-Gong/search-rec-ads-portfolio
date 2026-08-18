@@ -52,7 +52,7 @@ export interface RoadmapTrack {
   stages: Array<{
     title: Localized;
     topics: Localized;
-    project: Localized;
+    project?: Localized;
     status: ProjectStatus;
     compute: string;
     href?: string;
@@ -116,26 +116,6 @@ export const copy = {
 
 export const projects: ProjectMeta[] = [
   {
-    slug: 'product-search-relevance', domain: 'search', status: 'planned', compute: 'CPU',
-    algorithms: ['BM25', 'Dense retrieval', 'Hybrid ranking'], dataset: 'BEIR · query-document relevance',
-    authors: ['Ricky Gong', 'Ziqi Xu'],
-    title: { en: 'Search relevance benchmark', zh: '搜索相关性基准' },
-    summary: {
-      en: 'A planned retrieval study comparing lexical, dense, and hybrid search under relevance and latency constraints.',
-      zh: '计划对比词法、向量与混合检索，并分析相关性、延迟和失败查询。',
-    },
-  },
-  {
-    slug: 'criteo-ctr-prediction', domain: 'ads', status: 'planned', compute: 'GPU recommended',
-    algorithms: ['Logistic regression', 'GBDT + LR', 'DeepFM'], dataset: 'Criteo · display-ad interactions',
-    authors: ['Ricky Gong', 'Ziqi Xu'],
-    title: { en: 'CTR prediction and calibration', zh: 'CTR 预估与校准' },
-    summary: {
-      en: 'A planned ads case study covering sparse features, click prediction, probability calibration, and auction-aware evaluation.',
-      zh: '计划研究稀疏特征、点击率预估、概率校准，以及面向广告竞价的评估。',
-    },
-  },
-  {
     slug: 'spotify-content-recommender', domain: 'recommendation', status: 'complete', compute: 'CPU',
     algorithms: ['Popularity', 'Euclidean KNN', 'Cosine', 'Weighted cosine', 'K-Means retrieval'],
     dataset: 'Kaggle Spotify dataset · 170,653 tracks', authors: ['Ricky Gong', 'Ziqi Xu'],
@@ -147,7 +127,7 @@ export const projects: ProjectMeta[] = [
     },
   },
   {
-    slug: 'movielens-collaborative-filtering', domain: 'recommendation', status: 'complete', compute: 'CPU',
+    slug: 'movielens-collaborative-filtering', domain: 'recommendation', status: 'in-progress', compute: 'CPU',
     algorithms: ['Bayesian popularity', 'User-CF', 'Item-CF'], dataset: 'MovieLens 1M · 1,000,209 ratings',
     authors: ['Ricky Gong', 'Ziqi Xu'],
     sourceUrl: 'https://grouplens.org/datasets/movielens/1m/',
@@ -206,25 +186,21 @@ export const roadmapTracks: RoadmapTrack[] = [
       {
         title: { en: 'Information retrieval foundations', zh: '信息检索基础' },
         topics: { en: 'Inverted indexes · text processing · query analysis', zh: '倒排索引 · 文本预处理 · 查询分析' },
-        project: { en: 'Search system groundwork', zh: '搜索系统基础实验' },
         status: 'planned', compute: 'CPU',
       },
       {
         title: { en: 'Lexical retrieval and evaluation', zh: '词法检索与离线评估' },
         topics: { en: 'TF-IDF · BM25 · relevance metrics', zh: 'TF-IDF · BM25 · 相关性指标' },
-        project: { en: 'BEIR search relevance benchmark', zh: 'BEIR 搜索相关性基准' },
         status: 'planned', compute: 'CPU',
       },
       {
         title: { en: 'Semantic and hybrid retrieval', zh: '语义与混合检索' },
         topics: { en: 'Dense retrieval · vector search · hybrid fusion', zh: 'Dense Retrieval · 向量检索 · 混合融合' },
-        project: { en: 'Lexical vs. dense retrieval study', zh: '词法与向量检索对比实验' },
         status: 'planned', compute: 'GPU recommended',
       },
       {
         title: { en: 'Learned ranking and query understanding', zh: '学习排序与查询理解' },
         topics: { en: 'Learning to Rank · intent · LLM search', zh: 'Learning to Rank · 意图识别 · LLM Search' },
-        project: { en: 'End-to-end search ranking case study', zh: '端到端搜索排序项目' },
         status: 'planned', compute: 'GPU recommended',
       },
     ],
@@ -239,25 +215,21 @@ export const roadmapTracks: RoadmapTrack[] = [
       {
         title: { en: 'Ads systems and objectives', zh: '广告系统与目标' },
         topics: { en: 'Ecosystem · auctions · CTR/CVR metrics', zh: '广告生态 · 拍卖 · CTR/CVR 指标' },
-        project: { en: 'Auction and metric walkthrough', zh: '竞价与指标基础实验' },
         status: 'planned', compute: 'CPU',
       },
       {
         title: { en: 'Response prediction baselines', zh: '响应预估基线' },
         topics: { en: 'Feature engineering · negative sampling · logistic CTR', zh: '特征工程 · 负采样 · 逻辑回归 CTR' },
-        project: { en: 'Criteo CTR prediction', zh: 'Criteo CTR 预估' },
         status: 'planned', compute: 'CPU',
       },
       {
         title: { en: 'Deep prediction and calibration', zh: '深度预估与概率校准' },
         topics: { en: 'DeepFM · multi-task learning · calibration', zh: 'DeepFM · 多任务学习 · 概率校准' },
-        project: { en: 'Calibrated deep CTR benchmark', zh: '深度 CTR 与校准对比' },
         status: 'planned', compute: 'GPU recommended',
       },
       {
         title: { en: 'Bidding and online optimization', zh: '竞价与在线优化' },
         topics: { en: 'Bidding · budgets · online learning · experiments', zh: '出价 · 预算控制 · 在线学习 · 实验' },
-        project: { en: 'Budget-aware bidding simulation', zh: '预算约束竞价模拟' },
         status: 'planned', compute: 'CPU → GPU',
       },
     ],
@@ -279,7 +251,7 @@ export const roadmapTracks: RoadmapTrack[] = [
         title: { en: 'Collaborative signals', zh: '协同信号' },
         topics: { en: 'Popularity · User-CF · Item-CF · temporal evaluation', zh: '热门基线 · User-CF · Item-CF · 时间切分评估' },
         project: { en: 'MovieLens collaborative filtering', zh: 'MovieLens 协同过滤' },
-        status: 'complete', compute: 'CPU', href: '/projects/movielens-collaborative-filtering/',
+        status: 'in-progress', compute: 'CPU', href: '/projects/movielens-collaborative-filtering/',
       },
       {
         title: { en: 'Model-based recommendation', zh: '模型化推荐' },

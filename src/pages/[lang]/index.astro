@@ -75,6 +75,12 @@ const t = copy[lang];
   .algorithm-button::after { content:'→';margin-left:.55rem;color:var(--algorithm-color); }
   .algorithm-button.ads{--algorithm-color:var(--ads)}.algorithm-button.recommendation{--algorithm-color:var(--rec)}
   .algorithm-button:hover,.algorithm-button:focus-visible{background:color-mix(in srgb,var(--algorithm-color) 19%,rgba(7,17,31,.8));translate:0 -2px}
+  @media (min-width: 1200px) {
+    .algorithm-link-inner { align-items: center; }
+    .algorithm-link-inner > div:first-child { max-width: 500px; }
+    .algorithm-buttons { flex-wrap: nowrap; max-width: none!important; }
+    .algorithm-button { padding-inline: .9rem; font-size: .86rem; }
+  }
   @media (max-width: 700px) {
     .hero { min-height: 700px; }
     .hero h1, :global(html[lang='en']) .hero h1 { max-width: 16ch; font-size: clamp(2.3rem, 11vw, 3.25rem); white-space: normal; }

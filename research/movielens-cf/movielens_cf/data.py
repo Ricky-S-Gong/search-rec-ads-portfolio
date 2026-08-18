@@ -91,4 +91,21 @@ def dataset_profile(ratings: pd.DataFrame, movies: pd.DataFrame) -> dict:
             "moviesBelow10Ratings": int((per_movie < 10).sum()),
         },
         "genres": {"count": len(genre_counts), "top": genre_counts.most_common(8)},
+        "fields": [
+            {
+                "table": "ratings",
+                "name": name,
+                "dtype": str(ratings[name].dtype),
+                "example": ratings[name].iloc[0],
+            }
+            for name in RATING_COLUMNS
+        ] + [
+            {
+                "table": "movies",
+                "name": name,
+                "dtype": str(movies[name].dtype),
+                "example": movies[name].iloc[0],
+            }
+            for name in MOVIE_COLUMNS
+        ],
     }

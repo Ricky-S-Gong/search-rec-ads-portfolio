@@ -3,11 +3,55 @@
   "candidatePolicy": "Full fitted catalog minus seen movies",
   "dataset": "MovieLens 1M",
   "datasetUrl": "https://grouplens.org/datasets/movielens/1m/",
-  "experimentCodeVersion": "movielens-cf-v2",
-  "generatedAtUtc": "2026-08-12T05:48:13+00:00",
+  "experimentCodeVersion": "movielens-cf-v3",
+  "generatedAtUtc": "2026-08-18T01:05:43+00:00",
   "k": 10,
   "profile": {
     "density": 0.044684,
+    "fields": [
+      {
+        "dtype": "int32",
+        "example": 1,
+        "name": "user_id",
+        "table": "ratings"
+      },
+      {
+        "dtype": "int32",
+        "example": 1193,
+        "name": "movie_id",
+        "table": "ratings"
+      },
+      {
+        "dtype": "float32",
+        "example": 5.0,
+        "name": "rating",
+        "table": "ratings"
+      },
+      {
+        "dtype": "int64",
+        "example": 978300760,
+        "name": "timestamp",
+        "table": "ratings"
+      },
+      {
+        "dtype": "int32",
+        "example": 1,
+        "name": "movie_id",
+        "table": "movies"
+      },
+      {
+        "dtype": "string",
+        "example": "Toy Story (1995)",
+        "name": "title",
+        "table": "movies"
+      },
+      {
+        "dtype": "string",
+        "example": "Animation|Children's|Comedy",
+        "name": "genres",
+        "table": "movies"
+      }
+    ],
     "genres": {
       "count": 18,
       "top": [
@@ -103,13 +147,19 @@
     "compute": "CPU",
     "numpy": "2.5.1",
     "pandas": "3.0.5",
-    "platform": "macOS-13.0-x86_64-i386-64bit",
-    "python": "3.12.2",
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "python": "3.12.12",
     "scikitLearn": "1.9.0",
     "scipy": "1.18.0",
     "timingContext": "One single-process offline batch over the full ranking cohort; recommendSeconds includes candidate scoring, seen-item removal, and Top-10 selection, but excludes fitting, data loading, and artifact writing. BLAS thread count was not forced."
   },
   "seed": 42,
   "split": "Per-user temporal 80/10/10; refit train+validation for final test",
-  "version": "movielens-cf-v2"
+  "splitCounts": {
+    "fittedRatings": 897450,
+    "testRatings": 102759,
+    "trainRatings": 797758,
+    "validationRatings": 99692
+  },
+  "version": "movielens-cf-v3"
 }

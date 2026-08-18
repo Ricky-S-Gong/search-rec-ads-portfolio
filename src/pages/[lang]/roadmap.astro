@@ -13,7 +13,7 @@ const statusLabel = (status: ProjectStatus) => status === 'complete' ? t.complet
   <section class="section container roadmap">
     <div class="section-heading">
       <h1>{t.nav.roadmap}</h1>
-      <p class="muted">{lang === 'en' ? 'Separate learning paths for Search, Ads, and Recommendation, with the project and compute needed at each stage.' : '分别规划搜索、广告与推荐的学习路径，并标明每个阶段对应的项目与计算环境。'}</p>
+      <p class="muted">{lang === 'en' ? 'Separate learning paths for Search, Ads, and Recommendation, with compute needs and selected projects where available.' : '分别规划搜索、广告与推荐的学习路径，并标明计算环境；项目确定后再补充对应案例。'}</p>
     </div>
 
     <div class="roadmap-tabs" data-roadmap-tabs>
@@ -32,7 +32,7 @@ const statusLabel = (status: ProjectStatus) => status === 'complete' ? t.complet
             {track.stages.map((stage, index) => (
               <li>
                 <div class="stage-number"><span>{lang === 'en' ? 'Stage' : '阶段'}</span><strong>{String(index + 1).padStart(2, '0')}</strong></div>
-                <div class="stage-copy"><h2>{stage.title[lang]}</h2><p>{stage.topics[lang]}</p>{stage.href ? <a href={href(`/${lang}${stage.href}`)}>{stage.project[lang]} →</a> : <small>{stage.project[lang]}</small>}</div>
+                <div class="stage-copy"><h2>{stage.title[lang]}</h2><p>{stage.topics[lang]}</p>{stage.project && (stage.href ? <a href={href(`/${lang}${stage.href}`)}>{stage.project[lang]} →</a> : <small>{stage.project[lang]}</small>)}</div>
                 <div class="stage-meta"><span class={`status status-${stage.status}`}><i></i>{statusLabel(stage.status)}</span><strong>{stage.compute}</strong></div>
               </li>
             ))}

@@ -5,15 +5,20 @@ from movielens_cf.artifacts import validate_frontend_artifacts
 
 def valid_payloads():
     metrics = {
-        "version": "movielens-cf-v2",
+        "version": "movielens-cf-v3",
         "generatedAtUtc": "2026-08-12T00:00:00+00:00",
-        "experimentCodeVersion": "movielens-cf-v2",
+        "experimentCodeVersion": "movielens-cf-v3",
         "dataset": "MovieLens 1M",
         "seed": 42,
         "split": "temporal",
         "relevance": "rating >= 4",
         "candidatePolicy": "full catalog minus seen",
-        "models": [{"key": "user-cf"}, {"key": "item-cf"}],
+        "splitCounts": {"trainRatings": 70, "validationRatings": 10, "fittedRatings": 80, "testRatings": 20},
+        "baselines": {"bayesianPopularity": {"test": {"hit_rate_at_10": 0.5}, "examples": [{}, {}]}},
+        "models": [
+            {"key": "user-cf", "test": {"hit_rate_at_10": 0.4}},
+            {"key": "item-cf", "test": {"hit_rate_at_10": 0.3}},
+        ],
     }
     samples = {
         "version": "movielens-samples-v2",
@@ -28,19 +33,22 @@ def valid_payloads():
         }],
         "relatedItems": [],
     }
-    return metrics, samples
+    profile = {"fields": [
+        {"name": name} for name in ("user_id", "movie_id", "rating", "timestamp", "title", "genres")
+    ]}
+    return metrics, samples, profile
 
 
 def test_frontend_artifact_schema_accepts_provenance_and_three_methods():
-    metrics, samples = valid_payloads()
+    metrics, samples, profile = valid_payloads()
 
-    validate_frontend_artifacts(metrics, samples)
+    validate_frontend_artifacts(metrics, samples, profile)
 
 
 def test_frontend_artifact_schema_rejects_missing_method_or_provenance():
-    metrics, samples = valid_payloads()
+    metrics, samples, profile = valid_payloads()
     del metrics["seed"]
     del samples["users"][0]["methods"]["popularity"]
 
     with pytest.raises(ValueError, match="seed"):
-        validate_frontend_artifacts(metrics, samples)
+        validate_frontend_artifacts(metrics, samples, profile)

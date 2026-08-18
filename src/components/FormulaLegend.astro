@@ -1,0 +1,23 @@
+---
+import KatexMath from './KatexMath.astro';
+
+interface Entry {
+  latex: string;
+  description: string;
+}
+
+const { entries, label = 'Formula variables' } = Astro.props as { entries: Entry[]; label?: string };
+---
+
+<aside class="formula-legend" aria-label={label}>
+  <strong>{label}</strong>
+  <ul>
+    {entries.map((entry) => <li><KatexMath latex={entry.latex} /> <span>{entry.description}</span></li>)}
+  </ul>
+</aside>
+
+<style>
+  .formula-legend{display:grid;gap:.45rem;padding:.85rem 1rem;border:1px solid var(--line);border-left:3px solid var(--rec);border-radius:12px;background:rgba(12,27,48,.42)}
+  .formula-legend strong{font:.7rem 'IBM Plex Mono',monospace;letter-spacing:.05em;text-transform:uppercase;color:var(--starlight)}
+  .formula-legend ul{display:grid;gap:.32rem;margin:0;padding-left:1.1rem}.formula-legend li{color:var(--muted);font-size:.86rem}.formula-legend :global(.katex-math-inline){color:var(--starlight)}
+</style>
