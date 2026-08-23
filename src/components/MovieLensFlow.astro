@@ -2,19 +2,47 @@
 const { type, lang } = Astro.props as { type: 'evaluation' | 'user' | 'item'; lang: 'en' | 'zh' };
 const zh = lang === 'zh';
 const data = type === 'evaluation'
-  ? { label: zh ? '时间评估流程' : 'Temporal evaluation flow', nodes: [zh ? '原始用户–电影评分\n按用户排序' : 'Raw user–movie ratings\nsort within user', zh ? '80% Train\n拟合候选' : '80% Train\nfit candidates', zh ? '10% Validation\n选择 k、支持度、收缩' : '10% Validation\nselect k, support, shrinkage', zh ? 'Train + Validation\n重拟合最终模型' : 'Train + Validation\nrefit final model', zh ? '10% Test\n只评估一次' : '10% Test\nevaluate once'] }
+  ? { label: zh ? '时间评估流程' : 'Temporal evaluation flow', nodes: [
+      [zh?'读取评分':'Read ratings',zh?'保留原始 1–5 星与时间戳。':'Keep raw 1–5 stars and timestamps.'],
+      [zh?'用户内排序':'Order per user',zh?'按时间、电影 ID 稳定排序。':'Stable sort by time, then movie ID.'],
+      ['Train 80%',zh?'拟合候选模型与相似度。':'Fit candidate models and similarities.'],
+      ['Validation 10%',zh?'只在这里选方法与超参数。':'Select methods and parameters here only.'],
+      [zh?'选择规则':'Selection rule',zh?'先 NDCG，再 Recall、Hit Rate、同分与覆盖。':'NDCG, then Recall, Hit Rate, ties, and coverage.'],
+      ['Fit = Train + Validation',zh?'用已选配置重拟合。':'Refit the chosen configuration.'],
+      ['Test 10%',zh?'不再调参，只做最终对照。':'No more tuning; final comparison only.'],
+    ] }
   : type === 'user'
-    ? { label: 'User-CF flow', nodes: [zh ? '训练评分\n中心化' : 'Training ratings\nmean-center', zh ? '共同评分\n余弦 + 收缩' : 'Co-ratings\ncosine + shrinkage', zh ? '相似用户\n加权残差' : 'Similar users\nweighted residuals', zh ? '排除已看\n完整目录 Top-10' : 'Remove seen\nfull-catalog Top-10', zh ? '展示推荐\n证据与命中' : 'Present recommendations\nevidence and hits'] }
-    : { label: 'Item-CF flow', nodes: [zh ? '训练评分\n按用户中心化' : 'Training ratings\ncenter by user', zh ? '共同用户\nadjusted cosine' : 'Co-raters\nadjusted cosine', zh ? '相似电影\n加权残差' : 'Similar items\nweighted residuals', zh ? '排除已看\n完整目录 Top-10' : 'Remove seen\nfull-catalog Top-10', zh ? '展示推荐\n来源电影证据' : 'Present recommendations\nsource-item evidence'] };
+    ? { label: 'User-CF flow', nodes: [
+      [zh?'读取训练评分':'Read training ratings',zh?'输入用户、电影和原始星级。':'Input users, movies, and raw stars.'],
+      [zh?'计算基线残差':'Compute baseline residuals',zh?'实际评分减去用户与电影通常会得到的分数。':'Observed rating minus the usual user–movie baseline.'],
+      [zh?'共同评分集合':'Build co-rated sets',zh?'只比较两位用户都评过的电影。':'Use movies rated by both users only.'],
+      [zh?'相似度与收缩':'Similarity + shrinkage',zh?'余弦衡量方向，支持度门槛与收缩抑制巧合。':'Cosine measures direction; support and shrinkage control chance overlap.'],
+      [zh?'逐候选聚合':'Aggregate each candidate',zh?'汇总评过该候选的有效相似用户残差。':'Combine residuals from valid neighbors who rated it.'],
+      ['Fallback',zh?'邻居不足时改用 Bayesian 分。':'Use the Bayesian score when evidence is thin.'],
+      [zh?'多级排序':'Rank with evidence',zh?'主预测分 → Bayesian 分 → 证据强度 → ID。':'Prediction → Bayesian score → evidence → ID.'],
+      ['Top-10',zh?'排除已看后从完整目录取十部。':'Remove seen movies and take ten from the full catalog.'],
+      [zh?'命中判断':'Judge hits',zh?'只用隐藏测试期中原始评分 ≥4 的电影。':'Use hidden raw test ratings ≥4 only.'],
+    ] }
+    : { label: 'Item-CF flow', nodes: [
+      [zh?'读取训练评分':'Read training ratings',zh?'输入用户、电影和原始星级。':'Input users, movies, and raw stars.'],
+      [zh?'计算基线残差':'Compute baseline residuals',zh?'正值表示比通常更喜欢，负值表示更不喜欢。':'Positive means liked more than usual; negative means less.'],
+      [zh?'共同用户集合':'Build co-rater sets',zh?'只比较同时评过两部电影的用户。':'Use users who rated both movies only.'],
+      [zh?'相似度与收缩':'Similarity + shrinkage',zh?'用共同用户的残差计算电影关系并抑制低支持噪声。':'Relate movies through co-rater residuals and shrink weak support.'],
+      [zh?'逐候选聚合':'Aggregate each candidate',zh?'汇总目标用户评过的相似来源电影残差。':'Combine residuals from similar source movies the user rated.'],
+      ['Fallback',zh?'有效来源不足时改用 Bayesian 分。':'Use the Bayesian score when source evidence is thin.'],
+      [zh?'多级排序':'Rank with evidence',zh?'主预测分 → Bayesian 分 → 证据强度 → ID。':'Prediction → Bayesian score → evidence → ID.'],
+      ['Top-10',zh?'排除已看后从完整目录取十部。':'Remove seen movies and take ten from the full catalog.'],
+      [zh?'命中判断':'Judge hits',zh?'与隐藏测试期原始评分 ≥4 的电影求交集。':'Intersect with hidden raw test ratings ≥4.'],
+    ] };
 ---
 
 <figure class="flow" aria-label={data.label}>
   <figcaption>{data.label}</figcaption>
   <ol>
-    {data.nodes.map((node, index) => <li><span>{String(index + 1).padStart(2, '0')}</span><strong>{node.split('\n').map((line) => <>{line}<br /></>)}</strong></li>)}
+    {data.nodes.map((node, index) => <li><span>{String(index + 1).padStart(2, '0')}</span><strong>{node[0]}</strong><p>{node[1]}</p></li>)}
   </ol>
 </figure>
 
 <style>
-  .flow{display:grid;gap:.8rem;margin:0;padding:1.05rem;border:1px solid var(--line);border-radius:16px;background:linear-gradient(135deg,rgba(167,139,250,.12),rgba(12,27,48,.76))}.flow figcaption{padding:0;border:0;color:var(--starlight);font:600 .88rem 'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.06em}.flow ol{display:grid;grid-template-columns:repeat(5,minmax(130px,1fr));gap:.55rem;margin:0;padding:0;list-style:none;overflow-x:auto}.flow li{position:relative;display:grid;gap:.45rem;min-height:102px;padding:.75rem;border:1px solid color-mix(in srgb,var(--rec) 36%,var(--line));border-radius:11px;background:rgba(7,17,31,.7)}.flow li:not(:last-child)::after{content:'→';position:absolute;z-index:1;right:-.68rem;top:50%;translate:0 -50%;color:var(--rec);font-size:1.25rem}.flow li>span{color:var(--rec);font:.65rem 'IBM Plex Mono',monospace}.flow li strong{font-size:.83rem;line-height:1.35}@media(max-width:720px){.flow ol{grid-template-columns:repeat(5,155px)}.flow li{min-height:92px}}
+  .flow{display:grid;gap:.8rem;margin:0;padding:1.05rem;border:1px solid var(--line);border-radius:16px;background:linear-gradient(135deg,rgba(167,139,250,.12),rgba(12,27,48,.76))}.flow figcaption{padding:0;border:0;color:var(--starlight);font:600 .88rem 'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.06em}.flow ol{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(180px,1fr);gap:.55rem;margin:0;padding:0 0 .35rem;list-style:none;overflow-x:auto}.flow li{position:relative;display:grid;align-content:start;gap:.45rem;min-height:150px;padding:.8rem;border:1px solid color-mix(in srgb,var(--rec) 36%,var(--line));border-radius:11px;background:rgba(7,17,31,.7)}.flow li:not(:last-child)::after{content:'→';position:absolute;z-index:1;right:-.68rem;top:50%;translate:0 -50%;color:var(--rec);font-size:1.25rem}.flow li>span{color:var(--rec);font:.65rem 'IBM Plex Mono',monospace}.flow li strong{font-size:.83rem;line-height:1.35}.flow li p{margin:0;color:var(--muted);font-size:.72rem;line-height:1.5}@media(max-width:720px){.flow ol{grid-auto-columns:170px}.flow li{min-height:145px}}
 </style>

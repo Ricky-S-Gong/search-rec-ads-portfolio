@@ -6,6 +6,20 @@ import numpy as np
 import pandas as pd
 
 
+def relevant_truth(
+    holdout: pd.DataFrame, catalog: set[int], threshold: float = 4.0
+) -> dict[int, set[int]]:
+    """Build ranking truth from raw holdout ratings within the fitted catalog."""
+    relevant = holdout.loc[
+        (holdout["rating"] >= threshold) & holdout["movie_id"].isin(catalog)
+    ]
+    return {
+        int(user_id): set(group["movie_id"].astype(int))
+        for user_id, group in relevant.groupby("user_id", observed=True)
+        if len(group)
+    }
+
+
 def rating_metrics(actual: pd.Series | np.ndarray, predicted: pd.Series | np.ndarray) -> dict:
     actual_values = np.asarray(actual, dtype=float)
     predicted_values = np.asarray(predicted, dtype=float)

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { chooseRecommendations, formatPercent, recommendationOverlap, visibleRecommendations } from './movielens-demo.mjs';
+import { chooseRecommendations, formatPercent, recommendationOverlap, sampleCounts, visibleRecommendations } from './movielens-demo.mjs';
 
 test('chooseRecommendations switches methods without mutating the sample', () => {
   const sample = { userCf: [{ title: 'A' }], itemCf: [{ title: 'B' }] };
@@ -30,4 +30,21 @@ test('visibleRecommendations defaults to five rows and expands to ten', () => {
   assert.equal(visibleRecommendations(recommendations, false).length, 5);
   assert.equal(visibleRecommendations(recommendations, true).length, 10);
   assert.deepEqual(visibleRecommendations(recommendations, false), recommendations.slice(0, 5));
+});
+
+test('sampleCounts distinguishes model history totals from displayed examples', () => {
+  const sample = {
+    activity: 42,
+    historyTotal: 42,
+    history: Array.from({ length: 5 }),
+    relevantTestTotal: 8,
+    relevantTest: Array.from({ length: 8 }),
+  };
+
+  assert.deepEqual(sampleCounts(sample), {
+    historyTotal: 42,
+    historyShown: 5,
+    relevantTotal: 8,
+    relevantShown: 5,
+  });
 });
