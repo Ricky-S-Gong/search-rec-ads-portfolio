@@ -9,6 +9,7 @@ from movielens_cf.evaluation import (
     ranking_tie_stats,
     rating_metrics,
     recommendation_stats,
+    relevant_truth,
 )
 
 
@@ -82,6 +83,22 @@ def test_ranking_tie_stats_distinguish_full_and_partial_exact_ties():
     assert stats["fullyTiedListShare"] == pytest.approx(1 / 3)
     assert stats["entriesInExactTieShare"] == pytest.approx(5 / 9)
     assert stats["largestTieGroup"] == 3
+
+
+def test_relevance_uses_raw_test_ratings_and_the_fitted_catalog_only():
+    test = pd.DataFrame(
+        [
+            (1, 10, 4.0),
+            (1, 20, 3.9),
+            (1, 30, 5.0),
+            (2, 10, 3.0),
+        ],
+        columns=["user_id", "movie_id", "rating"],
+    )
+
+    truth = relevant_truth(test, catalog={10, 20}, threshold=4.0)
+
+    assert truth == {1: {10}}
 
 
 import pytest

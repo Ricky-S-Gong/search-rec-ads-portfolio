@@ -18,3 +18,12 @@ export function recommendationOverlap(first, second) {
 export function visibleRecommendations(recommendations, expanded, defaultCount = 5) {
   return recommendations.slice(0, expanded ? 10 : defaultCount);
 }
+
+export function sampleCounts(sample, defaultCount = 5) {
+  return {
+    historyTotal: sample.historyTotal ?? sample.activity ?? sample.history.length,
+    historyShown: Math.min(defaultCount, sample.history.length),
+    relevantTotal: sample.relevantTestTotal ?? sample.relevantTest.length,
+    relevantShown: Math.min(defaultCount, sample.relevantTest.length),
+  };
+}

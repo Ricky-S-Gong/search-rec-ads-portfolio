@@ -10,20 +10,9 @@
           ],
           "movieId": 3114,
           "popularityBand": "head",
-          "similarity": 0.4976,
+          "similarity": 0.3267,
           "support": 1015,
           "title": "Toy Story 2 (1999)"
-        },
-        {
-          "genres": [
-            "Action",
-            "Adventure"
-          ],
-          "movieId": 1198,
-          "popularityBand": "head",
-          "similarity": 0.2879,
-          "support": 1118,
-          "title": "Raiders of the Lost Ark (1981)"
         },
         {
           "genres": [
@@ -33,36 +22,46 @@
           ],
           "movieId": 2355,
           "popularityBand": "head",
-          "similarity": 0.2814,
+          "similarity": 0.1941,
           "support": 989,
           "title": "Bug's Life, A (1998)"
         },
         {
           "genres": [
-            "Action",
-            "Adventure",
-            "Drama",
-            "Sci-Fi",
-            "War"
+            "Animation",
+            "Children's",
+            "Comedy",
+            "Musical"
           ],
-          "movieId": 1196,
+          "movieId": 588,
           "popularityBand": "head",
-          "similarity": 0.2646,
-          "support": 1267,
-          "title": "Star Wars: Episode V - The Empire Strikes Back (1980)"
+          "similarity": 0.1862,
+          "support": 937,
+          "title": "Aladdin (1992)"
         },
         {
           "genres": [
-            "Action",
-            "Adventure",
-            "Fantasy",
-            "Sci-Fi"
+            "Children's",
+            "Comedy",
+            "Drama"
           ],
-          "movieId": 260,
+          "movieId": 34,
           "popularityBand": "head",
-          "similarity": 0.2634,
-          "support": 1253,
-          "title": "Star Wars: Episode IV - A New Hope (1977)"
+          "similarity": 0.1517,
+          "support": 1021,
+          "title": "Babe (1995)"
+        },
+        {
+          "genres": [
+            "Animation",
+            "Children's",
+            "Musical"
+          ],
+          "movieId": 595,
+          "popularityBand": "head",
+          "similarity": 0.1409,
+          "support": 710,
+          "title": "Beauty and the Beast (1991)"
         }
       ],
       "seed": {
@@ -81,15 +80,50 @@
         {
           "genres": [
             "Action",
+            "Sci-Fi",
+            "Thriller"
+          ],
+          "movieId": 589,
+          "popularityBand": "head",
+          "similarity": 0.1457,
+          "support": 1843,
+          "title": "Terminator 2: Judgment Day (1991)"
+        },
+        {
+          "genres": [
+            "Action",
             "Adventure",
             "Fantasy",
             "Sci-Fi"
           ],
           "movieId": 260,
           "popularityBand": "head",
-          "similarity": 0.4033,
+          "similarity": 0.1055,
           "support": 1761,
           "title": "Star Wars: Episode IV - A New Hope (1977)"
+        },
+        {
+          "genres": [
+            "Action",
+            "Romance",
+            "Thriller"
+          ],
+          "movieId": 353,
+          "popularityBand": "head",
+          "similarity": 0.0943,
+          "support": 578,
+          "title": "Crow, The (1994)"
+        },
+        {
+          "genres": [
+            "Action",
+            "Drama"
+          ],
+          "movieId": 3578,
+          "popularityBand": "head",
+          "similarity": 0.0911,
+          "support": 1038,
+          "title": "Gladiator (2000)"
         },
         {
           "genres": [
@@ -101,44 +135,9 @@
           ],
           "movieId": 1196,
           "popularityBand": "head",
-          "similarity": 0.3879,
+          "similarity": 0.0896,
           "support": 1765,
           "title": "Star Wars: Episode V - The Empire Strikes Back (1980)"
-        },
-        {
-          "genres": [
-            "Action",
-            "Sci-Fi",
-            "Thriller"
-          ],
-          "movieId": 589,
-          "popularityBand": "head",
-          "similarity": 0.377,
-          "support": 1843,
-          "title": "Terminator 2: Judgment Day (1991)"
-        },
-        {
-          "genres": [
-            "Action",
-            "Adventure"
-          ],
-          "movieId": 1198,
-          "popularityBand": "head",
-          "similarity": 0.3568,
-          "support": 1456,
-          "title": "Raiders of the Lost Ark (1981)"
-        },
-        {
-          "genres": [
-            "Action",
-            "Sci-Fi",
-            "Thriller"
-          ],
-          "movieId": 1240,
-          "popularityBand": "head",
-          "similarity": 0.3277,
-          "support": 1452,
-          "title": "Terminator, The (1984)"
         }
       ],
       "seed": {
@@ -161,20 +160,41 @@
           ],
           "movieId": 296,
           "popularityBand": "head",
-          "similarity": 0.3821,
+          "similarity": 0.1779,
           "support": 1532,
           "title": "Pulp Fiction (1994)"
+        },
+        {
+          "genres": [
+            "Drama",
+            "Romance"
+          ],
+          "movieId": 2291,
+          "popularityBand": "head",
+          "similarity": 0.116,
+          "support": 895,
+          "title": "Edward Scissorhands (1990)"
+        },
+        {
+          "genres": [
+            "Comedy"
+          ],
+          "movieId": 1394,
+          "popularityBand": "head",
+          "similarity": 0.1121,
+          "support": 872,
+          "title": "Raising Arizona (1987)"
         },
         {
           "genres": [
             "Crime",
             "Thriller"
           ],
-          "movieId": 50,
+          "movieId": 1089,
           "popularityBand": "head",
-          "similarity": 0.3561,
-          "support": 1329,
-          "title": "Usual Suspects, The (1995)"
+          "similarity": 0.1096,
+          "support": 969,
+          "title": "Reservoir Dogs (1992)"
         },
         {
           "genres": [
@@ -183,33 +203,9 @@
           ],
           "movieId": 1213,
           "popularityBand": "head",
-          "similarity": 0.3222,
+          "similarity": 0.1068,
           "support": 1229,
           "title": "GoodFellas (1990)"
-        },
-        {
-          "genres": [
-            "Crime",
-            "Film-Noir",
-            "Mystery",
-            "Thriller"
-          ],
-          "movieId": 1617,
-          "popularityBand": "head",
-          "similarity": 0.3129,
-          "support": 1454,
-          "title": "L.A. Confidential (1997)"
-        },
-        {
-          "genres": [
-            "Drama",
-            "Thriller"
-          ],
-          "movieId": 593,
-          "popularityBand": "head",
-          "similarity": 0.3054,
-          "support": 1657,
-          "title": "Silence of the Lambs, The (1991)"
         }
       ],
       "seed": {
@@ -226,73 +222,83 @@
   ],
   "users": [
     {
-      "activity": 42,
+      "activity": 49,
       "history": [
         {
           "genres": [
-            "Animation",
-            "Children's",
-            "Musical"
+            "Comedy",
+            "Drama",
+            "War"
           ],
-          "movieId": 364,
-          "popularityBand": "head",
+          "movieId": 946,
+          "popularityBand": "long-tail",
           "rating": 5.0,
-          "title": "Lion King, The (1994)"
-        },
-        {
-          "genres": [
-            "Comedy"
-          ],
-          "movieId": 223,
-          "popularityBand": "head",
-          "rating": 5.0,
-          "title": "Clerks (1994)"
-        },
-        {
-          "genres": [
-            "Comedy"
-          ],
-          "movieId": 2997,
-          "popularityBand": "head",
-          "rating": 5.0,
-          "title": "Being John Malkovich (1999)"
+          "title": "To Be or Not to Be (1942)"
         },
         {
           "genres": [
             "Drama"
           ],
-          "movieId": 318,
-          "popularityBand": "head",
+          "movieId": 2612,
+          "popularityBand": "long-tail",
           "rating": 5.0,
-          "title": "Shawshank Redemption, The (1994)"
+          "title": "Mildred Pierce (1945)"
         },
         {
           "genres": [
-            "Crime",
-            "Drama"
+            "Film-Noir",
+            "Romance",
+            "Thriller"
           ],
-          "movieId": 296,
+          "movieId": 930,
           "popularityBand": "head",
           "rating": 5.0,
-          "title": "Pulp Fiction (1994)"
+          "title": "Notorious (1946)"
+        },
+        {
+          "genres": [
+            "Mystery",
+            "Thriller"
+          ],
+          "movieId": 1212,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "Third Man, The (1949)"
+        },
+        {
+          "genres": [
+            "Comedy"
+          ],
+          "movieId": 3481,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "High Fidelity (2000)"
         }
       ],
+      "historyTotal": 49,
       "methods": {
         "itemCf": [
           {
             "evidence": [
               {
-                "contribution": 0.8986,
-                "residual": 1.762,
-                "similarity": 0.0744,
-                "source": "Pulp Fiction (1994)",
+                "contribution": 0.2048,
+                "residual": 0.947,
+                "similarity": 0.1074,
+                "source": "It's a Wonderful Life (1946)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.8633,
-                "residual": 1.762,
-                "similarity": 0.0715,
-                "source": "Shawshank Redemption, The (1994)",
+                "contribution": 0.1852,
+                "residual": 0.832,
+                "similarity": 0.1107,
+                "source": "Casablanca (1942)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.1331,
+                "residual": 0.838,
+                "similarity": 0.0789,
+                "source": "Citizen Kane (1941)",
                 "sourceRating": 5.0
               }
             ],
@@ -301,176 +307,38 @@
               "Drama"
             ],
             "hit": false,
-            "movieId": 94,
-            "neighbors": 2,
-            "popularityBand": "long-tail",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.1458,
-            "title": "Beautiful Girls (1996)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 1.6527,
-                "residual": 1.762,
-                "similarity": 0.0008,
-                "source": "Pulp Fiction (1994)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": -0.0148,
-                "residual": -0.238,
-                "similarity": 0.0,
-                "source": "Silence of the Lambs, The (1991)",
-                "sourceRating": 3.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Drama"
-            ],
-            "hit": false,
-            "movieId": 2695,
-            "neighbors": 2,
-            "popularityBand": "long-tail",
-            "rankScore": 4.876,
-            "ratingEstimate": 4.876,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.0008,
-            "title": "Boys, The (1997)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.6625,
-                "residual": 1.762,
-                "similarity": 0.0781,
-                "source": "Clerks (1994)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.654,
-                "residual": 1.762,
-                "similarity": 0.0771,
-                "source": "Being John Malkovich (1999)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.1926,
-                "residual": 0.762,
-                "similarity": 0.0525,
-                "source": "Pleasantville (1998)",
-                "sourceRating": 4.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Comedy",
-              "Drama"
-            ],
-            "hit": false,
-            "movieId": 3174,
-            "neighbors": 3,
+            "movieId": 1207,
+            "neighbors": 6,
             "popularityBand": "head",
-            "rankScore": 4.7472,
-            "ratingEstimate": 4.747,
+            "rankScore": 4.8591,
+            "ratingEstimate": 4.859,
             "scoreWasClipped": false,
-            "similarityWeight": 0.2076,
-            "title": "Man on the Moon (1999)"
+            "secondaryScore": 4.4089,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.4971,
+            "title": "To Kill a Mockingbird (1962)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.963,
-                "residual": 1.762,
-                "similarity": 0.0049,
-                "source": "Clerks (1994)",
+                "contribution": 0.2517,
+                "residual": 0.947,
+                "similarity": 0.1383,
+                "source": "It's a Wonderful Life (1946)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.3512,
-                "residual": 1.762,
-                "similarity": 0.0018,
-                "source": "Shawshank Redemption, The (1994)",
+                "contribution": 0.178,
+                "residual": 1.036,
+                "similarity": 0.0895,
+                "source": "Rebecca (1940)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.173,
-                "residual": 0.762,
-                "similarity": 0.002,
-                "source": "Beauty and the Beast (1991)",
-                "sourceRating": 4.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Comedy"
-            ],
-            "hit": false,
-            "movieId": 863,
-            "neighbors": 4,
-            "popularityBand": "long-tail",
-            "rankScore": 4.7189,
-            "ratingEstimate": 4.719,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.0089,
-            "title": "Celestial Clockwork (1994)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 1.189,
-                "residual": 1.762,
-                "similarity": 0.1309,
-                "source": "Lion King, The (1994)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.2477,
-                "residual": 0.762,
-                "similarity": 0.063,
-                "source": "Beauty and the Beast (1991)",
-                "sourceRating": 4.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Animation",
-              "Musical"
-            ],
-            "hit": false,
-            "movieId": 2394,
-            "neighbors": 2,
-            "popularityBand": "head",
-            "rankScore": 4.6749,
-            "ratingEstimate": 4.675,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.1939,
-            "title": "Prince of Egypt, The (1998)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.3782,
-                "residual": 1.762,
-                "similarity": 0.1299,
-                "source": "Shawshank Redemption, The (1994)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.3501,
-                "residual": 1.762,
-                "similarity": 0.1202,
-                "source": "Pulp Fiction (1994)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.3071,
-                "residual": 1.762,
-                "similarity": 0.1054,
-                "source": "Being John Malkovich (1999)",
+                "contribution": 0.1624,
+                "residual": 0.794,
+                "similarity": 0.1065,
+                "source": "Third Man, The (1949)",
                 "sourceRating": 5.0
               }
             ],
@@ -479,145 +347,76 @@
               "Drama"
             ],
             "hit": false,
-            "movieId": 337,
+            "movieId": 954,
             "neighbors": 5,
-            "popularityBand": "head",
-            "rankScore": 4.5876,
-            "ratingEstimate": 4.588,
+            "popularityBand": "long-tail",
+            "rankScore": 4.7833,
+            "ratingEstimate": 4.783,
             "scoreWasClipped": false,
-            "similarityWeight": 0.6051,
-            "title": "What's Eating Gilbert Grape (1993)"
+            "secondaryScore": 4.1896,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.5208,
+            "title": "Mr. Smith Goes to Washington (1939)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.9921,
-                "residual": 1.762,
-                "similarity": 0.227,
-                "source": "Shawshank Redemption, The (1994)",
+                "contribution": -0.2506,
+                "residual": -1.2,
+                "similarity": 0.1128,
+                "source": "Double Indemnity (1944)",
+                "sourceRating": 3.0
+              },
+              {
+                "contribution": 0.2112,
+                "residual": 0.838,
+                "similarity": 0.1361,
+                "source": "Citizen Kane (1941)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.3329,
-                "residual": 0.762,
-                "similarity": 0.1761,
-                "source": "Toy Story (1995)",
-                "sourceRating": 4.0
+                "contribution": 0.1859,
+                "residual": 0.91,
+                "similarity": 0.1104,
+                "source": "Notorious (1946)",
+                "sourceRating": 5.0
               }
             ],
             "fallback": false,
             "genres": [
-              "Comedy",
-              "Romance"
-            ],
-            "hit": false,
-            "movieId": 1307,
-            "neighbors": 2,
-            "popularityBand": "head",
-            "rankScore": 4.5631,
-            "ratingEstimate": 4.563,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.4031,
-            "title": "When Harry Met Sally... (1989)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.9876,
-                "residual": 1.762,
-                "similarity": 0.186,
-                "source": "Shawshank Redemption, The (1994)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.3348,
-                "residual": 0.762,
-                "similarity": 0.1458,
-                "source": "E.T. the Extra-Terrestrial (1982)",
-                "sourceRating": 4.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Drama",
-              "Romance",
+              "Mystery",
               "Thriller"
             ],
             "hit": false,
-            "movieId": 1674,
-            "neighbors": 2,
+            "movieId": 904,
+            "neighbors": 5,
             "popularityBand": "head",
-            "rankScore": 4.5605,
-            "ratingEstimate": 4.561,
+            "rankScore": 4.6543,
+            "ratingEstimate": 4.654,
             "scoreWasClipped": false,
-            "similarityWeight": 0.3319,
-            "title": "Witness (1985)"
+            "secondaryScore": 4.4632,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.5403,
+            "title": "Rear Window (1954)"
           },
           {
-            "evidence": [
-              {
-                "contribution": 0.9442,
-                "residual": 1.762,
-                "similarity": 0.1442,
-                "source": "Shawshank Redemption, The (1994)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.3536,
-                "residual": 0.762,
-                "similarity": 0.1249,
-                "source": "Usual Suspects, The (1995)",
-                "sourceRating": 4.0
-              }
-            ],
-            "fallback": false,
+            "evidence": [],
+            "fallback": true,
             "genres": [
               "Drama"
             ],
             "hit": false,
-            "movieId": 3098,
-            "neighbors": 2,
+            "movieId": 318,
+            "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.5359,
-            "ratingEstimate": 4.536,
+            "rankScore": 4.5485,
+            "ratingEstimate": 4.548,
             "scoreWasClipped": false,
-            "similarityWeight": 0.2691,
-            "title": "Natural, The (1984)"
+            "secondaryScore": 4.5485,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.0,
+            "title": "Shawshank Redemption, The (1994)"
           },
-          {
-            "evidence": [
-              {
-                "contribution": 0.9351,
-                "residual": 1.762,
-                "similarity": 0.1158,
-                "source": "Pulp Fiction (1994)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.3575,
-                "residual": 0.762,
-                "similarity": 0.1024,
-                "source": "Reservoir Dogs (1992)",
-                "sourceRating": 4.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Crime",
-              "Drama"
-            ],
-            "hit": false,
-            "movieId": 1729,
-            "neighbors": 2,
-            "popularityBand": "head",
-            "rankScore": 4.5308,
-            "ratingEstimate": 4.531,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.2182,
-            "title": "Jackie Brown (1997)"
-          }
-        ],
-        "popularity": [
           {
             "evidence": [],
             "fallback": true,
@@ -627,11 +426,14 @@
             ],
             "hit": false,
             "movieId": 2019,
-            "neighbors": 0,
+            "neighbors": 3,
             "popularityBand": "head",
             "rankScore": 4.527,
-            "ratingEstimate": null,
+            "ratingEstimate": 4.527,
             "scoreWasClipped": false,
+            "secondaryScore": 4.527,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.0,
             "title": "Seven Samurai (The Magnificent Seven) (Shichinin no samurai) (1954)"
           },
           {
@@ -642,14 +444,144 @@
               "Crime",
               "Drama"
             ],
+            "hit": true,
+            "movieId": 858,
+            "neighbors": 3,
+            "popularityBand": "head",
+            "rankScore": 4.5168,
+            "ratingEstimate": 4.517,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.5168,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.0,
+            "title": "Godfather, The (1972)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Crime",
+              "Thriller"
+            ],
             "hit": false,
+            "movieId": 50,
+            "neighbors": 0,
+            "popularityBand": "head",
+            "rankScore": 4.513,
+            "ratingEstimate": 4.513,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.513,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.0,
+            "title": "Usual Suspects, The (1995)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Drama",
+              "War"
+            ],
+            "hit": false,
+            "movieId": 527,
+            "neighbors": 1,
+            "popularityBand": "head",
+            "rankScore": 4.5,
+            "ratingEstimate": 4.5,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.5,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.0,
+            "title": "Schindler's List (1993)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Animation",
+              "Comedy"
+            ],
+            "hit": false,
+            "movieId": 1148,
+            "neighbors": 1,
+            "popularityBand": "head",
+            "rankScore": 4.4948,
+            "ratingEstimate": 4.495,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.4948,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.0,
+            "title": "Wrong Trousers, The (1993)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Animation",
+              "Comedy",
+              "Thriller"
+            ],
+            "hit": false,
+            "movieId": 745,
+            "neighbors": 1,
+            "popularityBand": "head",
+            "rankScore": 4.4946,
+            "ratingEstimate": 4.495,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.4946,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.0,
+            "title": "Close Shave, A (1995)"
+          }
+        ],
+        "popularity": [
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Drama"
+            ],
+            "hit": false,
+            "movieId": 318,
+            "neighbors": 0,
+            "popularityBand": "head",
+            "rankScore": 4.5162,
+            "ratingEstimate": null,
+            "scoreWasClipped": false,
+            "title": "Shawshank Redemption, The (1994)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Action",
+              "Crime",
+              "Drama"
+            ],
+            "hit": true,
             "movieId": 858,
             "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.5168,
+            "rankScore": 4.4858,
             "ratingEstimate": null,
             "scoreWasClipped": false,
             "title": "Godfather, The (1972)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Crime",
+              "Thriller"
+            ],
+            "hit": false,
+            "movieId": 50,
+            "neighbors": 0,
+            "popularityBand": "head",
+            "rankScore": 4.4744,
+            "ratingEstimate": null,
+            "scoreWasClipped": false,
+            "title": "Usual Suspects, The (1995)"
           },
           {
             "evidence": [],
@@ -662,10 +594,42 @@
             "movieId": 527,
             "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.5,
+            "rankScore": 4.4705,
             "ratingEstimate": null,
             "scoreWasClipped": false,
             "title": "Schindler's List (1993)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Action",
+              "Adventure"
+            ],
+            "hit": true,
+            "movieId": 1198,
+            "neighbors": 0,
+            "popularityBand": "head",
+            "rankScore": 4.4393,
+            "ratingEstimate": null,
+            "scoreWasClipped": false,
+            "title": "Raiders of the Lost Ark (1981)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Action",
+              "Drama"
+            ],
+            "hit": false,
+            "movieId": 2019,
+            "neighbors": 0,
+            "popularityBand": "head",
+            "rankScore": 4.4231,
+            "ratingEstimate": null,
+            "scoreWasClipped": false,
+            "title": "Seven Samurai (The Magnificent Seven) (Shichinin no samurai) (1954)"
           },
           {
             "evidence": [],
@@ -678,7 +642,7 @@
             "movieId": 1148,
             "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.4948,
+            "rankScore": 4.423,
             "ratingEstimate": null,
             "scoreWasClipped": false,
             "title": "Wrong Trousers, The (1993)"
@@ -695,26 +659,10 @@
             "movieId": 745,
             "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.4946,
+            "rankScore": 4.4014,
             "ratingEstimate": null,
             "scoreWasClipped": false,
             "title": "Close Shave, A (1995)"
-          },
-          {
-            "evidence": [],
-            "fallback": true,
-            "genres": [
-              "Action",
-              "Adventure"
-            ],
-            "hit": true,
-            "movieId": 1198,
-            "neighbors": 0,
-            "popularityBand": "head",
-            "rankScore": 4.4651,
-            "ratingEstimate": null,
-            "scoreWasClipped": false,
-            "title": "Raiders of the Lost Ark (1981)"
           },
           {
             "evidence": [],
@@ -727,7 +675,7 @@
             "movieId": 904,
             "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.4632,
+            "rankScore": 4.401,
             "ratingEstimate": null,
             "scoreWasClipped": false,
             "title": "Rear Window (1954)"
@@ -743,315 +691,34 @@
             "movieId": 750,
             "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.4456,
+            "rankScore": 4.399,
             "ratingEstimate": null,
             "scoreWasClipped": false,
             "title": "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb (1963)"
-          },
-          {
-            "evidence": [],
-            "fallback": true,
-            "genres": [
-              "Film-Noir"
-            ],
-            "hit": false,
-            "movieId": 922,
-            "neighbors": 0,
-            "popularityBand": "head",
-            "rankScore": 4.4355,
-            "ratingEstimate": null,
-            "scoreWasClipped": false,
-            "title": "Sunset Blvd. (a.k.a. Sunset Boulevard) (1950)"
-          },
-          {
-            "evidence": [],
-            "fallback": true,
-            "genres": [
-              "Drama"
-            ],
-            "hit": false,
-            "movieId": 1207,
-            "neighbors": 0,
-            "popularityBand": "head",
-            "rankScore": 4.4089,
-            "ratingEstimate": null,
-            "scoreWasClipped": false,
-            "title": "To Kill a Mockingbird (1962)"
           }
         ],
         "userCf": [
           {
             "evidence": [
               {
-                "contribution": 0.3454,
-                "residual": 1.8,
-                "similarity": 0.0344,
-                "source": "Viewer 3683",
+                "contribution": 0.1611,
+                "residual": 1.287,
+                "similarity": 0.0489,
+                "source": "Viewer 2962",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.3009,
-                "residual": 1.97,
-                "similarity": 0.0274,
-                "source": "Viewer 5795",
+                "contribution": 0.13,
+                "residual": 1.232,
+                "similarity": 0.0412,
+                "source": "Viewer 5627",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.2691,
-                "residual": 1.754,
-                "similarity": 0.0275,
-                "source": "Viewer 5397",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Drama",
-              "War"
-            ],
-            "hit": false,
-            "movieId": 1178,
-            "neighbors": 6,
-            "popularityBand": "long-tail",
-            "rankScore": 4.6517,
-            "ratingEstimate": 4.652,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.1792,
-            "title": "Paths of Glory (1957)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.2508,
-                "residual": 1.8,
-                "similarity": 0.0344,
-                "source": "Viewer 3683",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.2489,
-                "residual": 1.525,
-                "similarity": 0.0403,
-                "source": "Viewer 4995",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.2185,
-                "residual": 1.97,
-                "similarity": 0.0274,
-                "source": "Viewer 5795",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Film-Noir",
-              "Mystery"
-            ],
-            "hit": false,
-            "movieId": 1284,
-            "neighbors": 8,
-            "popularityBand": "head",
-            "rankScore": 4.4377,
-            "ratingEstimate": 4.438,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.2467,
-            "title": "Big Sleep, The (1946)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.4184,
-                "residual": 2.102,
-                "similarity": 0.032,
-                "source": "Viewer 1059",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.2564,
-                "residual": 1.484,
-                "similarity": 0.0278,
-                "source": "Viewer 3675",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.2431,
-                "residual": 1.163,
-                "similarity": 0.0336,
-                "source": "Viewer 2679",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Comedy",
-              "Musical"
-            ],
-            "hit": false,
-            "movieId": 2946,
-            "neighbors": 5,
-            "popularityBand": "long-tail",
-            "rankScore": 4.4195,
-            "ratingEstimate": 4.42,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.1609,
-            "title": "Help! (1965)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.3069,
-                "residual": 1.54,
-                "similarity": 0.0286,
-                "source": "Viewer 2567",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.2872,
-                "residual": 1.484,
-                "similarity": 0.0278,
-                "source": "Viewer 3675",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.2294,
-                "residual": 1.014,
-                "similarity": 0.0325,
-                "source": "Viewer 5086",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Comedy",
-              "Drama",
-              "War"
-            ],
-            "hit": false,
-            "movieId": 3035,
-            "neighbors": 5,
-            "popularityBand": "long-tail",
-            "rankScore": 4.3968,
-            "ratingEstimate": 4.397,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.1436,
-            "title": "Mister Roberts (1955)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.364,
-                "residual": 2.881,
-                "similarity": 0.0298,
-                "source": "Viewer 2106",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.2288,
-                "residual": 1.97,
-                "similarity": 0.0274,
-                "source": "Viewer 5795",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.166,
-                "residual": 1.163,
-                "similarity": 0.0336,
-                "source": "Viewer 2679",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Drama"
-            ],
-            "hit": false,
-            "movieId": 954,
-            "neighbors": 8,
-            "popularityBand": "long-tail",
-            "rankScore": 4.3777,
-            "ratingEstimate": 4.378,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.2357,
-            "title": "Mr. Smith Goes to Washington (1939)"
-          },
-          {
-            "evidence": [],
-            "fallback": true,
-            "genres": [
-              "Action",
-              "Adventure"
-            ],
-            "hit": false,
-            "movieId": 2905,
-            "neighbors": 1,
-            "popularityBand": "long-tail",
-            "rankScore": 4.3413,
-            "ratingEstimate": 4.341,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.0,
-            "title": "Sanjuro (1962)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.2711,
-                "residual": 1.525,
-                "similarity": 0.0403,
-                "source": "Viewer 4995",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.2323,
-                "residual": 1.447,
-                "similarity": 0.0364,
-                "source": "Viewer 352",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.2072,
-                "residual": 1.678,
-                "similarity": 0.028,
-                "source": "Viewer 23",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Action",
-              "Crime"
-            ],
-            "hit": false,
-            "movieId": 3265,
-            "neighbors": 7,
-            "popularityBand": "long-tail",
-            "rankScore": 4.3229,
-            "ratingEstimate": 4.323,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.2265,
-            "title": "Hard-Boiled (Lashou shentan) (1992)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.0684,
-                "residual": 2.483,
-                "similarity": 0.0358,
-                "source": "Viewer 2010",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.0519,
-                "residual": 2.102,
-                "similarity": 0.032,
-                "source": "Viewer 1059",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.0486,
-                "residual": 2.302,
-                "similarity": 0.0274,
-                "source": "Viewer 3411",
+                "contribution": 0.0967,
+                "residual": 0.811,
+                "similarity": 0.0466,
+                "source": "Viewer 2121",
                 "sourceRating": 5.0
               }
             ],
@@ -1061,61 +728,369 @@
               "Crime",
               "Drama"
             ],
-            "hit": false,
-            "movieId": 858,
-            "neighbors": 41,
+            "hit": true,
+            "movieId": 1221,
+            "neighbors": 8,
             "popularityBand": "head",
-            "rankScore": 4.3162,
-            "ratingEstimate": 4.316,
+            "rankScore": 4.7678,
+            "ratingEstimate": 4.768,
             "scoreWasClipped": false,
-            "similarityWeight": 1.2977,
-            "title": "Godfather, The (1972)"
+            "secondaryScore": 4.3474,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.3909,
+            "title": "Godfather: Part II, The (1974)"
           },
           {
-            "evidence": [],
-            "fallback": true,
+            "evidence": [
+              {
+                "contribution": 0.1868,
+                "residual": 0.816,
+                "similarity": 0.0575,
+                "source": "Viewer 1693",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.1429,
+                "residual": 0.77,
+                "similarity": 0.0466,
+                "source": "Viewer 2121",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.1091,
+                "residual": 0.606,
+                "similarity": 0.0452,
+                "source": "Viewer 1077",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
             "genres": [
-              "Comedy",
-              "Drama",
-              "Western"
+              "Drama"
             ],
             "hit": false,
-            "movieId": 3030,
-            "neighbors": 1,
+            "movieId": 3089,
+            "neighbors": 5,
             "popularityBand": "long-tail",
-            "rankScore": 4.3071,
-            "ratingEstimate": 4.307,
+            "rankScore": 4.6995,
+            "ratingEstimate": 4.699,
             "scoreWasClipped": false,
-            "similarityWeight": 0.0,
-            "title": "Yojimbo (1961)"
+            "secondaryScore": 4.272,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.2512,
+            "title": "Bicycle Thief, The (Ladri di biciclette) (1948)"
           },
           {
-            "evidence": [],
-            "fallback": true,
+            "evidence": [
+              {
+                "contribution": 0.2351,
+                "residual": 1.305,
+                "similarity": 0.0412,
+                "source": "Viewer 5627",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.1696,
+                "residual": 0.95,
+                "similarity": 0.0409,
+                "source": "Viewer 5763",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.1421,
+                "residual": 0.72,
+                "similarity": 0.0452,
+                "source": "Viewer 1077",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
+            "genres": [
+              "Crime",
+              "Drama"
+            ],
+            "hit": false,
+            "movieId": 1213,
+            "neighbors": 5,
+            "popularityBand": "head",
+            "rankScore": 4.6731,
+            "ratingEstimate": 4.673,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.2608,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.2289,
+            "title": "GoodFellas (1990)"
+          },
+          {
+            "evidence": [
+              {
+                "contribution": 0.3193,
+                "residual": 1.222,
+                "similarity": 0.0825,
+                "source": "Viewer 1594",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.2423,
+                "residual": 1.33,
+                "similarity": 0.0575,
+                "source": "Viewer 1693",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.1748,
+                "residual": 1.351,
+                "similarity": 0.0409,
+                "source": "Viewer 5763",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
             "genres": [
               "Comedy"
             ],
             "hit": false,
-            "movieId": 3022,
-            "neighbors": 4,
-            "popularityBand": "long-tail",
-            "rankScore": 4.2845,
-            "ratingEstimate": 4.284,
+            "movieId": 2395,
+            "neighbors": 6,
+            "popularityBand": "head",
+            "rankScore": 4.6019,
+            "ratingEstimate": 4.602,
             "scoreWasClipped": false,
+            "secondaryScore": 3.8457,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.3158,
+            "title": "Rushmore (1998)"
+          },
+          {
+            "evidence": [
+              {
+                "contribution": 0.1215,
+                "residual": 0.894,
+                "similarity": 0.0575,
+                "source": "Viewer 1693",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.0934,
+                "residual": 0.848,
+                "similarity": 0.0466,
+                "source": "Viewer 2121",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.0883,
+                "residual": 0.914,
+                "similarity": 0.0409,
+                "source": "Viewer 5763",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
+            "genres": [
+              "Comedy",
+              "Crime"
+            ],
+            "hit": false,
+            "movieId": 910,
+            "neighbors": 8,
+            "popularityBand": "head",
+            "rankScore": 4.5577,
+            "ratingEstimate": 4.558,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.2954,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.4231,
+            "title": "Some Like It Hot (1959)"
+          },
+          {
+            "evidence": [
+              {
+                "contribution": 0.1321,
+                "residual": 1.15,
+                "similarity": 0.0489,
+                "source": "Viewer 2962",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": -0.125,
+                "residual": -1.293,
+                "similarity": 0.0412,
+                "source": "Viewer 1094",
+                "sourceRating": 3.0
+              },
+              {
+                "contribution": 0.0972,
+                "residual": 0.72,
+                "similarity": 0.0575,
+                "source": "Viewer 1693",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
+            "genres": [
+              "Mystery",
+              "Thriller"
+            ],
+            "hit": false,
+            "movieId": 904,
+            "neighbors": 9,
+            "popularityBand": "head",
+            "rankScore": 4.5558,
+            "ratingEstimate": 4.556,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.4632,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.4259,
+            "title": "Rear Window (1954)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Action",
+              "Drama"
+            ],
+            "hit": false,
+            "movieId": 2019,
+            "neighbors": 3,
+            "popularityBand": "head",
+            "rankScore": 4.527,
+            "ratingEstimate": 4.527,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.527,
+            "secondaryScoreName": "bayesianPopularity",
             "similarityWeight": 0.0,
-            "title": "General, The (1927)"
+            "title": "Seven Samurai (The Magnificent Seven) (Shichinin no samurai) (1954)"
+          },
+          {
+            "evidence": [
+              {
+                "contribution": 0.2148,
+                "residual": 0.876,
+                "similarity": 0.0575,
+                "source": "Viewer 1693",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.1516,
+                "residual": 0.864,
+                "similarity": 0.0412,
+                "source": "Viewer 1094",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.1295,
+                "residual": 0.657,
+                "similarity": 0.0462,
+                "source": "Viewer 5906",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
+            "genres": [
+              "Comedy",
+              "Drama"
+            ],
+            "hit": false,
+            "movieId": 2324,
+            "neighbors": 5,
+            "popularityBand": "head",
+            "rankScore": 4.4953,
+            "ratingEstimate": 4.495,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.3201,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.2346,
+            "title": "Life Is Beautiful (La Vita è bella) (1997)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Animation",
+              "Comedy"
+            ],
+            "hit": false,
+            "movieId": 1148,
+            "neighbors": 4,
+            "popularityBand": "head",
+            "rankScore": 4.4948,
+            "ratingEstimate": 4.495,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.4948,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.0,
+            "title": "Wrong Trousers, The (1993)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Animation",
+              "Comedy",
+              "Thriller"
+            ],
+            "hit": false,
+            "movieId": 745,
+            "neighbors": 3,
+            "popularityBand": "head",
+            "rankScore": 4.4946,
+            "ratingEstimate": 4.495,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.4946,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.0,
+            "title": "Close Shave, A (1995)"
           }
         ]
       },
       "relevantTest": [
         {
           "genres": [
-            "Comedy"
+            "Action",
+            "Crime",
+            "Drama"
           ],
-          "movieId": 3421,
+          "movieId": 858,
           "popularityBand": "head",
-          "rating": 4.0,
-          "title": "Animal House (1978)"
+          "rating": 5.0,
+          "title": "Godfather, The (1972)"
+        },
+        {
+          "genres": [
+            "Action",
+            "Adventure",
+            "Drama",
+            "Sci-Fi",
+            "War"
+          ],
+          "movieId": 1196,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "Star Wars: Episode V - The Empire Strikes Back (1980)"
+        },
+        {
+          "genres": [
+            "Action",
+            "Crime",
+            "Drama"
+          ],
+          "movieId": 1221,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "Godfather: Part II, The (1974)"
+        },
+        {
+          "genres": [
+            "Action",
+            "Adventure",
+            "Romance",
+            "War"
+          ],
+          "movieId": 969,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "African Queen, The (1951)"
         },
         {
           "genres": [
@@ -1126,40 +1101,11 @@
           "popularityBand": "head",
           "rating": 5.0,
           "title": "Raiders of the Lost Ark (1981)"
-        },
-        {
-          "genres": [
-            "Adventure",
-            "Animation",
-            "Sci-Fi"
-          ],
-          "movieId": 3745,
-          "popularityBand": "head",
-          "rating": 4.0,
-          "title": "Titan A.E. (2000)"
-        },
-        {
-          "genres": [
-            "Animation",
-            "Children's"
-          ],
-          "movieId": 2761,
-          "popularityBand": "head",
-          "rating": 4.0,
-          "title": "Iron Giant, The (1999)"
-        },
-        {
-          "genres": [
-            "Drama"
-          ],
-          "movieId": 3160,
-          "popularityBand": "head",
-          "rating": 4.0,
-          "title": "Magnolia (1999)"
         }
       ],
-      "user": "Viewer 142",
-      "userId": 142
+      "relevantTestTotal": 5,
+      "user": "Viewer 140",
+      "userId": 140
     },
     {
       "activity": 153,
@@ -1215,29 +1161,30 @@
           "title": "Basic Instinct (1992)"
         }
       ],
+      "historyTotal": 153,
       "methods": {
         "itemCf": [
           {
             "evidence": [
               {
-                "contribution": 0.5771,
-                "residual": 1.248,
-                "similarity": 0.1243,
-                "source": "Fried Green Tomatoes (1991)",
+                "contribution": 0.1668,
+                "residual": 0.903,
+                "similarity": 0.1238,
+                "source": "Few Good Men, A (1992)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.3358,
-                "residual": 1.248,
-                "similarity": 0.0723,
+                "contribution": 0.1631,
+                "residual": 1.204,
+                "similarity": 0.0908,
                 "source": "Terms of Endearment (1983)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.3355,
-                "residual": 1.248,
-                "similarity": 0.0723,
-                "source": "Dead Poets Society (1989)",
+                "contribution": 0.1283,
+                "residual": 0.921,
+                "similarity": 0.0933,
+                "source": "E.T. the Extra-Terrestrial (1982)",
                 "sourceRating": 5.0
               }
             ],
@@ -1246,185 +1193,199 @@
               "Drama"
             ],
             "hit": false,
-            "movieId": 261,
-            "neighbors": 3,
-            "popularityBand": "long-tail",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
+            "movieId": 1961,
+            "neighbors": 7,
+            "popularityBand": "head",
+            "rankScore": 4.9,
+            "ratingEstimate": 4.9,
             "scoreWasClipped": false,
-            "similarityWeight": 0.2689,
-            "title": "Little Women (1994)"
+            "secondaryScore": 4.0412,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.6703,
+            "title": "Rain Man (1988)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.6257,
-                "residual": 1.248,
-                "similarity": 0.0297,
-                "source": "Election (1999)",
+                "contribution": 0.0956,
+                "residual": 0.903,
+                "similarity": 0.0846,
+                "source": "Few Good Men, A (1992)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.6227,
-                "residual": 1.248,
-                "similarity": 0.0295,
-                "source": "Dangerous Liaisons (1988)",
+                "contribution": 0.0951,
+                "residual": 0.819,
+                "similarity": 0.0928,
+                "source": "Dead Poets Society (1989)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.0794,
+                "residual": 0.781,
+                "similarity": 0.0812,
+                "source": "Forrest Gump (1994)",
                 "sourceRating": 5.0
               }
             ],
             "fallback": false,
             "genres": [
-              "Comedy"
+              "Drama"
             ],
             "hit": false,
-            "movieId": 298,
-            "neighbors": 2,
-            "popularityBand": "long-tail",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
+            "movieId": 1704,
+            "neighbors": 9,
+            "popularityBand": "head",
+            "rankScore": 4.8623,
+            "ratingEstimate": 4.862,
             "scoreWasClipped": false,
-            "similarityWeight": 0.0592,
-            "title": "Pushing Hands (1992)"
+            "secondaryScore": 4.1676,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.7991,
+            "title": "Good Will Hunting (1997)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.6985,
-                "residual": 1.248,
-                "similarity": 0.222,
+                "contribution": 0.2912,
+                "residual": 1.226,
+                "similarity": 0.0709,
+                "source": "Time to Kill, A (1996)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.256,
+                "residual": 1.31,
+                "similarity": 0.0584,
+                "source": "Basic Instinct (1992)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.2352,
+                "residual": 1.291,
+                "similarity": 0.0544,
+                "source": "Titanic (1997)",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
+            "genres": [
+              "Drama"
+            ],
+            "hit": false,
+            "movieId": 848,
+            "neighbors": 5,
+            "popularityBand": "long-tail",
+            "rankScore": 4.8231,
+            "ratingEstimate": 4.823,
+            "scoreWasClipped": false,
+            "secondaryScore": 3.4576,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.2988,
+            "title": "Spitfire Grill, The (1996)"
+          },
+          {
+            "evidence": [
+              {
+                "contribution": 0.2485,
+                "residual": 0.896,
+                "similarity": 0.0079,
+                "source": "Cider House Rules, The (1999)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.1106,
+                "residual": 0.353,
+                "similarity": 0.0089,
                 "source": "Schindler's List (1993)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.5499,
-                "residual": 1.248,
-                "similarity": 0.1747,
-                "source": "Shawshank Redemption, The (1994)",
+                "contribution": 0.1083,
+                "residual": 0.542,
+                "similarity": 0.0057,
+                "source": "American Beauty (1999)",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
+            "genres": [
+              "Drama"
+            ],
+            "hit": false,
+            "movieId": 2197,
+            "neighbors": 6,
+            "popularityBand": "long-tail",
+            "rankScore": 4.7725,
+            "ratingEstimate": 4.773,
+            "scoreWasClipped": false,
+            "secondaryScore": 3.7882,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.0285,
+            "title": "Firelight (1997)"
+          },
+          {
+            "evidence": [
+              {
+                "contribution": 0.1032,
+                "residual": 0.781,
+                "similarity": 0.1007,
+                "source": "Forrest Gump (1994)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.0708,
+                "residual": 0.903,
+                "similarity": 0.0598,
+                "source": "Few Good Men, A (1992)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.0692,
+                "residual": 0.602,
+                "similarity": 0.0876,
+                "source": "American History X (1998)",
                 "sourceRating": 5.0
               }
             ],
             "fallback": false,
             "genres": [
               "Drama",
-              "War"
+              "Thriller"
             ],
             "hit": false,
-            "movieId": 1299,
-            "neighbors": 2,
+            "movieId": 3147,
+            "neighbors": 10,
             "popularityBand": "head",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
+            "rankScore": 4.7386,
+            "ratingEstimate": 4.739,
             "scoreWasClipped": false,
-            "similarityWeight": 0.3967,
-            "title": "Killing Fields, The (1984)"
+            "secondaryScore": 4.1446,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.7624,
+            "title": "Green Mile, The (1999)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.6353,
-                "residual": 1.248,
-                "similarity": 0.1002,
-                "source": "Shawshank Redemption, The (1994)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.613,
-                "residual": 1.248,
-                "similarity": 0.0966,
-                "source": "Schindler's List (1993)",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Comedy"
-            ],
-            "hit": false,
-            "movieId": 1537,
-            "neighbors": 2,
-            "popularityBand": "long-tail",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.1968,
-            "title": "Shall We Dance? (Shall We Dansu?) (1996)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.676,
-                "residual": 1.248,
-                "similarity": 0.0505,
-                "source": "Titanic (1997)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.5724,
-                "residual": 1.248,
-                "similarity": 0.0428,
+                "contribution": 0.2812,
+                "residual": 1.251,
+                "similarity": 0.0379,
                 "source": "Steel Magnolias (1989)",
                 "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Comedy"
-            ],
-            "hit": false,
-            "movieId": 1612,
-            "neighbors": 2,
-            "popularityBand": "long-tail",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.0933,
-            "title": "Kiss Me, Guido (1997)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.6528,
-                "residual": 1.248,
-                "similarity": 0.0161,
-                "source": "Titanic (1997)",
-                "sourceRating": 5.0
               },
               {
-                "contribution": 0.5956,
-                "residual": 1.248,
-                "similarity": 0.0147,
-                "source": "Breakfast Club, The (1985)",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Comedy"
-            ],
-            "hit": false,
-            "movieId": 1793,
-            "neighbors": 2,
-            "popularityBand": "long-tail",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.0307,
-            "title": "Welcome to Woop-Woop (1997)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.6513,
-                "residual": 1.248,
-                "similarity": 0.0702,
+                "contribution": 0.2226,
+                "residual": 1.204,
+                "similarity": 0.0311,
                 "source": "Terms of Endearment (1983)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.5971,
-                "residual": 1.248,
-                "similarity": 0.0643,
-                "source": "Steel Magnolias (1989)",
+                "contribution": 0.1804,
+                "residual": 0.896,
+                "similarity": 0.0339,
+                "source": "Cider House Rules, The (1999)",
                 "sourceRating": 5.0
               }
             ],
@@ -1434,61 +1395,38 @@
               "Romance"
             ],
             "hit": false,
-            "movieId": 2029,
-            "neighbors": 2,
+            "movieId": 1564,
+            "neighbors": 5,
             "popularityBand": "long-tail",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
+            "rankScore": 4.7086,
+            "ratingEstimate": 4.709,
             "scoreWasClipped": false,
-            "similarityWeight": 0.1345,
-            "title": "Billy's Hollywood Screen Kiss (1997)"
+            "secondaryScore": 3.7168,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.1684,
+            "title": "Roseanna's Grave (For Roseanna) (1997)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.6838,
-                "residual": 1.248,
-                "similarity": 0.0936,
-                "source": "Boys on the Side (1995)",
+                "contribution": 0.2218,
+                "residual": 1.291,
+                "similarity": 0.0476,
+                "source": "Titanic (1997)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.5646,
-                "residual": 1.248,
-                "similarity": 0.0773,
-                "source": "Dying Young (1991)",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Drama",
-              "Romance"
-            ],
-            "hit": false,
-            "movieId": 2154,
-            "neighbors": 2,
-            "popularityBand": "long-tail",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.1709,
-            "title": "How Stella Got Her Groove Back (1998)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.6397,
-                "residual": 1.248,
-                "similarity": 0.0371,
-                "source": "American Beauty (1999)",
+                "contribution": 0.1937,
+                "residual": 1.226,
+                "similarity": 0.0437,
+                "source": "Time to Kill, A (1996)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.6087,
-                "residual": 1.248,
-                "similarity": 0.0353,
-                "source": "Schindler's List (1993)",
+                "contribution": 0.1474,
+                "residual": 0.903,
+                "similarity": 0.0452,
+                "source": "Few Good Men, A (1992)",
                 "sourceRating": 5.0
               }
             ],
@@ -1497,72 +1435,142 @@
               "Drama"
             ],
             "hit": false,
-            "movieId": 3456,
-            "neighbors": 2,
-            "popularityBand": "long-tail",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
+            "movieId": 3178,
+            "neighbors": 6,
+            "popularityBand": "head",
+            "rankScore": 4.6869,
+            "ratingEstimate": 4.687,
             "scoreWasClipped": false,
-            "similarityWeight": 0.0725,
-            "title": "Color of Paradise, The (Rang-e Khoda) (1999)"
+            "secondaryScore": 3.816,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.2768,
+            "title": "Hurricane, The (1999)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.4619,
-                "residual": 1.248,
-                "similarity": 0.1051,
-                "source": "St. Elmo's Fire (1985)",
+                "contribution": 0.275,
+                "residual": 1.251,
+                "similarity": 0.1296,
+                "source": "Steel Magnolias (1989)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.3933,
-                "residual": 1.248,
-                "similarity": 0.0895,
+                "contribution": 0.2283,
+                "residual": 1.204,
+                "similarity": 0.1119,
+                "source": "Terms of Endearment (1983)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.2004,
+                "residual": 1.049,
+                "similarity": 0.1127,
+                "source": "Fried Green Tomatoes (1991)",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
+            "genres": [
+              "Drama"
+            ],
+            "hit": false,
+            "movieId": 1962,
+            "neighbors": 5,
+            "popularityBand": "head",
+            "rankScore": 4.6797,
+            "ratingEstimate": 4.68,
+            "scoreWasClipped": false,
+            "secondaryScore": 3.8818,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.5898,
+            "title": "Driving Miss Daisy (1989)"
+          },
+          {
+            "evidence": [
+              {
+                "contribution": 0.3239,
+                "residual": 1.197,
+                "similarity": 0.1032,
+                "source": "Top Gun (1986)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.2336,
+                "residual": 1.406,
+                "similarity": 0.0634,
                 "source": "Legends of the Fall (1994)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.3931,
-                "residual": 1.248,
-                "similarity": 0.0895,
-                "source": "Dying Young (1991)",
+                "contribution": 0.1263,
+                "residual": 0.781,
+                "similarity": 0.0617,
+                "source": "Forrest Gump (1994)",
                 "sourceRating": 5.0
               }
             ],
             "fallback": false,
             "genres": [
-              "Drama",
-              "Romance"
-            ],
-            "hit": false,
-            "movieId": 3528,
-            "neighbors": 3,
-            "popularityBand": "long-tail",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.2841,
-            "title": "Prince of Tides, The (1991)"
-          }
-        ],
-        "popularity": [
-          {
-            "evidence": [],
-            "fallback": true,
-            "genres": [
               "Action",
+              "Romance",
+              "War"
+            ],
+            "hit": true,
+            "movieId": 1408,
+            "neighbors": 5,
+            "popularityBand": "head",
+            "rankScore": 4.6499,
+            "ratingEstimate": 4.65,
+            "scoreWasClipped": false,
+            "secondaryScore": 3.8033,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.3815,
+            "title": "Last of the Mohicans, The (1992)"
+          },
+          {
+            "evidence": [
+              {
+                "contribution": 0.1768,
+                "residual": 1.049,
+                "similarity": 0.0838,
+                "source": "Fried Green Tomatoes (1991)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.1639,
+                "residual": 0.903,
+                "similarity": 0.0902,
+                "source": "Few Good Men, A (1992)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.139,
+                "residual": 0.781,
+                "similarity": 0.0884,
+                "source": "Forrest Gump (1994)",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
+            "genres": [
+              "Comedy",
               "Drama"
             ],
             "hit": false,
-            "movieId": 2019,
-            "neighbors": 0,
+            "movieId": 1784,
+            "neighbors": 6,
             "popularityBand": "head",
-            "rankScore": 4.527,
-            "ratingEstimate": null,
+            "rankScore": 4.6413,
+            "ratingEstimate": 4.641,
             "scoreWasClipped": false,
-            "title": "Seven Samurai (The Magnificent Seven) (Shichinin no samurai) (1954)"
-          },
+            "secondaryScore": 3.9408,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.497,
+            "title": "As Good As It Gets (1997)"
+          }
+        ],
+        "popularity": [
           {
             "evidence": [],
             "fallback": true,
@@ -1575,10 +1583,60 @@
             "movieId": 858,
             "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.5168,
+            "rankScore": 4.4858,
             "ratingEstimate": null,
             "scoreWasClipped": false,
             "title": "Godfather, The (1972)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Action",
+              "Adventure"
+            ],
+            "hit": false,
+            "movieId": 1198,
+            "neighbors": 0,
+            "popularityBand": "head",
+            "rankScore": 4.4393,
+            "ratingEstimate": null,
+            "scoreWasClipped": false,
+            "title": "Raiders of the Lost Ark (1981)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Action",
+              "Adventure",
+              "Fantasy",
+              "Sci-Fi"
+            ],
+            "hit": false,
+            "movieId": 260,
+            "neighbors": 0,
+            "popularityBand": "head",
+            "rankScore": 4.4237,
+            "ratingEstimate": null,
+            "scoreWasClipped": false,
+            "title": "Star Wars: Episode IV - A New Hope (1977)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Action",
+              "Drama"
+            ],
+            "hit": false,
+            "movieId": 2019,
+            "neighbors": 0,
+            "popularityBand": "head",
+            "rankScore": 4.4231,
+            "ratingEstimate": null,
+            "scoreWasClipped": false,
+            "title": "Seven Samurai (The Magnificent Seven) (Shichinin no samurai) (1954)"
           },
           {
             "evidence": [],
@@ -1591,7 +1649,7 @@
             "movieId": 1148,
             "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.4948,
+            "rankScore": 4.423,
             "ratingEstimate": null,
             "scoreWasClipped": false,
             "title": "Wrong Trousers, The (1993)"
@@ -1608,26 +1666,10 @@
             "movieId": 745,
             "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.4946,
+            "rankScore": 4.4014,
             "ratingEstimate": null,
             "scoreWasClipped": false,
             "title": "Close Shave, A (1995)"
-          },
-          {
-            "evidence": [],
-            "fallback": true,
-            "genres": [
-              "Action",
-              "Adventure"
-            ],
-            "hit": false,
-            "movieId": 1198,
-            "neighbors": 0,
-            "popularityBand": "head",
-            "rankScore": 4.4651,
-            "ratingEstimate": null,
-            "scoreWasClipped": false,
-            "title": "Raiders of the Lost Ark (1981)"
           },
           {
             "evidence": [],
@@ -1640,7 +1682,7 @@
             "movieId": 904,
             "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.4632,
+            "rankScore": 4.401,
             "ratingEstimate": null,
             "scoreWasClipped": false,
             "title": "Rear Window (1954)"
@@ -1656,7 +1698,7 @@
             "movieId": 750,
             "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.4456,
+            "rankScore": 4.399,
             "ratingEstimate": null,
             "scoreWasClipped": false,
             "title": "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb (1963)"
@@ -1665,34 +1707,18 @@
             "evidence": [],
             "fallback": true,
             "genres": [
-              "Action",
-              "Adventure",
-              "Fantasy",
-              "Sci-Fi"
+              "Drama",
+              "Romance",
+              "War"
             ],
             "hit": false,
-            "movieId": 260,
+            "movieId": 912,
             "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.445,
+            "rankScore": 4.3604,
             "ratingEstimate": null,
             "scoreWasClipped": false,
-            "title": "Star Wars: Episode IV - A New Hope (1977)"
-          },
-          {
-            "evidence": [],
-            "fallback": true,
-            "genres": [
-              "Film-Noir"
-            ],
-            "hit": false,
-            "movieId": 922,
-            "neighbors": 0,
-            "popularityBand": "head",
-            "rankScore": 4.4355,
-            "ratingEstimate": null,
-            "scoreWasClipped": false,
-            "title": "Sunset Blvd. (a.k.a. Sunset Boulevard) (1950)"
+            "title": "Casablanca (1942)"
           },
           {
             "evidence": [],
@@ -1701,37 +1727,79 @@
               "Drama"
             ],
             "hit": false,
-            "movieId": 1207,
+            "movieId": 1193,
             "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.4089,
+            "rankScore": 4.3464,
             "ratingEstimate": null,
             "scoreWasClipped": false,
-            "title": "To Kill a Mockingbird (1962)"
+            "title": "One Flew Over the Cuckoo's Nest (1975)"
           }
         ],
         "userCf": [
           {
             "evidence": [
               {
-                "contribution": 0.4743,
-                "residual": 1.898,
-                "similarity": 0.082,
-                "source": "Viewer 3475",
+                "contribution": 0.1511,
+                "residual": 0.507,
+                "similarity": 0.1863,
+                "source": "Viewer 3600",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.4211,
-                "residual": 1.823,
-                "similarity": 0.0758,
-                "source": "Viewer 531",
+                "contribution": 0.1189,
+                "residual": 0.612,
+                "similarity": 0.1215,
+                "source": "Viewer 4402",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.2829,
-                "residual": 1.793,
-                "similarity": 0.0518,
-                "source": "Viewer 4611",
+                "contribution": 0.1144,
+                "residual": 0.727,
+                "similarity": 0.0984,
+                "source": "Viewer 958",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
+            "genres": [
+              "Action",
+              "Crime",
+              "Drama"
+            ],
+            "hit": false,
+            "movieId": 1221,
+            "neighbors": 5,
+            "popularityBand": "head",
+            "rankScore": 4.9675,
+            "ratingEstimate": 4.968,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.3474,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.6249,
+            "title": "Godfather: Part II, The (1974)"
+          },
+          {
+            "evidence": [
+              {
+                "contribution": 0.1123,
+                "residual": 0.457,
+                "similarity": 0.1863,
+                "source": "Viewer 3600",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.092,
+                "residual": 0.652,
+                "similarity": 0.1069,
+                "source": "Viewer 4513",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.0887,
+                "residual": 0.538,
+                "similarity": 0.1251,
+                "source": "Viewer 5920",
                 "sourceRating": 5.0
               }
             ],
@@ -1740,36 +1808,79 @@
               "Drama"
             ],
             "hit": false,
-            "movieId": 1758,
-            "neighbors": 5,
-            "popularityBand": "long-tail",
-            "rankScore": 5.2241,
-            "ratingEstimate": 5.0,
-            "scoreWasClipped": true,
-            "similarityWeight": 0.3281,
-            "title": "Dangerous Beauty (1998)"
+            "movieId": 1193,
+            "neighbors": 6,
+            "popularityBand": "head",
+            "rankScore": 4.8163,
+            "ratingEstimate": 4.816,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.3801,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.7582,
+            "title": "One Flew Over the Cuckoo's Nest (1975)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.0811,
-                "residual": 1.898,
-                "similarity": 0.082,
-                "source": "Viewer 3475",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.0801,
-                "residual": 2.013,
-                "similarity": 0.0764,
-                "source": "Viewer 3620",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.0757,
-                "residual": 1.246,
-                "similarity": 0.1166,
+                "contribution": 0.2262,
+                "residual": 0.803,
+                "similarity": 0.1863,
                 "source": "Viewer 3600",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.2021,
+                "residual": 0.975,
+                "similarity": 0.1372,
+                "source": "Viewer 5569",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.1671,
+                "residual": 0.884,
+                "similarity": 0.1251,
+                "source": "Viewer 5920",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
+            "genres": [
+              "Comedy",
+              "Romance"
+            ],
+            "hit": false,
+            "movieId": 1307,
+            "neighbors": 5,
+            "popularityBand": "head",
+            "rankScore": 4.7796,
+            "ratingEstimate": 4.78,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.0657,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.6615,
+            "title": "When Harry Met Sally... (1989)"
+          },
+          {
+            "evidence": [
+              {
+                "contribution": -0.1308,
+                "residual": -0.758,
+                "similarity": 0.1069,
+                "source": "Viewer 4085",
+                "sourceRating": 4.0
+              },
+              {
+                "contribution": 0.1025,
+                "residual": 0.341,
+                "similarity": 0.1863,
+                "source": "Viewer 3600",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.089,
+                "residual": 0.56,
+                "similarity": 0.0984,
+                "source": "Viewer 958",
                 "sourceRating": 5.0
               }
             ],
@@ -1781,187 +1892,37 @@
             ],
             "hit": false,
             "movieId": 858,
-            "neighbors": 33,
+            "neighbors": 5,
             "popularityBand": "head",
-            "rankScore": 4.9014,
-            "ratingEstimate": 4.901,
+            "rankScore": 4.764,
+            "ratingEstimate": 4.764,
             "scoreWasClipped": false,
-            "similarityWeight": 1.9186,
+            "secondaryScore": 4.5168,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.6192,
             "title": "Godfather, The (1972)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.1103,
-                "residual": 1.898,
-                "similarity": 0.082,
-                "source": "Viewer 3475",
+                "contribution": 0.2959,
+                "residual": 1.481,
+                "similarity": 0.1347,
+                "source": "Viewer 15",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.103,
-                "residual": 1.246,
-                "similarity": 0.1166,
-                "source": "Viewer 3600",
+                "contribution": 0.2237,
+                "residual": 1.307,
+                "similarity": 0.1154,
+                "source": "Viewer 2577",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.0996,
-                "residual": 2.36,
-                "similarity": 0.0595,
-                "source": "Viewer 746",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Drama"
-            ],
-            "hit": false,
-            "movieId": 1193,
-            "neighbors": 23,
-            "popularityBand": "head",
-            "rankScore": 4.8682,
-            "ratingEstimate": 4.868,
-            "scoreWasClipped": false,
-            "similarityWeight": 1.4103,
-            "title": "One Flew Over the Cuckoo's Nest (1975)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.152,
-                "residual": 2.122,
-                "similarity": 0.0551,
-                "source": "Viewer 3441",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.1186,
-                "residual": 1.055,
-                "similarity": 0.0864,
-                "source": "Viewer 5920",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.1127,
-                "residual": 1.8,
-                "similarity": 0.0481,
-                "source": "Viewer 970",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Drama"
-            ],
-            "hit": false,
-            "movieId": 3916,
-            "neighbors": 13,
-            "popularityBand": "long-tail",
-            "rankScore": 4.851,
-            "ratingEstimate": 4.851,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.7684,
-            "title": "Remember the Titans (2000)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.4063,
-                "residual": 2.282,
-                "similarity": 0.0519,
-                "source": "Viewer 1962",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.2411,
-                "residual": 1.261,
-                "similarity": 0.0557,
-                "source": "Viewer 1068",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.19,
-                "residual": 1.266,
-                "similarity": 0.0437,
-                "source": "Viewer 3349",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Drama"
-            ],
-            "hit": false,
-            "movieId": 2310,
-            "neighbors": 6,
-            "popularityBand": "long-tail",
-            "rankScore": 4.7894,
-            "ratingEstimate": 4.789,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.2912,
-            "title": "Mighty, The (1998)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.1621,
-                "residual": 1.823,
-                "similarity": 0.0758,
-                "source": "Viewer 531",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.1371,
-                "residual": 2.122,
-                "similarity": 0.0551,
-                "source": "Viewer 3441",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.1263,
-                "residual": 1.502,
-                "similarity": 0.0716,
-                "source": "Viewer 5569",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Musical"
-            ],
-            "hit": false,
-            "movieId": 1035,
-            "neighbors": 16,
-            "popularityBand": "head",
-            "rankScore": 4.771,
-            "ratingEstimate": 4.771,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.8521,
-            "title": "Sound of Music, The (1965)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.0498,
-                "residual": 1.898,
-                "similarity": 0.082,
-                "source": "Viewer 3475",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.0465,
-                "residual": 1.246,
-                "similarity": 0.1166,
-                "source": "Viewer 3600",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.0449,
-                "residual": 2.36,
-                "similarity": 0.0595,
-                "source": "Viewer 746",
+                "contribution": 0.2093,
+                "residual": 1.319,
+                "similarity": 0.1069,
+                "source": "Viewer 4513",
                 "sourceRating": 5.0
               }
             ],
@@ -1972,113 +1933,119 @@
               "War"
             ],
             "hit": false,
-            "movieId": 110,
-            "neighbors": 55,
+            "movieId": 3753,
+            "neighbors": 6,
             "popularityBand": "head",
-            "rankScore": 4.7708,
-            "ratingEstimate": 4.771,
+            "rankScore": 4.7058,
+            "ratingEstimate": 4.706,
             "scoreWasClipped": false,
-            "similarityWeight": 3.1243,
-            "title": "Braveheart (1995)"
+            "secondaryScore": 3.7617,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.674,
+            "title": "Patriot, The (2000)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.4303,
-                "residual": 2.222,
-                "similarity": 0.0447,
-                "source": "Viewer 3476",
+                "contribution": 0.2243,
+                "residual": 0.819,
+                "similarity": 0.1863,
+                "source": "Viewer 3600",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.3425,
-                "residual": 1.802,
-                "similarity": 0.0439,
-                "source": "Viewer 4140",
+                "contribution": 0.1654,
+                "residual": 0.9,
+                "similarity": 0.1251,
+                "source": "Viewer 5920",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.2713,
-                "residual": 1.355,
-                "similarity": 0.0463,
-                "source": "Viewer 2592",
+                "contribution": 0.1133,
+                "residual": 0.721,
+                "similarity": 0.1069,
+                "source": "Viewer 4085",
                 "sourceRating": 5.0
               }
             ],
             "fallback": false,
             "genres": [
-              "Western"
+              "Drama"
             ],
             "hit": false,
-            "movieId": 1283,
+            "movieId": 1961,
             "neighbors": 5,
-            "popularityBand": "long-tail",
-            "rankScore": 4.7514,
-            "ratingEstimate": 4.751,
+            "popularityBand": "head",
+            "rankScore": 4.6822,
+            "ratingEstimate": 4.682,
             "scoreWasClipped": false,
-            "similarityWeight": 0.2311,
-            "title": "High Noon (1952)"
+            "secondaryScore": 4.0412,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.6805,
+            "title": "Rain Man (1988)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.1499,
-                "residual": 1.823,
-                "similarity": 0.0758,
-                "source": "Viewer 531",
+                "contribution": 0.105,
+                "residual": 0.719,
+                "similarity": 0.1863,
+                "source": "Viewer 3600",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.1267,
-                "residual": 2.122,
-                "similarity": 0.0551,
-                "source": "Viewer 3441",
+                "contribution": 0.0858,
+                "residual": 0.876,
+                "similarity": 0.1251,
+                "source": "Viewer 3239",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.1079,
-                "residual": 2.222,
-                "similarity": 0.0447,
-                "source": "Viewer 3476",
+                "contribution": 0.0644,
+                "residual": 0.782,
+                "similarity": 0.1051,
+                "source": "Viewer 2570",
                 "sourceRating": 5.0
               }
             ],
             "fallback": false,
             "genres": [
               "Drama",
-              "Mystery"
+              "Thriller"
             ],
-            "hit": true,
-            "movieId": 2686,
-            "neighbors": 17,
+            "hit": false,
+            "movieId": 3147,
+            "neighbors": 10,
             "popularityBand": "head",
-            "rankScore": 4.7444,
-            "ratingEstimate": 4.744,
+            "rankScore": 4.6468,
+            "ratingEstimate": 4.647,
             "scoreWasClipped": false,
-            "similarityWeight": 0.9218,
-            "title": "Red Violin, The (Le Violon rouge) (1998)"
+            "secondaryScore": 4.1446,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 1.2765,
+            "title": "Green Mile, The (1999)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.1935,
-                "residual": 1.898,
-                "similarity": 0.082,
-                "source": "Viewer 3475",
+                "contribution": 0.2615,
+                "residual": 1.116,
+                "similarity": 0.1863,
+                "source": "Viewer 3600",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.1034,
-                "residual": 1.546,
-                "similarity": 0.0538,
-                "source": "Viewer 5140",
+                "contribution": 0.1882,
+                "residual": 1.197,
+                "similarity": 0.1251,
+                "source": "Viewer 5920",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.0883,
-                "residual": 1.551,
-                "similarity": 0.0457,
-                "source": "Viewer 1354",
+                "contribution": 0.1558,
+                "residual": 1.179,
+                "similarity": 0.1051,
+                "source": "Viewer 2570",
                 "sourceRating": 5.0
               }
             ],
@@ -2088,14 +2055,97 @@
               "Romance"
             ],
             "hit": false,
-            "movieId": 497,
-            "neighbors": 15,
+            "movieId": 539,
+            "neighbors": 6,
             "popularityBand": "head",
-            "rankScore": 4.7271,
-            "ratingEstimate": 4.727,
+            "rankScore": 4.6263,
+            "ratingEstimate": 4.626,
             "scoreWasClipped": false,
-            "similarityWeight": 0.804,
-            "title": "Much Ado About Nothing (1993)"
+            "secondaryScore": 3.7573,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.7952,
+            "title": "Sleepless in Seattle (1993)"
+          },
+          {
+            "evidence": [
+              {
+                "contribution": 0.0984,
+                "residual": 0.859,
+                "similarity": 0.1372,
+                "source": "Viewer 5569",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.0803,
+                "residual": 0.768,
+                "similarity": 0.1251,
+                "source": "Viewer 5920",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.0659,
+                "residual": 0.75,
+                "similarity": 0.1051,
+                "source": "Viewer 2570",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
+            "genres": [
+              "Drama"
+            ],
+            "hit": false,
+            "movieId": 1704,
+            "neighbors": 9,
+            "popularityBand": "head",
+            "rankScore": 4.6186,
+            "ratingEstimate": 4.619,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.1676,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 1.1969,
+            "title": "Good Will Hunting (1997)"
+          },
+          {
+            "evidence": [
+              {
+                "contribution": 0.2144,
+                "residual": 1.112,
+                "similarity": 0.1347,
+                "source": "Viewer 15",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.1497,
+                "residual": 0.836,
+                "similarity": 0.1251,
+                "source": "Viewer 5920",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": -0.1068,
+                "residual": -0.666,
+                "similarity": 0.1118,
+                "source": "Viewer 4094",
+                "sourceRating": 4.0
+              }
+            ],
+            "fallback": false,
+            "genres": [
+              "Action",
+              "Drama"
+            ],
+            "hit": false,
+            "movieId": 3578,
+            "neighbors": 6,
+            "popularityBand": "head",
+            "rankScore": 4.6154,
+            "ratingEstimate": 4.615,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.1143,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.6981,
+            "title": "Gladiator (2000)"
           }
         ]
       },
@@ -2243,86 +2293,173 @@
           "title": "What Lies Beneath (2000)"
         }
       ],
+      "relevantTestTotal": 14,
       "user": "Viewer 133",
       "userId": 133
     },
     {
-      "activity": 438,
+      "activity": 414,
       "history": [
         {
           "genres": [
-            "Comedy",
-            "Western"
-          ],
-          "movieId": 3671,
-          "popularityBand": "head",
-          "rating": 5.0,
-          "title": "Blazing Saddles (1974)"
-        },
-        {
-          "genres": [
-            "Western"
-          ],
-          "movieId": 599,
-          "popularityBand": "long-tail",
-          "rating": 5.0,
-          "title": "Wild Bunch, The (1969)"
-        },
-        {
-          "genres": [
-            "Comedy",
+            "Crime",
             "Drama",
-            "Western"
-          ],
-          "movieId": 3030,
-          "popularityBand": "long-tail",
-          "rating": 5.0,
-          "title": "Yojimbo (1961)"
-        },
-        {
-          "genres": [
-            "Drama",
-            "Mystery"
-          ],
-          "movieId": 800,
-          "popularityBand": "head",
-          "rating": 5.0,
-          "title": "Lone Star (1996)"
-        },
-        {
-          "genres": [
-            "Mystery",
+            "Romance",
             "Thriller"
           ],
-          "movieId": 904,
+          "movieId": 293,
           "popularityBand": "head",
           "rating": 5.0,
-          "title": "Rear Window (1954)"
+          "title": "Professional, The (a.k.a. Leon: The Professional) (1994)"
+        },
+        {
+          "genres": [
+            "Drama"
+          ],
+          "movieId": 1759,
+          "popularityBand": "long-tail",
+          "rating": 5.0,
+          "title": "Four Days in September (1997)"
+        },
+        {
+          "genres": [
+            "Drama"
+          ],
+          "movieId": 2959,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "Fight Club (1999)"
+        },
+        {
+          "genres": [
+            "Comedy",
+            "Drama"
+          ],
+          "movieId": 235,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "Ed Wood (1994)"
+        },
+        {
+          "genres": [
+            "Drama",
+            "Fantasy",
+            "Romance",
+            "Thriller"
+          ],
+          "movieId": 247,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "Heavenly Creatures (1994)"
         }
       ],
+      "historyTotal": 414,
       "methods": {
         "itemCf": [
           {
             "evidence": [
               {
-                "contribution": 0.6327,
-                "residual": 1.527,
-                "similarity": 0.0659,
-                "source": "Paths of Glory (1957)",
+                "contribution": 0.5479,
+                "residual": 2.265,
+                "similarity": 0.0434,
+                "source": "Strange Days (1995)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.4501,
-                "residual": 1.527,
-                "similarity": 0.0469,
-                "source": "Touch of Evil (1958)",
+                "contribution": 0.3223,
+                "residual": 1.912,
+                "similarity": 0.0302,
+                "source": "Who Framed Roger Rabbit? (1988)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.4446,
-                "residual": 1.527,
-                "similarity": 0.0463,
-                "source": "Rear Window (1954)",
+                "contribution": 0.2417,
+                "residual": 1.374,
+                "similarity": 0.0315,
+                "source": "L.A. Confidential (1997)",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
+            "genres": [
+              "Action",
+              "Adventure"
+            ],
+            "hit": false,
+            "movieId": 2905,
+            "neighbors": 5,
+            "popularityBand": "long-tail",
+            "rankScore": 5.1533,
+            "ratingEstimate": 5.0,
+            "scoreWasClipped": true,
+            "secondaryScore": 4.3413,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.1792,
+            "title": "Sanjuro (1962)"
+          },
+          {
+            "evidence": [
+              {
+                "contribution": 0.36,
+                "residual": 1.483,
+                "similarity": 0.1155,
+                "source": "Shining, The (1980)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.2834,
+                "residual": 1.3,
+                "similarity": 0.1037,
+                "source": "GoodFellas (1990)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.2503,
+                "residual": 1.582,
+                "similarity": 0.0753,
+                "source": "Trainspotting (1996)",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
+            "genres": [
+              "Action",
+              "Drama",
+              "War"
+            ],
+            "hit": false,
+            "movieId": 1222,
+            "neighbors": 5,
+            "popularityBand": "head",
+            "rankScore": 4.8693,
+            "ratingEstimate": 4.869,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.088,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.4758,
+            "title": "Full Metal Jacket (1987)"
+          },
+          {
+            "evidence": [
+              {
+                "contribution": 0.1953,
+                "residual": 1.824,
+                "similarity": 0.0883,
+                "source": "Big Lebowski, The (1998)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.1704,
+                "residual": 1.374,
+                "similarity": 0.1023,
+                "source": "L.A. Confidential (1997)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.1532,
+                "residual": 1.615,
+                "similarity": 0.0782,
+                "source": "Clerks (1994)",
                 "sourceRating": 5.0
               }
             ],
@@ -2331,37 +2468,80 @@
               "Crime",
               "Thriller"
             ],
-            "hit": false,
-            "movieId": 659,
-            "neighbors": 3,
-            "popularityBand": "long-tail",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
+            "hit": true,
+            "movieId": 50,
+            "neighbors": 10,
+            "popularityBand": "head",
+            "rankScore": 4.8424,
+            "ratingEstimate": 4.842,
             "scoreWasClipped": false,
-            "similarityWeight": 0.1592,
-            "title": "Purple Noon (1960)"
+            "secondaryScore": 4.513,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.8247,
+            "title": "Usual Suspects, The (1995)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.3768,
-                "residual": 1.527,
-                "similarity": 0.1252,
-                "source": "Seventh Seal, The (Sjunde inseglet, Det) (1957)",
+                "contribution": 0.4022,
+                "residual": 1.895,
+                "similarity": 0.087,
+                "source": "Repo Man (1984)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.364,
-                "residual": 1.527,
-                "similarity": 0.121,
-                "source": "Paths of Glory (1957)",
+                "contribution": 0.3449,
+                "residual": 1.871,
+                "similarity": 0.0756,
+                "source": "Ed Wood (1994)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.2404,
-                "residual": 1.527,
-                "similarity": 0.0799,
-                "source": "Seven Samurai (The Magnificent Seven) (Shichinin no samurai) (1954)",
+                "contribution": 0.3382,
+                "residual": 1.824,
+                "similarity": 0.076,
+                "source": "Big Lebowski, The (1998)",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
+            "genres": [
+              "Comedy",
+              "Documentary"
+            ],
+            "hit": false,
+            "movieId": 2064,
+            "neighbors": 5,
+            "popularityBand": "head",
+            "rankScore": 4.8237,
+            "ratingEstimate": 4.824,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.0445,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.41,
+            "title": "Roger & Me (1989)"
+          },
+          {
+            "evidence": [
+              {
+                "contribution": 0.4333,
+                "residual": 1.989,
+                "similarity": 0.0192,
+                "source": "Edward Scissorhands (1990)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.3028,
+                "residual": 0.92,
+                "similarity": 0.029,
+                "source": "People vs. Larry Flynt, The (1996)",
+                "sourceRating": 4.0
+              },
+              {
+                "contribution": 0.2625,
+                "residual": 1.475,
+                "similarity": 0.0157,
+                "source": "Professional, The (a.k.a. Leon: The Professional) (1994)",
                 "sourceRating": 5.0
               }
             ],
@@ -2370,285 +2550,218 @@
               "Drama"
             ],
             "hit": false,
-            "movieId": 668,
-            "neighbors": 6,
+            "movieId": 1117,
+            "neighbors": 5,
             "popularityBand": "long-tail",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
+            "rankScore": 4.6914,
+            "ratingEstimate": 4.691,
             "scoreWasClipped": false,
-            "similarityWeight": 0.5076,
-            "title": "Pather Panchali (1955)"
+            "secondaryScore": 3.7781,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.0881,
+            "title": "Eighth Day, The (Le Huitième jour ) (1996)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.4727,
-                "residual": 1.527,
-                "similarity": 0.302,
-                "source": "Apocalypse Now (1979)",
+                "contribution": 0.3392,
+                "residual": 1.871,
+                "similarity": 0.0855,
+                "source": "Ed Wood (1994)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.402,
-                "residual": 1.527,
-                "similarity": 0.2569,
-                "source": "Godfather, The (1972)",
+                "contribution": 0.3377,
+                "residual": 1.824,
+                "similarity": 0.0872,
+                "source": "Big Lebowski, The (1998)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.3398,
-                "residual": 1.527,
-                "similarity": 0.2171,
-                "source": "Raiders of the Lost Ark (1981)",
+                "contribution": 0.3241,
+                "residual": 1.873,
+                "similarity": 0.0815,
+                "source": "Nightmare Before Christmas, The (1993)",
                 "sourceRating": 5.0
               }
             ],
             "fallback": false,
             "genres": [
-              "Drama",
-              "War"
+              "Comedy",
+              "Romance"
             ],
             "hit": false,
-            "movieId": 1272,
-            "neighbors": 4,
+            "movieId": 471,
+            "neighbors": 6,
             "popularityBand": "head",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
+            "rankScore": 4.6375,
+            "ratingEstimate": 4.638,
             "scoreWasClipped": false,
-            "similarityWeight": 0.9758,
-            "title": "Patton (1970)"
+            "secondaryScore": 3.634,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.4714,
+            "title": "Hudsucker Proxy, The (1994)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.8257,
-                "residual": 1.527,
-                "similarity": 0.1255,
+                "contribution": 0.3455,
+                "residual": 1.779,
+                "similarity": 0.0899,
+                "source": "Rosemary's Baby (1968)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.2763,
+                "residual": 1.618,
+                "similarity": 0.0791,
+                "source": "Exorcist, The (1973)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.268,
+                "residual": 1.234,
+                "similarity": 0.1006,
+                "source": "Silence of the Lambs, The (1991)",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
+            "genres": [
+              "Horror"
+            ],
+            "hit": false,
+            "movieId": 3499,
+            "neighbors": 5,
+            "popularityBand": "head",
+            "rankScore": 4.6227,
+            "ratingEstimate": 4.623,
+            "scoreWasClipped": false,
+            "secondaryScore": 3.828,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.463,
+            "title": "Misery (1990)"
+          },
+          {
+            "evidence": [
+              {
+                "contribution": 0.7536,
+                "residual": 1.98,
+                "similarity": 0.0198,
+                "source": "Batman (1989)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.4083,
+                "residual": 1.336,
+                "similarity": 0.0159,
+                "source": "Run Lola Run (Lola rennt) (1998)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.1771,
+                "residual": 1.301,
+                "similarity": 0.0071,
+                "source": "Princess Bride, The (1987)",
+                "sourceRating": 5.0
+              }
+            ],
+            "fallback": false,
+            "genres": [
+              "Drama"
+            ],
+            "hit": false,
+            "movieId": 1567,
+            "neighbors": 5,
+            "popularityBand": "long-tail",
+            "rankScore": 4.6001,
+            "ratingEstimate": 4.6,
+            "scoreWasClipped": false,
+            "secondaryScore": 3.6003,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.0521,
+            "title": "Last Time I Committed Suicide, The (1997)"
+          },
+          {
+            "evidence": [
+              {
+                "contribution": 0.2501,
+                "residual": 1.871,
+                "similarity": 0.0642,
+                "source": "Ed Wood (1994)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.2375,
+                "residual": 1.483,
+                "similarity": 0.0768,
                 "source": "Shining, The (1980)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.7017,
-                "residual": 1.527,
-                "similarity": 0.1067,
-                "source": "Nosferatu (Nosferatu, eine Symphonie des Grauens) (1922)",
+                "contribution": 0.2119,
+                "residual": 1.618,
+                "similarity": 0.0628,
+                "source": "Exorcist, The (1973)",
                 "sourceRating": 5.0
               }
             ],
             "fallback": false,
             "genres": [
-              "Horror",
-              "Thriller"
+              "Drama"
             ],
             "hit": false,
-            "movieId": 2160,
-            "neighbors": 2,
+            "movieId": 2313,
+            "neighbors": 7,
             "popularityBand": "head",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
+            "rankScore": 4.5933,
+            "ratingEstimate": 4.593,
             "scoreWasClipped": false,
-            "similarityWeight": 0.2322,
-            "title": "Rosemary's Baby (1968)"
+            "secondaryScore": 4.0046,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.4798,
+            "title": "Elephant Man, The (1980)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.839,
-                "residual": 1.527,
-                "similarity": 0.0187,
-                "source": "Seventh Seal, The (Sjunde inseglet, Det) (1957)",
+                "contribution": 0.258,
+                "residual": 2.66,
+                "similarity": 0.0595,
+                "source": "Mars Attacks! (1996)",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.6884,
-                "residual": 1.527,
-                "similarity": 0.0153,
-                "source": "Seven Samurai (The Magnificent Seven) (Shichinin no samurai) (1954)",
+                "contribution": 0.2261,
+                "residual": 2.334,
+                "similarity": 0.0594,
+                "source": "Orgazmo (1997)",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.207,
+                "residual": 2.206,
+                "similarity": 0.0576,
+                "source": "Fear and Loathing in Las Vegas (1998)",
                 "sourceRating": 5.0
               }
             ],
             "fallback": false,
             "genres": [
-              "Drama"
+              "Comedy",
+              "Romance"
             ],
             "hit": false,
-            "movieId": 2544,
-            "neighbors": 2,
-            "popularityBand": "long-tail",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.034,
-            "title": "School of Flesh, The (L' École de la chair) (1998)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.335,
-                "residual": 1.527,
-                "similarity": 0.1011,
-                "source": "Seventh Seal, The (Sjunde inseglet, Det) (1957)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.3224,
-                "residual": 1.527,
-                "similarity": 0.0973,
-                "source": "Yojimbo (1961)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.3096,
-                "residual": 1.527,
-                "similarity": 0.0934,
-                "source": "Bonnie and Clyde (1967)",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Drama"
-            ],
-            "hit": false,
-            "movieId": 2732,
-            "neighbors": 5,
-            "popularityBand": "long-tail",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.4609,
-            "title": "Jules and Jim (Jules et Jim) (1961)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.7673,
-                "residual": 1.527,
-                "similarity": 0.0941,
-                "source": "Big Night (1996)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.7601,
-                "residual": 1.527,
-                "similarity": 0.0932,
-                "source": "My Left Foot (1989)",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Drama"
-            ],
-            "hit": false,
-            "movieId": 3260,
-            "neighbors": 2,
+            "movieId": 2502,
+            "neighbors": 10,
             "popularityBand": "head",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
+            "rankScore": 4.5726,
+            "ratingEstimate": 4.573,
             "scoreWasClipped": false,
-            "similarityWeight": 0.1874,
-            "title": "Howards End (1992)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.9451,
-                "residual": 1.527,
-                "similarity": 0.0632,
-                "source": "Seventh Seal, The (Sjunde inseglet, Det) (1957)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.5823,
-                "residual": 1.527,
-                "similarity": 0.039,
-                "source": "Seven Samurai (The Magnificent Seven) (Shichinin no samurai) (1954)",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Drama"
-            ],
-            "hit": false,
-            "movieId": 3289,
-            "neighbors": 2,
-            "popularityBand": "long-tail",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.1022,
-            "title": "Not One Less (Yi ge dou bu neng shao) (1999)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.3958,
-                "residual": 1.527,
-                "similarity": 0.0633,
-                "source": "Citizen Kane (1941)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.3878,
-                "residual": 1.527,
-                "similarity": 0.062,
-                "source": "Battleship Potemkin, The (Bronenosets Potyomkin) (1925)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.3808,
-                "residual": 1.527,
-                "similarity": 0.0609,
-                "source": "Paths of Glory (1957)",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Drama"
-            ],
-            "hit": false,
-            "movieId": 3736,
-            "neighbors": 4,
-            "popularityBand": "long-tail",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.2441,
-            "title": "Big Carnival, The (1951)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 1.0638,
-                "residual": 1.527,
-                "similarity": 0.0461,
-                "source": "Nosferatu (Nosferatu, eine Symphonie des Grauens) (1922)",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.4636,
-                "residual": 1.527,
-                "similarity": 0.0201,
-                "source": "Monty Python and the Holy Grail (1974)",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Drama"
-            ],
-            "hit": false,
-            "movieId": 3845,
-            "neighbors": 2,
-            "popularityBand": "long-tail",
-            "rankScore": 5.0,
-            "ratingEstimate": 5.0,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.0662,
-            "title": "And God Created Woman (Et Dieu&#8230;Créa la Femme) (1956)"
+            "secondaryScore": 3.8027,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.6132,
+            "title": "Office Space (1999)"
           }
         ],
         "popularity": [
@@ -2656,14 +2769,79 @@
             "evidence": [],
             "fallback": true,
             "genres": [
+              "Drama"
+            ],
+            "hit": false,
+            "movieId": 318,
+            "neighbors": 0,
+            "popularityBand": "head",
+            "rankScore": 4.5162,
+            "ratingEstimate": null,
+            "scoreWasClipped": false,
+            "title": "Shawshank Redemption, The (1994)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Crime",
+              "Thriller"
+            ],
+            "hit": true,
+            "movieId": 50,
+            "neighbors": 0,
+            "popularityBand": "head",
+            "rankScore": 4.4744,
+            "ratingEstimate": null,
+            "scoreWasClipped": false,
+            "title": "Usual Suspects, The (1995)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Action",
+              "Adventure",
+              "Fantasy",
+              "Sci-Fi"
+            ],
+            "hit": true,
+            "movieId": 260,
+            "neighbors": 0,
+            "popularityBand": "head",
+            "rankScore": 4.4237,
+            "ratingEstimate": null,
+            "scoreWasClipped": false,
+            "title": "Star Wars: Episode IV - A New Hope (1977)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Action",
+              "Drama"
+            ],
+            "hit": false,
+            "movieId": 2019,
+            "neighbors": 0,
+            "popularityBand": "head",
+            "rankScore": 4.4231,
+            "ratingEstimate": null,
+            "scoreWasClipped": false,
+            "title": "Seven Samurai (The Magnificent Seven) (Shichinin no samurai) (1954)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
               "Animation",
               "Comedy"
             ],
-            "hit": true,
+            "hit": false,
             "movieId": 1148,
             "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.4948,
+            "rankScore": 4.423,
             "ratingEstimate": null,
             "scoreWasClipped": false,
             "title": "Wrong Trousers, The (1993)"
@@ -2680,25 +2858,10 @@
             "movieId": 745,
             "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.4946,
+            "rankScore": 4.4014,
             "ratingEstimate": null,
             "scoreWasClipped": false,
             "title": "Close Shave, A (1995)"
-          },
-          {
-            "evidence": [],
-            "fallback": true,
-            "genres": [
-              "Film-Noir"
-            ],
-            "hit": false,
-            "movieId": 922,
-            "neighbors": 0,
-            "popularityBand": "head",
-            "rankScore": 4.4355,
-            "ratingEstimate": null,
-            "scoreWasClipped": false,
-            "title": "Sunset Blvd. (a.k.a. Sunset Boulevard) (1950)"
           },
           {
             "evidence": [],
@@ -2708,13 +2871,44 @@
               "Thriller"
             ],
             "hit": false,
-            "movieId": 1212,
+            "movieId": 904,
             "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.4009,
+            "rankScore": 4.401,
             "ratingEstimate": null,
             "scoreWasClipped": false,
-            "title": "Third Man, The (1949)"
+            "title": "Rear Window (1954)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Sci-Fi",
+              "War"
+            ],
+            "hit": false,
+            "movieId": 750,
+            "neighbors": 0,
+            "popularityBand": "head",
+            "rankScore": 4.399,
+            "ratingEstimate": null,
+            "scoreWasClipped": false,
+            "title": "Dr. Strangelove or: How I Learned to Stop Worrying and Love the Bomb (1963)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Thriller"
+            ],
+            "hit": true,
+            "movieId": 2762,
+            "neighbors": 0,
+            "popularityBand": "head",
+            "rankScore": 4.3782,
+            "ratingEstimate": null,
+            "scoreWasClipped": false,
+            "title": "Sixth Sense, The (1999)"
           },
           {
             "evidence": [],
@@ -2728,306 +2922,115 @@
             "movieId": 912,
             "neighbors": 0,
             "popularityBand": "head",
-            "rankScore": 4.3962,
+            "rankScore": 4.3604,
             "ratingEstimate": null,
             "scoreWasClipped": false,
             "title": "Casablanca (1942)"
-          },
-          {
-            "evidence": [],
-            "fallback": true,
-            "genres": [
-              "Adventure",
-              "War"
-            ],
-            "hit": false,
-            "movieId": 1204,
-            "neighbors": 0,
-            "popularityBand": "head",
-            "rankScore": 4.384,
-            "ratingEstimate": null,
-            "scoreWasClipped": false,
-            "title": "Lawrence of Arabia (1962)"
-          },
-          {
-            "evidence": [],
-            "fallback": true,
-            "genres": [
-              "Film-Noir",
-              "Mystery"
-            ],
-            "hit": false,
-            "movieId": 913,
-            "neighbors": 0,
-            "popularityBand": "head",
-            "rankScore": 4.3838,
-            "ratingEstimate": null,
-            "scoreWasClipped": false,
-            "title": "Maltese Falcon, The (1941)"
-          },
-          {
-            "evidence": [],
-            "fallback": true,
-            "genres": [
-              "Drama"
-            ],
-            "hit": true,
-            "movieId": 1193,
-            "neighbors": 0,
-            "popularityBand": "head",
-            "rankScore": 4.3801,
-            "ratingEstimate": null,
-            "scoreWasClipped": false,
-            "title": "One Flew Over the Cuckoo's Nest (1975)"
-          },
-          {
-            "evidence": [],
-            "fallback": true,
-            "genres": [
-              "Adventure",
-              "War"
-            ],
-            "hit": true,
-            "movieId": 1262,
-            "neighbors": 0,
-            "popularityBand": "head",
-            "rankScore": 4.3645,
-            "ratingEstimate": null,
-            "scoreWasClipped": false,
-            "title": "Great Escape, The (1963)"
-          },
-          {
-            "evidence": [],
-            "fallback": true,
-            "genres": [
-              "Drama",
-              "War"
-            ],
-            "hit": false,
-            "movieId": 1250,
-            "neighbors": 0,
-            "popularityBand": "head",
-            "rankScore": 4.3643,
-            "ratingEstimate": null,
-            "scoreWasClipped": false,
-            "title": "Bridge on the River Kwai, The (1957)"
           }
         ],
         "userCf": [
           {
             "evidence": [
               {
-                "contribution": 0.2424,
-                "residual": 1.933,
-                "similarity": 0.1423,
+                "contribution": 0.2609,
+                "residual": 1.057,
+                "similarity": 0.1369,
+                "source": "Viewer 5397",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.2435,
+                "residual": 1.265,
+                "similarity": 0.1067,
+                "source": "Viewer 5161",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.2016,
+                "residual": 1.041,
+                "similarity": 0.1074,
                 "source": "Viewer 3182",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.2424,
-                "residual": 1.937,
-                "similarity": 0.142,
-                "source": "Viewer 1019",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.2324,
-                "residual": 1.942,
-                "similarity": 0.1357,
-                "source": "Viewer 2288",
                 "sourceRating": 5.0
               }
             ],
             "fallback": false,
             "genres": [
-              "Crime",
+              "Comedy",
               "Drama"
             ],
             "hit": false,
-            "movieId": 3741,
-            "neighbors": 8,
-            "popularityBand": "long-tail",
-            "rankScore": 4.9688,
-            "ratingEstimate": 4.969,
+            "movieId": 1276,
+            "neighbors": 5,
+            "popularityBand": "head",
+            "rankScore": 4.4862,
+            "ratingEstimate": 4.486,
             "scoreWasClipped": false,
-            "similarityWeight": 1.1341,
-            "title": "Badlands (1973)"
+            "secondaryScore": 4.2219,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.5547,
+            "title": "Cool Hand Luke (1967)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.2243,
-                "residual": 2.303,
-                "similarity": 0.1471,
-                "source": "Viewer 5788",
+                "contribution": 0.3542,
+                "residual": 2.035,
+                "similarity": 0.1392,
+                "source": "Viewer 3942",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.182,
-                "residual": 1.937,
-                "similarity": 0.142,
-                "source": "Viewer 1019",
+                "contribution": 0.2287,
+                "residual": 1.714,
+                "similarity": 0.1067,
+                "source": "Viewer 5161",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.1812,
-                "residual": 1.74,
-                "similarity": 0.1573,
-                "source": "Viewer 1447",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Comedy"
-            ],
-            "hit": false,
-            "movieId": 3462,
-            "neighbors": 10,
-            "popularityBand": "long-tail",
-            "rankScore": 4.9233,
-            "ratingEstimate": 4.923,
-            "scoreWasClipped": false,
-            "similarityWeight": 1.5103,
-            "title": "Modern Times (1936)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.3849,
-                "residual": 1.937,
-                "similarity": 0.142,
-                "source": "Viewer 1019",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.3691,
-                "residual": 1.942,
-                "similarity": 0.1357,
-                "source": "Viewer 2288",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.3522,
-                "residual": 1.803,
-                "similarity": 0.1395,
-                "source": "Viewer 6016",
+                "contribution": 0.2,
+                "residual": 1.49,
+                "similarity": 0.1074,
+                "source": "Viewer 3182",
                 "sourceRating": 5.0
               }
             ],
             "fallback": false,
             "genres": [
               "Drama",
-              "Western"
+              "Mystery"
             ],
             "hit": false,
-            "movieId": 3093,
-            "neighbors": 5,
-            "popularityBand": "long-tail",
-            "rankScore": 4.9152,
-            "ratingEstimate": 4.915,
-            "scoreWasClipped": false,
-            "similarityWeight": 0.7141,
-            "title": "McCabe & Mrs. Miller (1971)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.041,
-                "residual": 2.483,
-                "similarity": 0.1582,
-                "source": "Viewer 2010",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.0377,
-                "residual": 1.694,
-                "similarity": 0.2131,
-                "source": "Viewer 4543",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.0357,
-                "residual": 1.97,
-                "similarity": 0.1733,
-                "source": "Viewer 5795",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Action",
-              "Crime",
-              "Drama"
-            ],
-            "hit": false,
-            "movieId": 1221,
-            "neighbors": 65,
+            "movieId": 2076,
+            "neighbors": 7,
             "popularityBand": "head",
-            "rankScore": 4.8665,
-            "ratingEstimate": 4.867,
+            "rankScore": 4.4842,
+            "ratingEstimate": 4.484,
             "scoreWasClipped": false,
-            "similarityWeight": 9.5718,
-            "title": "Godfather: Part II, The (1974)"
+            "secondaryScore": 3.768,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.7999,
+            "title": "Blue Velvet (1986)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.0569,
-                "residual": 2.381,
-                "similarity": 0.2206,
-                "source": "Viewer 5367",
+                "contribution": 0.1851,
+                "residual": 1.084,
+                "similarity": 0.1369,
+                "source": "Viewer 5397",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.0453,
-                "residual": 2.132,
-                "similarity": 0.196,
-                "source": "Viewer 1449",
+                "contribution": 0.172,
+                "residual": 1.293,
+                "similarity": 0.1067,
+                "source": "Viewer 5161",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.0445,
-                "residual": 2.529,
-                "similarity": 0.1626,
-                "source": "Viewer 1010",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Drama"
-            ],
-            "hit": true,
-            "movieId": 1193,
-            "neighbors": 61,
-            "popularityBand": "head",
-            "rankScore": 4.8595,
-            "ratingEstimate": 4.859,
-            "scoreWasClipped": false,
-            "similarityWeight": 9.2329,
-            "title": "One Flew Over the Cuckoo's Nest (1975)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.263,
-                "residual": 1.513,
-                "similarity": 0.1823,
-                "source": "Viewer 1980",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.2618,
-                "residual": 1.901,
-                "similarity": 0.1444,
-                "source": "Viewer 5530",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.2597,
-                "residual": 1.818,
-                "similarity": 0.1498,
+                "contribution": 0.148,
+                "residual": 1.222,
+                "similarity": 0.0971,
                 "source": "Viewer 5636",
                 "sourceRating": 5.0
               }
@@ -3037,403 +3040,344 @@
               "Drama"
             ],
             "hit": false,
-            "movieId": 1131,
+            "movieId": 1228,
             "neighbors": 7,
-            "popularityBand": "long-tail",
-            "rankScore": 4.7848,
-            "ratingEstimate": 4.785,
+            "popularityBand": "head",
+            "rankScore": 4.4813,
+            "ratingEstimate": 4.481,
             "scoreWasClipped": false,
-            "similarityWeight": 1.0489,
-            "title": "Jean de Florette (1986)"
+            "secondaryScore": 4.1641,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.8019,
+            "title": "Raging Bull (1980)"
           },
           {
             "evidence": [
+              {
+                "contribution": 0.1586,
+                "residual": 1.567,
+                "similarity": 0.1392,
+                "source": "Viewer 3942",
+                "sourceRating": 5.0
+              },
               {
                 "contribution": 0.109,
-                "residual": 2.132,
-                "similarity": 0.196,
-                "source": "Viewer 1449",
+                "residual": 1.462,
+                "similarity": 0.1025,
+                "source": "Viewer 2010",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.1072,
-                "residual": 2.529,
-                "similarity": 0.1626,
-                "source": "Viewer 1010",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.0941,
-                "residual": 1.694,
-                "similarity": 0.2131,
-                "source": "Viewer 4543",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
-            "genres": [
-              "Drama"
-            ],
-            "hit": false,
-            "movieId": 3468,
-            "neighbors": 25,
-            "popularityBand": "head",
-            "rankScore": 4.7711,
-            "ratingEstimate": 4.771,
-            "scoreWasClipped": false,
-            "similarityWeight": 3.8358,
-            "title": "Hustler, The (1961)"
-          },
-          {
-            "evidence": [
-              {
-                "contribution": 0.0592,
-                "residual": 2.381,
-                "similarity": 0.2206,
-                "source": "Viewer 5367",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.0471,
-                "residual": 2.132,
-                "similarity": 0.196,
-                "source": "Viewer 1449",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.0464,
-                "residual": 2.529,
-                "similarity": 0.1626,
-                "source": "Viewer 1010",
+                "contribution": 0.1032,
+                "residual": 1.037,
+                "similarity": 0.1369,
+                "source": "Viewer 5397",
                 "sourceRating": 5.0
               }
             ],
             "fallback": false,
             "genres": [
               "Drama",
+              "War"
+            ],
+            "hit": false,
+            "movieId": 1208,
+            "neighbors": 12,
+            "popularityBand": "head",
+            "rankScore": 4.4523,
+            "ratingEstimate": 4.452,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.2337,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 1.3751,
+            "title": "Apocalypse Now (1979)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Film-Noir"
+            ],
+            "hit": false,
+            "movieId": 922,
+            "neighbors": 0,
+            "popularityBand": "head",
+            "rankScore": 4.4355,
+            "ratingEstimate": 4.435,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.4355,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.0,
+            "title": "Sunset Blvd. (a.k.a. Sunset Boulevard) (1950)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Drama",
+              "War"
+            ],
+            "hit": false,
+            "movieId": 1178,
+            "neighbors": 2,
+            "popularityBand": "long-tail",
+            "rankScore": 4.4068,
+            "ratingEstimate": 4.407,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.4068,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.0,
+            "title": "Paths of Glory (1957)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Mystery",
               "Thriller"
             ],
             "hit": false,
-            "movieId": 111,
-            "neighbors": 59,
+            "movieId": 1212,
+            "neighbors": 2,
             "popularityBand": "head",
-            "rankScore": 4.769,
-            "ratingEstimate": 4.769,
+            "rankScore": 4.4009,
+            "ratingEstimate": 4.401,
             "scoreWasClipped": false,
-            "similarityWeight": 8.8679,
-            "title": "Taxi Driver (1976)"
+            "secondaryScore": 4.4009,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.0,
+            "title": "Third Man, The (1949)"
           },
           {
-            "evidence": [
-              {
-                "contribution": 0.0691,
-                "residual": 1.694,
-                "similarity": 0.2131,
-                "source": "Viewer 4543",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.0653,
-                "residual": 1.97,
-                "similarity": 0.1733,
-                "source": "Viewer 5795",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.0612,
-                "residual": 1.684,
-                "similarity": 0.1899,
-                "source": "Viewer 3507",
-                "sourceRating": 5.0
-              }
-            ],
-            "fallback": false,
+            "evidence": [],
+            "fallback": true,
             "genres": [
-              "Adventure",
+              "Drama",
+              "Romance",
               "War"
             ],
             "hit": false,
-            "movieId": 1204,
-            "neighbors": 34,
+            "movieId": 912,
+            "neighbors": 4,
             "popularityBand": "head",
-            "rankScore": 4.7659,
-            "ratingEstimate": 4.766,
+            "rankScore": 4.3962,
+            "ratingEstimate": 4.396,
             "scoreWasClipped": false,
-            "similarityWeight": 5.2254,
-            "title": "Lawrence of Arabia (1962)"
+            "secondaryScore": 4.3962,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.0,
+            "title": "Casablanca (1942)"
+          },
+          {
+            "evidence": [],
+            "fallback": true,
+            "genres": [
+              "Crime",
+              "Film-Noir"
+            ],
+            "hit": false,
+            "movieId": 3435,
+            "neighbors": 3,
+            "popularityBand": "head",
+            "rankScore": 4.389,
+            "ratingEstimate": 4.389,
+            "scoreWasClipped": false,
+            "secondaryScore": 4.389,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 0.0,
+            "title": "Double Indemnity (1944)"
           },
           {
             "evidence": [
               {
-                "contribution": 0.111,
-                "residual": 2.381,
-                "similarity": 0.2206,
-                "source": "Viewer 5367",
+                "contribution": 0.1086,
+                "residual": 1.424,
+                "similarity": 0.1392,
+                "source": "Viewer 3942",
                 "sourceRating": 5.0
               },
               {
-                "contribution": 0.0869,
-                "residual": 2.529,
-                "similarity": 0.1626,
-                "source": "Viewer 1010",
-                "sourceRating": 5.0
-              },
-              {
-                "contribution": 0.083,
-                "residual": 2.483,
-                "similarity": 0.1582,
+                "contribution": 0.0741,
+                "residual": 1.319,
+                "similarity": 0.1025,
                 "source": "Viewer 2010",
+                "sourceRating": 5.0
+              },
+              {
+                "contribution": 0.067,
+                "residual": 0.894,
+                "similarity": 0.1369,
+                "source": "Viewer 5397",
                 "sourceRating": 5.0
               }
             ],
             "fallback": false,
             "genres": [
+              "Action",
               "Adventure",
-              "War"
+              "Fantasy",
+              "Sci-Fi"
             ],
             "hit": true,
-            "movieId": 1262,
-            "neighbors": 31,
+            "movieId": 260,
+            "neighbors": 16,
             "popularityBand": "head",
-            "rankScore": 4.7485,
-            "ratingEstimate": 4.749,
+            "rankScore": 4.3881,
+            "ratingEstimate": 4.388,
             "scoreWasClipped": false,
-            "similarityWeight": 4.7339,
-            "title": "Great Escape, The (1963)"
+            "secondaryScore": 4.445,
+            "secondaryScoreName": "bayesianPopularity",
+            "similarityWeight": 1.8254,
+            "title": "Star Wars: Episode IV - A New Hope (1977)"
           }
         ]
       },
       "relevantTest": [
         {
           "genres": [
-            "Comedy",
+            "Drama"
+          ],
+          "movieId": 2337,
+          "popularityBand": "long-tail",
+          "rating": 4.0,
+          "title": "Velvet Goldmine (1998)"
+        },
+        {
+          "genres": [
+            "Drama"
+          ],
+          "movieId": 428,
+          "popularityBand": "long-tail",
+          "rating": 4.0,
+          "title": "Bronx Tale, A (1993)"
+        },
+        {
+          "genres": [
+            "Crime",
+            "Drama"
+          ],
+          "movieId": 1466,
+          "popularityBand": "head",
+          "rating": 4.0,
+          "title": "Donnie Brasco (1997)"
+        },
+        {
+          "genres": [
+            "Drama"
+          ],
+          "movieId": 2329,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "American History X (1998)"
+        },
+        {
+          "genres": [
             "Drama",
-            "Musical"
-          ],
-          "movieId": 1288,
-          "popularityBand": "head",
-          "rating": 4.0,
-          "title": "This Is Spinal Tap (1984)"
-        },
-        {
-          "genres": [
-            "Animation",
-            "Children's",
-            "Musical"
-          ],
-          "movieId": 595,
-          "popularityBand": "head",
-          "rating": 4.0,
-          "title": "Beauty and the Beast (1991)"
-        },
-        {
-          "genres": [
-            "Adventure",
-            "Comedy",
-            "Sci-Fi"
-          ],
-          "movieId": 3175,
-          "popularityBand": "head",
-          "rating": 4.0,
-          "title": "Galaxy Quest (1999)"
-        },
-        {
-          "genres": [
-            "Action",
             "Thriller"
           ],
-          "movieId": 2763,
-          "popularityBand": "head",
-          "rating": 4.0,
-          "title": "Thomas Crown Affair, The (1999)"
-        },
-        {
-          "genres": [
-            "Drama"
-          ],
-          "movieId": 2682,
+          "movieId": 481,
           "popularityBand": "long-tail",
           "rating": 4.0,
-          "title": "Limbo (1999)"
+          "title": "Kalifornia (1993)"
         },
         {
           "genres": [
-            "Animation",
-            "Comedy"
-          ],
-          "movieId": 1148,
-          "popularityBand": "head",
-          "rating": 5.0,
-          "title": "Wrong Trousers, The (1993)"
-        },
-        {
-          "genres": [
-            "Comedy"
-          ],
-          "movieId": 1079,
-          "popularityBand": "head",
-          "rating": 4.0,
-          "title": "Fish Called Wanda, A (1988)"
-        },
-        {
-          "genres": [
-            "Comedy"
-          ],
-          "movieId": 3421,
-          "popularityBand": "head",
-          "rating": 5.0,
-          "title": "Animal House (1978)"
-        },
-        {
-          "genres": [
-            "Comedy"
-          ],
-          "movieId": 3039,
-          "popularityBand": "head",
-          "rating": 5.0,
-          "title": "Trading Places (1983)"
-        },
-        {
-          "genres": [
-            "Comedy",
-            "Romance"
-          ],
-          "movieId": 1265,
-          "popularityBand": "head",
-          "rating": 4.0,
-          "title": "Groundhog Day (1993)"
-        },
-        {
-          "genres": [
-            "Comedy"
-          ],
-          "movieId": 3608,
-          "popularityBand": "head",
-          "rating": 4.0,
-          "title": "Pee-wee's Big Adventure (1985)"
-        },
-        {
-          "genres": [
-            "Comedy"
-          ],
-          "movieId": 2736,
-          "popularityBand": "long-tail",
-          "rating": 4.0,
-          "title": "Brighton Beach Memoirs (1986)"
-        },
-        {
-          "genres": [
-            "Comedy"
-          ],
-          "movieId": 700,
-          "popularityBand": "long-tail",
-          "rating": 4.0,
-          "title": "Angus (1995)"
-        },
-        {
-          "genres": [
-            "Comedy",
             "Drama",
             "Romance"
           ],
-          "movieId": 3108,
+          "movieId": 1721,
           "popularityBand": "head",
           "rating": 4.0,
-          "title": "Fisher King, The (1991)"
+          "title": "Titanic (1997)"
         },
         {
           "genres": [
-            "Comedy"
+            "Drama",
+            "Horror"
           ],
-          "movieId": 2109,
+          "movieId": 253,
           "popularityBand": "head",
-          "rating": 5.0,
-          "title": "Jerk, The (1979)"
+          "rating": 4.0,
+          "title": "Interview with the Vampire (1994)"
         },
         {
           "genres": [
-            "Comedy"
+            "Drama",
+            "Horror"
           ],
-          "movieId": 216,
+          "movieId": 724,
           "popularityBand": "long-tail",
           "rating": 4.0,
-          "title": "Billy Madison (1995)"
+          "title": "Craft, The (1996)"
         },
         {
           "genres": [
-            "Comedy"
+            "Crime",
+            "Thriller"
           ],
-          "movieId": 2372,
+          "movieId": 50,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "Usual Suspects, The (1995)"
+        },
+        {
+          "genres": [
+            "Crime",
+            "Thriller"
+          ],
+          "movieId": 1089,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "Reservoir Dogs (1992)"
+        },
+        {
+          "genres": [
+            "Thriller"
+          ],
+          "movieId": 2762,
+          "popularityBand": "head",
+          "rating": 4.0,
+          "title": "Sixth Sense, The (1999)"
+        },
+        {
+          "genres": [
+            "Crime",
+            "Thriller"
+          ],
+          "movieId": 47,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "Seven (Se7en) (1995)"
+        },
+        {
+          "genres": [
+            "Horror",
+            "Thriller"
+          ],
+          "movieId": 1407,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "Scream (1996)"
+        },
+        {
+          "genres": [
+            "Film-Noir",
+            "Mystery",
+            "Thriller"
+          ],
+          "movieId": 1252,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "Chinatown (1974)"
+        },
+        {
+          "genres": [
+            "Crime"
+          ],
+          "movieId": 1034,
           "popularityBand": "long-tail",
-          "rating": 4.0,
-          "title": "Fletch Lives (1989)"
-        },
-        {
-          "genres": [
-            "Drama"
-          ],
-          "movieId": 1193,
-          "popularityBand": "head",
-          "rating": 4.0,
-          "title": "One Flew Over the Cuckoo's Nest (1975)"
-        },
-        {
-          "genres": [
-            "Drama"
-          ],
-          "movieId": 3098,
-          "popularityBand": "head",
-          "rating": 4.0,
-          "title": "Natural, The (1984)"
-        },
-        {
-          "genres": [
-            "Adventure",
-            "War"
-          ],
-          "movieId": 1262,
-          "popularityBand": "head",
           "rating": 5.0,
-          "title": "Great Escape, The (1963)"
-        },
-        {
-          "genres": [
-            "Animation",
-            "Children's",
-            "Comedy"
-          ],
-          "movieId": 3114,
-          "popularityBand": "head",
-          "rating": 5.0,
-          "title": "Toy Story 2 (1999)"
-        },
-        {
-          "genres": [
-            "Drama"
-          ],
-          "movieId": 1694,
-          "popularityBand": "head",
-          "rating": 4.0,
-          "title": "Apostle, The (1997)"
-        },
-        {
-          "genres": [
-            "Comedy",
-            "Drama"
-          ],
-          "movieId": 3897,
-          "popularityBand": "head",
-          "rating": 5.0,
-          "title": "Almost Famous (2000)"
-        },
-        {
-          "genres": [
-            "Drama"
-          ],
-          "movieId": 529,
-          "popularityBand": "head",
-          "rating": 5.0,
-          "title": "Searching for Bobby Fischer (1993)"
+          "title": "Freeway (1996)"
         },
         {
           "genres": [
@@ -3441,15 +3385,78 @@
             "Crime",
             "Drama"
           ],
-          "movieId": 2912,
+          "movieId": 1221,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "Godfather: Part II, The (1974)"
+        },
+        {
+          "genres": [
+            "Action",
+            "Crime",
+            "Sci-Fi"
+          ],
+          "movieId": 2985,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "Robocop (1987)"
+        },
+        {
+          "genres": [
+            "Film-Noir",
+            "Sci-Fi"
+          ],
+          "movieId": 541,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "Blade Runner (1982)"
+        },
+        {
+          "genres": [
+            "Action",
+            "Adventure",
+            "Fantasy",
+            "Sci-Fi"
+          ],
+          "movieId": 260,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "Star Wars: Episode IV - A New Hope (1977)"
+        },
+        {
+          "genres": [
+            "Sci-Fi"
+          ],
+          "movieId": 1199,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "Brazil (1985)"
+        },
+        {
+          "genres": [
+            "Sci-Fi"
+          ],
+          "movieId": 1206,
+          "popularityBand": "head",
+          "rating": 5.0,
+          "title": "Clockwork Orange, A (1971)"
+        },
+        {
+          "genres": [
+            "Action",
+            "Sci-Fi",
+            "Thriller"
+          ],
+          "movieId": 1240,
           "popularityBand": "head",
           "rating": 4.0,
-          "title": "Limey, The (1999)"
+          "title": "Terminator, The (1984)"
         }
       ],
-      "user": "Viewer 392",
-      "userId": 392
+      "relevantTestTotal": 22,
+      "user": "Viewer 1356",
+      "userId": 1356
     }
   ],
-  "version": "movielens-samples-v2"
+  "version": "movielens-samples-v4"
 }

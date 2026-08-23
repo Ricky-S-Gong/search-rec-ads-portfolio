@@ -3,8 +3,8 @@
   "candidatePolicy": "Full fitted catalog minus seen movies",
   "dataset": "MovieLens 1M",
   "datasetUrl": "https://grouplens.org/datasets/movielens/1m/",
-  "experimentCodeVersion": "movielens-cf-v3",
-  "generatedAtUtc": "2026-08-18T01:05:43+00:00",
+  "experimentCodeVersion": "movielens-cf-v4",
+  "generatedAtUtc": "2026-08-23T02:39:04+00:00",
   "k": 10,
   "profile": {
     "density": 0.044684,
@@ -147,8 +147,8 @@
     "compute": "CPU",
     "numpy": "2.5.1",
     "pandas": "3.0.5",
-    "platform": "macOS-26.5.2-arm64-arm-64bit",
-    "python": "3.12.12",
+    "platform": "macOS-13.0-arm64-arm-64bit",
+    "python": "3.12.13",
     "scikitLearn": "1.9.0",
     "scipy": "1.18.0",
     "timingContext": "One single-process offline batch over the full ranking cohort; recommendSeconds includes candidate scoring, seen-item removal, and Top-10 selection, but excludes fitting, data loading, and artifact writing. BLAS thread count was not forced."
@@ -161,5 +161,5 @@
     "trainRatings": 797758,
     "validationRatings": 99692
   },
-  "version": "movielens-cf-v3"
+  "version": "movielens-cf-v4"
 }

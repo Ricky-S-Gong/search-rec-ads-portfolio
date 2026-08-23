@@ -3,22 +3,22 @@
   "baselines": {
     "bayesianPopularity": {
       "beyondAccuracy": {
-        "catalog_coverage": 0.020906869399945696,
-        "long_tail_share": 0.0411340206185567,
-        "novelty": 9.762310870901947
+        "catalog_coverage": 0.027694814010317675,
+        "long_tail_share": 0.0013573883161512028,
+        "novelty": 9.47447255600681
       },
       "confidence95": {
         "hitRateAt10": [
-          0.1438144329896907,
-          0.16151202749140894
+          0.16906786941580756,
+          0.18883591065292096
         ],
         "ndcgAt10": [
-          0.024805113257160043,
-          0.028757103100805946
+          0.03118156130835218,
+          0.03577237355268149
         ],
         "recallAt10": [
-          0.020555205389785454,
-          0.024413107108684523
+          0.024769650648710104,
+          0.02908776002239878
         ]
       },
       "examples": [
@@ -26,7 +26,7 @@
           "movieId": 578,
           "ratingCount": 1,
           "ratingMean": 5.0,
-          "score": 3.6542490812448354,
+          "score": 3.61427628167785,
           "support": "low",
           "title": "Hour of the Pig, The (1993)"
         },
@@ -34,19 +34,81 @@
           "movieId": 2858,
           "ratingCount": 3279,
           "ratingMean": 4.32845401763916,
-          "score": 4.322945278435585,
+          "score": 4.306908146874303,
           "support": "high",
           "title": "American Beauty (1999)"
         }
       ],
       "globalMean": 3.600419044494629,
-      "priorWeight": 25.0,
+      "priorWeight": 100.0,
+      "selection": {
+        "primaryMetric": "ndcg_at_10",
+        "reason": "Selected on validation only from prior_weight={10,25,50,100}."
+      },
       "test": {
-        "hit_rate_at_10": 0.1527491408934708,
-        "ndcg_at_10": 0.026763659448595423,
-        "recall_at_10": 0.022470338645343507,
+        "hit_rate_at_10": 0.17920962199312715,
+        "ndcg_at_10": 0.033553382763589566,
+        "recall_at_10": 0.026891847793951002,
         "users": 5820
-      }
+      },
+      "validationCandidates": [
+        {
+          "beyondAccuracy": {
+            "catalog_coverage": 0.024270520861739843,
+            "long_tail_share": 0.0004664017965106236,
+            "novelty": 9.394455424350914
+          },
+          "metrics": {
+            "hit_rate_at_10": 0.1761962342373467,
+            "ndcg_at_10": 0.03565827741978648,
+            "recall_at_10": 0.03023533574408728,
+            "users": 5789
+          },
+          "priorWeight": 100.0
+        },
+        {
+          "beyondAccuracy": {
+            "catalog_coverage": 0.02290700845377693,
+            "long_tail_share": 0.002090171013992054,
+            "novelty": 9.526394437484809
+          },
+          "metrics": {
+            "hit_rate_at_10": 0.16669545690101917,
+            "ndcg_at_10": 0.032315991266249545,
+            "recall_at_10": 0.027719059848116772,
+            "users": 5789
+          },
+          "priorWeight": 50.0
+        },
+        {
+          "beyondAccuracy": {
+            "catalog_coverage": 0.020452686119443685,
+            "long_tail_share": 0.012523751943340818,
+            "novelty": 9.640109510326985
+          },
+          "metrics": {
+            "hit_rate_at_10": 0.15702193815857662,
+            "ndcg_at_10": 0.028741288478178303,
+            "recall_at_10": 0.025451572370154524,
+            "users": 5789
+          },
+          "priorWeight": 25.0
+        },
+        {
+          "beyondAccuracy": {
+            "catalog_coverage": 0.018816471229888193,
+            "long_tail_share": 0.13390913802038348,
+            "novelty": 10.204431531102216
+          },
+          "metrics": {
+            "hit_rate_at_10": 0.13646571083088616,
+            "ndcg_at_10": 0.02284395568962029,
+            "recall_at_10": 0.020863550018571337,
+            "users": 5789
+          },
+          "priorWeight": 10.0
+        }
+      ]
     },
     "biasRating": {
       "mae": 0.7275964255199722,
@@ -58,39 +120,158 @@
   "dataset": "MovieLens 1M",
   "datasetUrl": "https://grouplens.org/datasets/movielens/1m/",
   "diagnostics": {
+    "legacyV3": [
+      {
+        "algorithmVariant": "mean_centered",
+        "beyondAccuracy": {
+          "catalog_coverage": 0.2747759978278577,
+          "long_tail_share": 0.4201202749140893,
+          "novelty": 10.850931616106356
+        },
+        "hyperparameters": {
+          "k": 80,
+          "min_neighbors": 5,
+          "min_support": 10,
+          "shrinkage": 50.0
+        },
+        "key": "user-cf",
+        "system": {
+          "fallbackShare": 0.06032646048109966,
+          "fitSeconds": 5.371496624953579,
+          "neighborArtifactMiB": 3.6821861267089844,
+          "rankingTieStats": {
+            "entriesInExactTieShare": 0.0004571303187112582,
+            "fullyTiedListShare": 0.00017562346329469617,
+            "largestTieGroup": 4,
+            "lists": 5694
+          },
+          "recommendSeconds": 2.279443999985233,
+          "retainedNeighbors": 479611,
+          "top10ClippedShare": 0.44952367020790285,
+          "top10RawAboveRatingMaxShare": 0.44952367020790285,
+          "usersPerSecond": 2553.254214640809
+        },
+        "test": {
+          "hit_rate_at_10": 0.1393470790378007,
+          "ndcg_at_10": 0.02367923541518817,
+          "recall_at_10": 0.02098886839258822,
+          "users": 5820
+        }
+      },
+      {
+        "algorithmVariant": "mean_centered",
+        "beyondAccuracy": {
+          "catalog_coverage": 0.737170784686397,
+          "long_tail_share": 0.5689347079037801,
+          "novelty": 12.274109234371032
+        },
+        "hyperparameters": {
+          "k": 20,
+          "min_neighbors": 2,
+          "min_support": 5,
+          "shrinkage": 10.0
+        },
+        "key": "item-cf",
+        "system": {
+          "fallbackShare": 0.02281786941580756,
+          "fitSeconds": 2.809074832999613,
+          "neighborArtifactMiB": 0.5184860229492188,
+          "rankingTieStats": {
+            "entriesInExactTieShare": 0.8757736671824448,
+            "fullyTiedListShare": 0.7796200345423143,
+            "largestTieGroup": 10,
+            "lists": 5790
+          },
+          "recommendSeconds": 1.2967362919589505,
+          "retainedNeighbors": 66117,
+          "top10ClippedShare": 0.00010550007033338022,
+          "top10FiveStarOnlyEvidenceShare": 0.8786045857363904,
+          "top10RawAboveRatingMaxShare": 0.00010550007033338022,
+          "usersPerSecond": 4488.190880512688
+        },
+        "test": {
+          "hit_rate_at_10": 0.06666666666666667,
+          "ndcg_at_10": 0.010565746224341244,
+          "recall_at_10": 0.01252397457203965,
+          "users": 5820
+        }
+      }
+    ],
     "pairedUserCfMinusPopularity": {
       "hitRateAt10": {
         "confidence95": [
-          -0.022336769759450172,
-          -0.004467353951890034
+          0.0292053264604811,
+          0.0506872852233677
         ],
-        "meanDifference": -0.013402061855670102,
+        "meanDifference": 0.04020618556701031,
         "users": 5820
       },
       "ndcgAt10": {
         "confidence95": [
-          -0.004796458515707379,
-          -0.0012535056833216662
+          0.0033269771501033977,
+          0.007976478523455824
         ],
-        "meanDifference": -0.0030844240334072528,
+        "meanDifference": 0.005687276493912306,
         "users": 5820
       },
       "recallAt10": {
         "confidence95": [
-          -0.0034243391479636368,
-          0.0005196508469063929
+          0.004848745576903036,
+          0.01042038134656374
         ],
-        "meanDifference": -0.0014814702527552882,
+        "meanDifference": 0.007669015436949172,
         "users": 5820
       }
     },
     "rankingCorrection": "Top-N uses raw neighborhood estimates; rating RMSE/MAE uses estimates clipped to [1, 5].",
     "relevantItemHeadConcentration": {
       "definition": "Movies ranked by train+validation interaction count; head is the top 20% of fitted catalog items; denominator is relevant test ratings for the ranking cohort.",
-      "relevantTestRatings": 53025,
-      "top10PercentShare": 0.41934936350777935,
-      "top20PercentShare": 0.6306459217350306
-    }
+      "relevantTestRatings": 53016,
+      "top10PercentShare": 0.4194205522861023,
+      "top20PercentShare": 0.6307529802323827
+    },
+    "secondaryOrderingValidation": [
+      {
+        "beyondAccuracy": {
+          "catalog_coverage": 0.4341423506953913,
+          "long_tail_share": 0.12423561927794093,
+          "novelty": 10.017279155701269
+        },
+        "metrics": {
+          "hit_rate_at_10": 0.22059077560891346,
+          "ndcg_at_10": 0.04191901398821543,
+          "recall_at_10": 0.03634157317105193,
+          "users": 5789
+        },
+        "ordering": "none",
+        "rankingTieStats": {
+          "entriesInExactTieShare": 0.0,
+          "fullyTiedListShare": 0.0,
+          "largestTieGroup": 1,
+          "lists": 4362
+        }
+      },
+      {
+        "beyondAccuracy": {
+          "catalog_coverage": 0.4341423506953913,
+          "long_tail_share": 0.12423561927794093,
+          "novelty": 10.017279155701269
+        },
+        "metrics": {
+          "hit_rate_at_10": 0.22059077560891346,
+          "ndcg_at_10": 0.04191901398821543,
+          "recall_at_10": 0.03634157317105193,
+          "users": 5789
+        },
+        "ordering": "bayesian",
+        "rankingTieStats": {
+          "entriesInExactTieShare": 0.0,
+          "fullyTiedListShare": 0.0,
+          "largestTieGroup": 1,
+          "lists": 4362
+        }
+      }
+    ]
   },
   "evaluationPopulation": {
     "fittedCatalogMovies": 3683,
@@ -98,127 +279,140 @@
     "testRatings": 102759,
     "trainingRatings": 897450
   },
-  "experimentCodeVersion": "movielens-cf-v3",
-  "generatedAtUtc": "2026-08-18T01:05:43+00:00",
+  "experimentCodeVersion": "movielens-cf-v4",
+  "generatedAtUtc": "2026-08-23T02:39:04+00:00",
   "k": 10,
   "metricCaveat": "Offline explicit-rating results; they do not measure CTR, watch time, retention, revenue, or causal lift.",
   "models": [
     {
+      "algorithmVariant": "bias_aware",
       "beyondAccuracy": {
-        "catalog_coverage": 0.2747759978278577,
-        "long_tail_share": 0.4201202749140893,
-        "novelty": 10.850931616106356
+        "catalog_coverage": 0.25495519956557156,
+        "long_tail_share": 0.05810996563573883,
+        "novelty": 9.72049211264902
       },
       "confidence95": {
         "hitRateAt10": [
-          0.13092353951890034,
-          0.1479381443298969
+          0.20893041237113402,
+          0.22955756013745704
         ],
         "ndcgAt10": [
-          0.021916216373674195,
-          0.025583977415813516
+          0.036982918614939984,
+          0.04167218645485698
         ],
         "recallAt10": [
-          0.018994201440393065,
-          0.02299346183378501
+          0.032049482343164924,
+          0.037177370208151955
         ]
       },
       "hyperparameters": {
-        "k": 80,
+        "k": 20,
         "min_neighbors": 5,
-        "min_support": 10,
-        "shrinkage": 50.0
+        "min_support": 5,
+        "shrinkage": 10.0
       },
       "key": "user-cf",
       "label": "User-CF",
       "mode": "user",
       "rating": {
         "coverage": 0.9997080547689253,
-        "mae": 0.7206060777810352,
+        "mae": 0.7687832774634475,
         "ratings": 102729,
-        "rmse": 0.931312861568884
+        "rmse": 0.9732418446939128
       },
+      "secondaryOrdering": "Bayesian popularity, then evidence strength, then movie ID",
       "segments": [
         {
-          "hitRateAt10": 0.06941580756013746,
-          "ndcgAt10": 0.016906492533784897,
-          "recallAt10": 0.028751431844215348,
+          "hitRateAt10": 0.10240549828178694,
+          "ndcgAt10": 0.02786453568745366,
+          "recallAt10": 0.043688430698739976,
           "segment": "sparse",
           "trainingRatingsMedian": 27.0,
           "users": 1455
         },
         {
-          "hitRateAt10": 0.08109965635738832,
-          "ndcgAt10": 0.012904545562469939,
-          "recallAt10": 0.017497954508263785,
+          "hitRateAt10": 0.15532646048109966,
+          "ndcgAt10": 0.027001491278396166,
+          "recallAt10": 0.03387088856161021,
           "segment": "light",
           "trainingRatingsMedian": 60.0,
           "users": 1455
         },
         {
-          "hitRateAt10": 0.12852233676975944,
-          "ndcgAt10": 0.020806731585795248,
-          "recallAt10": 0.019325153312577906,
+          "hitRateAt10": 0.22268041237113403,
+          "ndcgAt10": 0.0330519240569888,
+          "recallAt10": 0.031134409835775895,
           "segment": "active",
           "trainingRatingsMedian": 127.0,
           "users": 1455
         },
         {
-          "hitRateAt10": 0.27835051546391754,
-          "ndcgAt10": 0.04409917197870261,
-          "recallAt10": 0.01838093390529584,
+          "hitRateAt10": 0.3972508591065292,
+          "ndcgAt10": 0.06904468600716886,
+          "recallAt10": 0.02954972382747463,
           "segment": "power",
           "trainingRatingsMedian": 320.0,
           "users": 1455
         }
       ],
-      "similarity": "Mean-centered cosine",
+      "selection": {
+        "primaryMetric": "ndcg_at_10",
+        "reason": "Best validation result under the predeclared lexicographic rule.",
+        "tieBreakOrder": [
+          "recall_at_10",
+          "hit_rate_at_10",
+          "fullyTiedListShare",
+          "catalog_coverage"
+        ]
+      },
+      "similarity": "Baseline-residual cosine",
       "system": {
-        "fallbackShare": 0.06032646048109966,
-        "fitSeconds": 5.129637542006094,
-        "neighborArtifactMiB": 3.6821861267089844,
+        "fallbackShare": 0.20235395189003436,
+        "fitSeconds": 5.535090250021312,
+        "neighborArtifactMiB": 0.9446754455566406,
         "rankingTieStats": {
-          "entriesInExactTieShare": 0.0004571303187112582,
-          "fullyTiedListShare": 0.00017562346329469617,
-          "largestTieGroup": 4,
-          "lists": 5694
+          "entriesInExactTieShare": 0.0,
+          "fullyTiedListShare": 0.0,
+          "largestTieGroup": 1,
+          "lists": 5584
         },
-        "recommendSeconds": 2.2069052500010002,
-        "retainedNeighbors": 479611,
-        "top10ClippedShare": 0.44952367020790285,
-        "top10RawAboveRatingMaxShare": 0.44952367020790285,
-        "usersPerSecond": 2637.1771058124777
+        "recommendSeconds": 2.838481666985899,
+        "retainedNeighbors": 120800,
+        "top10ClippedShare": 0.25657540443314736,
+        "top10RawAboveRatingMaxShare": 0.25657540443314736,
+        "usersPerSecond": 2050.391964017893
       },
       "test": {
-        "hit_rate_at_10": 0.1393470790378007,
-        "ndcg_at_10": 0.02367923541518817,
-        "recall_at_10": 0.02098886839258822,
+        "hit_rate_at_10": 0.21941580756013745,
+        "ndcg_at_10": 0.03924065925750187,
+        "recall_at_10": 0.03456086323090018,
         "users": 5820
       }
     },
     {
+      "algorithmVariant": "bias_aware",
       "beyondAccuracy": {
-        "catalog_coverage": 0.737170784686397,
-        "long_tail_share": 0.5689347079037801,
-        "novelty": 12.274109234371032
+        "catalog_coverage": 0.43334238392614716,
+        "long_tail_share": 0.13819587628865979,
+        "novelty": 10.102454003508484
       },
       "confidence95": {
         "hitRateAt10": [
-          0.06047680412371134,
-          0.07320017182130584
+          0.21082044673539518,
+          0.2316151202749141
         ],
         "ndcgAt10": [
-          0.009400512107528151,
-          0.01191019093868861
+          0.039065010996497035,
+          0.04397262329194701
         ],
         "recallAt10": [
-          0.01101660184396661,
-          0.01430132593607678
+          0.031904372645894775,
+          0.036229799281584686
         ]
       },
       "hyperparameters": {
         "k": 20,
-        "min_neighbors": 2,
+        "min_neighbors": 5,
         "min_support": 5,
         "shrinkage": 10.0
       },
@@ -227,82 +421,121 @@
       "mode": "item",
       "rating": {
         "coverage": 0.9997080547689253,
-        "mae": 0.744480216279562,
+        "mae": 0.7452998713354162,
         "ratings": 102729,
-        "rmse": 0.9652141249082046
+        "rmse": 0.9485096690819743
       },
+      "secondaryOrdering": "Bayesian popularity, then evidence strength, then movie ID",
       "segments": [
         {
-          "hitRateAt10": 0.06323024054982818,
-          "ndcgAt10": 0.01448741535658204,
-          "recallAt10": 0.02487972508591065,
+          "hitRateAt10": 0.07835051546391752,
+          "ndcgAt10": 0.023003206271998804,
+          "recallAt10": 0.02916380297823597,
           "segment": "sparse",
           "trainingRatingsMedian": 27.0,
           "users": 1455
         },
         {
-          "hitRateAt10": 0.061168384879725084,
-          "ndcgAt10": 0.010316449889268477,
-          "recallAt10": 0.0139049800905471,
+          "hitRateAt10": 0.1725085910652921,
+          "ndcgAt10": 0.03504152439413064,
+          "recallAt10": 0.04042873506791033,
           "segment": "light",
           "trainingRatingsMedian": 60.0,
           "users": 1455
         },
         {
-          "hitRateAt10": 0.05429553264604811,
-          "ndcgAt10": 0.006584514205072588,
-          "recallAt10": 0.006411547204451995,
+          "hitRateAt10": 0.2584192439862543,
+          "ndcgAt10": 0.041545028325710304,
+          "recallAt10": 0.03700060913012941,
           "segment": "active",
           "trainingRatingsMedian": 127.0,
           "users": 1455
         },
         {
-          "hitRateAt10": 0.0879725085910653,
-          "ndcgAt10": 0.010874605446441869,
-          "recallAt10": 0.0048996459072488474,
+          "hitRateAt10": 0.37731958762886597,
+          "ndcgAt10": 0.06687598017957268,
+          "recallAt10": 0.03025829447487208,
           "segment": "power",
           "trainingRatingsMedian": 320.0,
           "users": 1455
         }
       ],
-      "similarity": "Adjusted cosine",
+      "selection": {
+        "primaryMetric": "ndcg_at_10",
+        "reason": "Best validation result under the predeclared lexicographic rule.",
+        "tieBreakOrder": [
+          "recall_at_10",
+          "hit_rate_at_10",
+          "fullyTiedListShare",
+          "catalog_coverage"
+        ]
+      },
+      "similarity": "Baseline-residual cosine",
       "system": {
-        "fallbackShare": 0.02281786941580756,
-        "fitSeconds": 2.263160667003831,
-        "neighborArtifactMiB": 0.5184860229492188,
+        "fallbackShare": 0.4800687285223368,
+        "fitSeconds": 2.84479200001806,
+        "neighborArtifactMiB": 0.5192794799804688,
         "rankingTieStats": {
-          "entriesInExactTieShare": 0.8757736671824448,
-          "fullyTiedListShare": 0.7796200345423143,
-          "largestTieGroup": 10,
-          "lists": 5790
+          "entriesInExactTieShare": 0.0,
+          "fullyTiedListShare": 0.0,
+          "largestTieGroup": 1,
+          "lists": 4577
         },
-        "recommendSeconds": 1.3077038330084179,
-        "retainedNeighbors": 66117,
-        "top10ClippedShare": 0.00010550007033338022,
-        "top10FiveStarOnlyEvidenceShare": 0.8786045857363904,
-        "top10RawAboveRatingMaxShare": 0.00010550007033338022,
-        "usersPerSecond": 4450.549010482663
+        "recommendSeconds": 2.9085117499926127,
+        "retainedNeighbors": 66221,
+        "top10ClippedShare": 0.1812293456708526,
+        "top10FiveStarOnlyEvidenceShare": 0.1546265697290152,
+        "top10RawAboveRatingMaxShare": 0.1812293456708526,
+        "usersPerSecond": 2001.023375619776
       },
       "test": {
-        "hit_rate_at_10": 0.06666666666666667,
-        "ndcg_at_10": 0.010565746224341244,
-        "recall_at_10": 0.01252397457203965,
+        "hit_rate_at_10": 0.22164948453608246,
+        "ndcg_at_10": 0.04161643479285311,
+        "recall_at_10": 0.03421286041278695,
         "users": 5820
       }
     }
   ],
+  "postHocLimitation": "This v4 model iteration was motivated by tie failures already observed in the v3 test results. Hyperparameters remain validation-only, but the iteration is post-hoc rather than a fully untouched confirmatory experiment.",
   "relevance": "rating >= 4",
   "runtime": {
     "compute": "CPU",
     "numpy": "2.5.1",
     "pandas": "3.0.5",
-    "platform": "macOS-26.5.2-arm64-arm-64bit",
-    "python": "3.12.12",
+    "platform": "macOS-13.0-arm64-arm-64bit",
+    "python": "3.12.13",
     "scikitLearn": "1.9.0",
     "scipy": "1.18.0",
     "timingContext": "One single-process offline batch over the full ranking cohort; recommendSeconds includes candidate scoring, seen-item removal, and Top-10 selection, but excludes fitting, data loading, and artifact writing. BLAS thread count was not forced."
   },
   "seed": 42,
+  "sensitivity": {
+    "ratingAtLeast5": {
+      "methods": {
+        "item-cf": {
+          "hit_rate_at_10": 0.2063282794990112,
+          "ndcg_at_10": 0.05098586381733223,
+          "recall_at_10": 0.06436507445001952,
+          "users": 4551
+        },
+        "popularity": {
+          "hit_rate_at_10": 0.16348055372445616,
+          "ndcg_at_10": 0.03850250818372192,
+          "recall_at_10": 0.04794768104653833,
+          "users": 4551
+        },
+        "user-cf": {
+          "hit_rate_at_10": 0.1962206108547572,
+          "ndcg_at_10": 0.0443564958132026,
+          "recall_at_10": 0.05984449707414407,
+          "users": 4551
+        }
+      },
+      "population": 4551,
+      "readOnly": true,
+      "selectionUse": "None; this threshold never selects a model or replaces the main rating>=4 protocol."
+    }
+  },
   "split": "Per-user temporal 80/10/10; refit train+validation for final test",
   "splitCounts": {
     "fittedRatings": 897450,
@@ -310,5 +543,5 @@
     "trainRatings": 797758,
     "validationRatings": 99692
   },
-  "version": "movielens-cf-v3"
+  "version": "movielens-cf-v4"
 }

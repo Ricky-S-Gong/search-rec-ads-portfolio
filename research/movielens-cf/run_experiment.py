@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import itertools
 import platform
 import time
 from datetime import UTC, datetime
@@ -22,6 +23,7 @@ from movielens_cf.evaluation import (
     ranking_metrics,
     ranking_tie_stats,
     rating_metrics,
+    relevant_truth,
     recommendation_stats,
     user_bootstrap_interval,
 )
@@ -32,22 +34,15 @@ from movielens_cf.split import per_user_temporal_split
 SEED = 42
 K = 10
 RELEVANCE = 4.0
-CANDIDATES = [
-    {"k": 20, "min_support": 5, "shrinkage": 10.0, "min_neighbors": 2},
-    {"k": 40, "min_support": 5, "shrinkage": 25.0, "min_neighbors": 2},
-    {"k": 80, "min_support": 10, "shrinkage": 50.0, "min_neighbors": 5},
-]
-
-
-def relevant_truth(holdout: pd.DataFrame, catalog: set[int]) -> dict[int, set[int]]:
-    relevant = holdout.loc[
-        (holdout["rating"] >= RELEVANCE) & holdout["movie_id"].isin(catalog)
-    ]
-    return {
-        int(user_id): set(group["movie_id"].astype(int))
-        for user_id, group in relevant.groupby("user_id", observed=True)
-        if len(group)
-    }
+K_VALUES = (20, 40, 80)
+MIN_SUPPORT_VALUES = (5, 10, 20)
+SHRINKAGE_VALUES = (10.0, 25.0, 50.0)
+MIN_NEIGHBOR_VALUES = (2, 5)
+PRIOR_WEIGHTS = (10.0, 25.0, 50.0, 100.0)
+LEGACY_V3_PARAMS = {
+    "user": {"k": 80, "min_support": 10, "shrinkage": 50.0, "min_neighbors": 5},
+    "item": {"k": 20, "min_support": 5, "shrinkage": 10.0, "min_neighbors": 2},
+}
 
 
 def recommendation_ids(values: dict) -> dict[int, list[int]]:
@@ -71,12 +66,23 @@ def popularity_recommendations(
 
 
 def evaluate_configuration(
-    fitted: pd.DataFrame, holdout: pd.DataFrame, mode: str, params: dict
+    fitted: pd.DataFrame,
+    holdout: pd.DataFrame,
+    mode: str,
+    params: dict,
+    variant: str = "bias_aware",
+    secondary_ordering: str = "bayesian",
 ) -> tuple[NeighborhoodCF, dict, pd.DataFrame, dict[int, list[int]], dict]:
     started = time.perf_counter()
-    model = NeighborhoodCF(mode=mode, block_size=384, **params).fit(fitted)
+    model = NeighborhoodCF(
+        mode=mode,
+        variant=variant,
+        secondary_ordering=secondary_ordering,
+        block_size=384,
+        **params,
+    ).fit(fitted)
     fit_seconds = time.perf_counter() - started
-    truth = relevant_truth(holdout, set(model.movie_ids.astype(int)))
+    truth = relevant_truth(holdout, set(model.movie_ids.astype(int)), threshold=RELEVANCE)
     started = time.perf_counter()
     detailed = model.recommend_many(list(truth), n=K)
     recommend_seconds = time.perf_counter() - started
@@ -216,15 +222,15 @@ def sample_payload(
         if model.mode == "user":
             mask = model.binary[neighbors.indices, item].toarray().ravel() > 0
             indices, weights = neighbors.indices[mask], neighbors.data[mask]
-            residuals = model.centered[indices, item].toarray().ravel()
+            residuals = model.residual_matrix[indices, item].toarray().ravel()
             labels = [f"Viewer {int(model.user_ids[index])}" for index in indices]
-            source_ratings = residuals + model.user_means[indices]
+            source_ratings = model.ratings[indices, item].toarray().ravel()
         else:
             mask = model.binary[user, neighbors.indices].toarray().ravel() > 0
             indices, weights = neighbors.indices[mask], neighbors.data[mask]
-            residuals = model.centered[user, indices].toarray().ravel()
+            residuals = model.residual_matrix[user, indices].toarray().ravel()
             labels = [title.get(int(model.movie_ids[index]), str(model.movie_ids[index])) for index in indices]
-            source_ratings = residuals + model.user_means[user]
+            source_ratings = model.ratings[user, indices].toarray().ravel()
         denominator = float(np.abs(weights).sum())
         contributions = weights * residuals / denominator if denominator else np.zeros_like(weights)
         order = np.lexsort((np.asarray(labels), -np.abs(contributions)))[:3]
@@ -249,6 +255,8 @@ def sample_payload(
             scoreWasClipped=bool(recommendation.ranking_score != recommendation.rating_estimate),
             neighbors=int(recommendation.neighbor_count),
             fallback=bool(recommendation.used_fallback),
+            secondaryScore=round(float(recommendation.secondary_score), 4),
+            secondaryScoreName=recommendation.secondary_score_name,
             hit=movie_id in truth[user_id],
             evidence=[] if recommendation.used_fallback else evidence(model, user_id, movie_id),
         )
@@ -266,6 +274,7 @@ def sample_payload(
                 "userId": user_id,
                 "user": f"Viewer {user_id}",
                 "activity": int(activity.loc[user_id]),
+                "historyTotal": int(activity.loc[user_id]),
                 "history": [
                     movie_payload(int(row.movie_id), rating=float(row.rating))
                     for row in history.itertuples(index=False)
@@ -274,6 +283,7 @@ def sample_payload(
                     movie_payload(int(row.movie_id), rating=float(row.rating))
                     for row in relevant.itertuples(index=False)
                 ],
+                "relevantTestTotal": int(len(relevant)),
                 "methods": {
                     "popularity": [
                         movie_payload(
@@ -322,7 +332,7 @@ def sample_payload(
                 ],
             }
         )
-    return {"version": "movielens-samples-v2", "users": examples, "relatedItems": related}
+    return {"version": "movielens-samples-v4", "users": examples, "relatedItems": related}
 
 
 def make_figures(profile: dict, models: list[dict], fitted: pd.DataFrame, output: Path) -> None:
@@ -359,28 +369,6 @@ def make_figures(profile: dict, models: list[dict], fitted: pd.DataFrame, output
     ax.set_ylabel("Ratings (log scale)"); ax.spines[["top", "right"]].set_visible(False)
     fig.tight_layout(); save_svg(fig, output / "popularity-long-tail.svg"); plt.close(fig)
 
-    fig, axes = plt.subplots(1, 3, figsize=(12, 3.6), facecolor="#07111f")
-    for ax in axes:
-        ax.set_facecolor("#07111f")
-        ax.tick_params(colors="#9cb0c8", labelsize=8)
-        ax.spines[["top", "right"]].set_visible(False)
-    distribution = profile["ratingDistribution"]
-    rating_labels = sorted(distribution, key=int)
-    axes[0].bar(rating_labels, [distribution[label]["share"] for label in rating_labels], color="#35d0e2")
-    axes[0].set_title("Rating distribution", color="#edf5ff")
-    axes[0].set_ylabel("Share of ratings", color="#9cb0c8")
-    axes[1].hist(fitted.groupby("user_id", observed=True).size(), bins=35, color="#a78bfa")
-    axes[1].set_title("Ratings per user", color="#edf5ff")
-    axes[1].set_xlabel("Training interactions", color="#9cb0c8")
-    axes[2].hist(fitted.groupby("movie_id", observed=True).size(), bins=35, color="#f7b955")
-    axes[2].set_yscale("log")
-    axes[2].set_title("Ratings per movie", color="#edf5ff")
-    axes[2].set_xlabel("Training interactions", color="#9cb0c8")
-    fig.tight_layout()
-    save_svg(fig, output / "eda-overview.svg")
-    plt.close(fig)
-
-
 def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
     output.mkdir(parents=True, exist_ok=True)
     ratings, movies = load_movielens(data_dir)
@@ -391,14 +379,141 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
     train, validation, test = per_user_temporal_split(ratings)
     validation_results = []
     selected = {}
+    selection_details = {}
+    train_item_counts = train.groupby("movie_id", observed=True).size()
+
+    def candidate_sort_key(value: dict) -> tuple:
+        metrics = value["metrics"]
+        ties = value["system"]["rankingTieStats"]
+        return (
+            -metrics["ndcg_at_10"],
+            -metrics["recall_at_10"],
+            -metrics["hit_rate_at_10"],
+            ties["fullyTiedListShare"],
+            -value["beyondAccuracy"]["catalog_coverage"],
+            value["system"]["fitSeconds"],
+        )
+
     for mode in ("user", "item"):
-        candidates = []
-        for params in (CANDIDATES[:1] if smoke else CANDIDATES):
-            model, metrics, _, _, system = evaluate_configuration(train, validation, mode, params)
-            candidates.append({"params": params, "metrics": metrics, "system": system})
-        candidates.sort(key=lambda value: (-value["metrics"]["ndcg_at_10"], -value["metrics"]["recall_at_10"], value["system"]["fitSeconds"]))
+        stage_one_params = (
+            [LEGACY_V3_PARAMS[mode]]
+            if smoke
+            else [
+                {
+                    "k": k,
+                    "min_support": support,
+                    "shrinkage": shrinkage,
+                    "min_neighbors": 2,
+                }
+                for k, support, shrinkage in itertools.product(
+                    K_VALUES, MIN_SUPPORT_VALUES, SHRINKAGE_VALUES
+                )
+            ]
+        )
+        evaluated: dict[tuple, dict] = {}
+
+        def evaluate_candidate(params: dict, stage: str) -> dict:
+            key = tuple(params[name] for name in ("k", "min_support", "shrinkage", "min_neighbors"))
+            if key in evaluated:
+                return evaluated[key]
+            model, candidate_metrics, _, recommendations, system = evaluate_configuration(
+                train, validation, mode, params, variant="bias_aware"
+            )
+            record = {
+                "stage": stage,
+                "params": params,
+                "metrics": candidate_metrics,
+                "system": system,
+                "beyondAccuracy": recommendation_stats(
+                    recommendations, train_item_counts, len(model.movie_ids)
+                ),
+            }
+            evaluated[key] = record
+            return record
+
+        stage_one = [evaluate_candidate(params, "orthogonal-grid") for params in stage_one_params]
+        stage_one.sort(key=candidate_sort_key)
+        finalists = stage_one[:1] if smoke else stage_one[:3]
+        for finalist in finalists:
+            base = finalist["params"]
+            for min_neighbors in MIN_NEIGHBOR_VALUES:
+                evaluate_candidate(
+                    {**base, "min_neighbors": min_neighbors}, "min-neighbors-finalist"
+                )
+        candidates = sorted(evaluated.values(), key=candidate_sort_key)
         selected[mode] = candidates[0]["params"]
-        validation_results.append({"mode": mode, "candidates": candidates, "selected": selected[mode]})
+        selection_details[mode] = {
+            "primaryMetric": "ndcg_at_10",
+            "tieBreakOrder": [
+                "recall_at_10",
+                "hit_rate_at_10",
+                "fullyTiedListShare",
+                "catalog_coverage",
+            ],
+            "reason": "Best validation result under the predeclared lexicographic rule.",
+        }
+        validation_results.append(
+            {
+                "mode": mode,
+                "algorithmVariant": "bias_aware",
+                "searchProtocol": (
+                    "Smoke uses the legacy-sized configuration. Full run evaluates the 3x3x3 "
+                    "orthogonal k/support/shrinkage grid at min_neighbors=2, then compares "
+                    "min_neighbors={2,5} for the top three validation candidates."
+                ),
+                "candidates": candidates,
+                "selected": selected[mode],
+                "selection": selection_details[mode],
+            }
+        )
+
+    validation_truth = relevant_truth(
+        validation, set(train_item_counts.index.astype(int)), threshold=RELEVANCE
+    )
+    popularity_validation = []
+    for prior_weight in (PRIOR_WEIGHTS[:1] if smoke else PRIOR_WEIGHTS):
+        candidate = BayesianPopularity(prior_weight=prior_weight).fit(train)
+        recs = popularity_recommendations(candidate, train, list(validation_truth))
+        candidate_metrics, _ = ranking_metrics(validation_truth, recs, k=K)
+        popularity_validation.append(
+            {
+                "priorWeight": prior_weight,
+                "metrics": candidate_metrics,
+                "beyondAccuracy": recommendation_stats(
+                    recs, train_item_counts, len(train_item_counts)
+                ),
+            }
+        )
+    popularity_validation.sort(
+        key=lambda value: (
+            -value["metrics"]["ndcg_at_10"],
+            -value["metrics"]["recall_at_10"],
+            -value["metrics"]["hit_rate_at_10"],
+            -value["beyondAccuracy"]["catalog_coverage"],
+        )
+    )
+    selected_prior_weight = popularity_validation[0]["priorWeight"]
+
+    secondary_ablation = []
+    for ordering in ("none", "bayesian"):
+        ablation_model, ablation_metrics, _, ablation_recs, ablation_system = evaluate_configuration(
+            train,
+            validation,
+            "item",
+            selected["item"],
+            variant="bias_aware",
+            secondary_ordering=ordering,
+        )
+        secondary_ablation.append(
+            {
+                "ordering": ordering,
+                "metrics": ablation_metrics,
+                "beyondAccuracy": recommendation_stats(
+                    ablation_recs, train_item_counts, len(ablation_model.movie_ids)
+                ),
+                "rankingTieStats": ablation_system["rankingTieStats"],
+            }
+        )
 
     fitted = pd.concat([train, validation], ignore_index=True)
     final_models = []
@@ -408,7 +523,7 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
     item_counts = fitted.groupby("movie_id", observed=True).size()
     for mode in ("user", "item"):
         model, rank, per_user, recommendations, system = evaluate_configuration(
-            fitted, test, mode, selected[mode]
+            fitted, test, mode, selected[mode], variant="bias_aware"
         )
         model_objects[mode] = model
         final_per_user[mode] = per_user
@@ -419,8 +534,11 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
                 "key": f"{mode}-cf",
                 "label": "User-CF" if mode == "user" else "Item-CF",
                 "mode": mode,
-                "similarity": "Mean-centered cosine" if mode == "user" else "Adjusted cosine",
+                "algorithmVariant": "bias_aware",
+                "similarity": "Baseline-residual cosine",
+                "secondaryOrdering": "Bayesian popularity, then evidence strength, then movie ID",
                 "hyperparameters": selected[mode],
+                "selection": selection_details[mode],
                 "test": rank,
                 "rating": rating_evaluation(model, test),
                 "beyondAccuracy": beyond,
@@ -434,10 +552,50 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
             }
         )
 
-    truth = relevant_truth(test, set(item_counts.index.astype(int)))
-    popularity = BayesianPopularity().fit(fitted)
+    legacy_v3_models = []
+    for mode in ("user", "item"):
+        legacy_model, legacy_rank, _, legacy_recommendations, legacy_system = evaluate_configuration(
+            fitted,
+            test,
+            mode,
+            LEGACY_V3_PARAMS[mode],
+            variant="mean_centered",
+            secondary_ordering="legacy_id",
+        )
+        legacy_v3_models.append(
+            {
+                "key": f"{mode}-cf",
+                "algorithmVariant": "mean_centered",
+                "hyperparameters": LEGACY_V3_PARAMS[mode],
+                "test": legacy_rank,
+                "beyondAccuracy": recommendation_stats(
+                    legacy_recommendations, item_counts, len(legacy_model.movie_ids)
+                ),
+                "system": legacy_system,
+            }
+        )
+
+    truth = relevant_truth(test, set(item_counts.index.astype(int)), threshold=RELEVANCE)
+    popularity = BayesianPopularity(prior_weight=selected_prior_weight).fit(fitted)
     popular_recs = popularity_recommendations(popularity, fitted, list(truth))
     popular_rank, popular_per_user = ranking_metrics(truth, popular_recs, k=K)
+    truth_five = relevant_truth(test, set(item_counts.index.astype(int)), threshold=5.0)
+    sensitivity = {
+        "ratingAtLeast5": {
+            "readOnly": True,
+            "selectionUse": "None; this threshold never selects a model or replaces the main rating>=4 protocol.",
+            "population": len(truth_five),
+            "methods": {
+                "popularity": ranking_metrics(truth_five, popular_recs, k=K)[0],
+                "user-cf": ranking_metrics(
+                    truth_five, final_recommendations["user"], k=K
+                )[0],
+                "item-cf": ranking_metrics(
+                    truth_five, final_recommendations["item"], k=K
+                )[0],
+            },
+        }
+    }
     movie_titles = movies.set_index("movie_id")["title"].astype(str).to_dict()
     bayesian_rows = fitted.groupby("movie_id", observed=True)["rating"].agg(["count", "mean"])
     low_id = int(bayesian_rows.sort_values(["count", "mean"], ascending=[True, False]).index[0])
@@ -459,6 +617,11 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
     baselines = {
         "bayesianPopularity": {
             "priorWeight": popularity.prior_weight,
+            "validationCandidates": popularity_validation,
+            "selection": {
+                "primaryMetric": "ndcg_at_10",
+                "reason": "Selected on validation only from prior_weight={10,25,50,100}.",
+            },
             "globalMean": popularity.global_mean,
             "examples": bayesian_examples,
             "test": popular_rank,
@@ -485,8 +648,8 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
         "timingContext": "One single-process offline batch over the full ranking cohort; recommendSeconds includes candidate scoring, seen-item removal, and Top-10 selection, but excludes fitting, data loading, and artifact writing. BLAS thread count was not forced.",
     }
     metadata = {
-        "version": "movielens-cf-v3",
-        "experimentCodeVersion": "movielens-cf-v3",
+        "version": "movielens-cf-v4",
+        "experimentCodeVersion": "movielens-cf-v4",
         "generatedAtUtc": datetime.now(UTC).isoformat(timespec="seconds"),
         "dataset": "MovieLens 1M smoke subset" if smoke else "MovieLens 1M",
         "datasetUrl": "https://grouplens.org/datasets/movielens/1m/",
@@ -514,17 +677,39 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
         },
         "baselines": baselines,
         "models": final_models,
+        "postHocLimitation": (
+            "This v4 model iteration was motivated by tie failures already observed in the v3 test "
+            "results. Hyperparameters remain validation-only, but the iteration is post-hoc rather "
+            "than a fully untouched confirmatory experiment."
+        ),
+        "sensitivity": sensitivity,
         "diagnostics": {
             "relevantItemHeadConcentration": {
                 "definition": "Movies ranked by train+validation interaction count; head is the top 20% of fitted catalog items; denominator is relevant test ratings for the ranking cohort.",
-                "relevantTestRatings": int(test.loc[test["rating"] >= RELEVANCE].shape[0]),
+                "relevantTestRatings": int(
+                    test.loc[
+                        (test["rating"] >= RELEVANCE)
+                        & test["movie_id"].isin(item_counts.index)
+                        & test["user_id"].isin(truth)
+                    ].shape[0]
+                ),
                 "top10PercentShare": float(
-                    test.loc[test["rating"] >= RELEVANCE, "movie_id"]
+                    test.loc[
+                        (test["rating"] >= RELEVANCE)
+                        & test["movie_id"].isin(item_counts.index)
+                        & test["user_id"].isin(truth),
+                        "movie_id",
+                    ]
                     .map(item_counts.rank(method="average", ascending=False, pct=True))
                     .le(0.1).mean()
                 ),
                 "top20PercentShare": float(
-                    test.loc[test["rating"] >= RELEVANCE, "movie_id"]
+                    test.loc[
+                        (test["rating"] >= RELEVANCE)
+                        & test["movie_id"].isin(item_counts.index)
+                        & test["user_id"].isin(truth),
+                        "movie_id",
+                    ]
                     .map(item_counts.rank(method="average", ascending=False, pct=True))
                     .le(0.2).mean()
                 ),
@@ -541,6 +726,8 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
                 ),
             },
             "rankingCorrection": "Top-N uses raw neighborhood estimates; rating RMSE/MAE uses estimates clipped to [1, 5].",
+            "secondaryOrderingValidation": secondary_ablation,
+            "legacyV3": legacy_v3_models,
         },
         "metricCaveat": "Offline explicit-rating results; they do not measure CTR, watch time, retention, revenue, or causal lift.",
     }
@@ -557,7 +744,19 @@ def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
     validate_frontend_artifacts(metrics, samples, profile)
     write_json(output / "profile.json", {**metadata, "profile": profile})
     write_json(output / "metrics.json", metrics)
-    write_json(output / "comparisons.json", {**metadata, "validation": validation_results, "models": final_models, "baselines": baselines})
+    write_json(
+        output / "comparisons.json",
+        {
+            **metadata,
+            "validation": validation_results,
+            "popularityValidation": popularity_validation,
+            "secondaryOrderingValidation": secondary_ablation,
+            "legacyV3": legacy_v3_models,
+            "models": final_models,
+            "baselines": baselines,
+            "postHocLimitation": metrics["postHocLimitation"],
+        },
+    )
     write_json(output / "samples.json", samples)
     make_figures(profile, [{"label": "Popularity", "test": popular_rank}, *final_models], fitted, output)
     return metrics

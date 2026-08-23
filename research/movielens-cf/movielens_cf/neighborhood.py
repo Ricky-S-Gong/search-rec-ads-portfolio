@@ -8,10 +8,12 @@ import pandas as pd
 from scipy.sparse import csr_matrix
 from sklearn.preprocessing import normalize
 
-from .baselines import BayesianPopularity
+from .baselines import BayesianPopularity, BiasBaseline
 
 
 Mode = Literal["user", "item"]
+Variant = Literal["mean_centered", "bias_aware"]
+SecondaryOrdering = Literal["bayesian", "none", "legacy_id"]
 
 
 @dataclass(frozen=True)
@@ -29,6 +31,8 @@ class Recommendation:
     similarity_weight_sum: float
     neighbor_count: int
     used_fallback: bool
+    secondary_score: float = 0.0
+    secondary_score_name: str = "bayesianPopularity"
 
     @property
     def score(self) -> float:
@@ -42,15 +46,34 @@ def shrink_similarity(similarity: float, support: int, shrinkage: float) -> floa
     return float(similarity * support / (support + shrinkage)) if support + shrinkage else 0.0
 
 
-def select_top_indices(scores: np.ndarray, movie_ids: np.ndarray, n: int) -> np.ndarray:
-    """Select finite candidates by raw score, then deterministically by movie ID."""
+def select_top_indices(
+    scores: np.ndarray,
+    movie_ids: np.ndarray,
+    n: int,
+    secondary_scores: np.ndarray | None = None,
+    evidence_strength: np.ndarray | None = None,
+) -> np.ndarray:
+    """Rank all finite candidates by meaningful scores, with movie ID last."""
     finite = np.flatnonzero(np.isfinite(scores))
     take = min(max(n, 0), len(finite))
     if take == 0:
         return np.array([], dtype=int)
-    if take < len(finite):
-        finite = finite[np.argpartition(-scores[finite], take - 1)[:take]]
-    return finite[np.lexsort((movie_ids[finite], -scores[finite]))]
+    secondary = (
+        np.zeros_like(scores, dtype=float)
+        if secondary_scores is None
+        else np.asarray(secondary_scores, dtype=float)
+    )
+    evidence = (
+        np.zeros_like(scores, dtype=float)
+        if evidence_strength is None
+        else np.asarray(evidence_strength, dtype=float)
+    )
+    if secondary.shape != scores.shape or evidence.shape != scores.shape:
+        raise ValueError("ranking score arrays must share the same shape")
+    order = np.lexsort(
+        (movie_ids[finite], -evidence[finite], -secondary[finite], -scores[finite])
+    )
+    return finite[order[:take]]
 
 
 class NeighborhoodCF:
@@ -59,6 +82,8 @@ class NeighborhoodCF:
     def __init__(
         self,
         mode: Mode,
+        variant: Variant = "mean_centered",
+        secondary_ordering: SecondaryOrdering = "bayesian",
         k: int = 40,
         min_support: int = 5,
         shrinkage: float = 25.0,
@@ -67,7 +92,13 @@ class NeighborhoodCF:
     ):
         if mode not in ("user", "item"):
             raise ValueError("mode must be 'user' or 'item'")
+        if variant not in ("mean_centered", "bias_aware"):
+            raise ValueError("variant must be 'mean_centered' or 'bias_aware'")
+        if secondary_ordering not in ("bayesian", "none", "legacy_id"):
+            raise ValueError("unsupported secondary_ordering")
         self.mode = mode
+        self.variant = variant
+        self.secondary_ordering = secondary_ordering
         self.k = k
         self.min_support = min_support
         self.shrinkage = shrinkage
@@ -89,11 +120,29 @@ class NeighborhoodCF:
         self.user_means = np.asarray(self.ratings.sum(axis=1)).ravel() / counts
         centered_values = values - self.user_means[rows]
         self.centered = csr_matrix((centered_values, (rows, cols)), shape=shape, dtype=np.float32)
-        entity_values = self.centered if self.mode == "user" else self.centered.T.tocsr()
+        self.baseline = BiasBaseline().fit(ratings)
+        baseline_residual_values = self.baseline.residuals(ratings).astype(np.float32)
+        self.baseline_residuals = csr_matrix(
+            (baseline_residual_values, (rows, cols)), shape=shape, dtype=np.float32
+        )
+        self.residual_matrix = (
+            self.centered if self.variant == "mean_centered" else self.baseline_residuals
+        )
+        entity_values = (
+            self.residual_matrix if self.mode == "user" else self.residual_matrix.T.tocsr()
+        )
         entity_binary = self.binary if self.mode == "user" else self.binary.T.tocsr()
         self.similarity = self._top_k_similarity(entity_values, entity_binary)
         self.popularity = BayesianPopularity().fit(ratings)
         self.global_mean = float(values.mean())
+        self.user_biases = np.asarray(
+            [self.baseline.user_bias.get(int(user_id), 0.0) for user_id in self.user_ids],
+            dtype=float,
+        )
+        self.item_biases = np.asarray(
+            [self.baseline.item_bias.get(int(movie_id), 0.0) for movie_id in self.movie_ids],
+            dtype=float,
+        )
         self.seen = {
             user_id: set(group["movie_id"].astype(int))
             for user_id, group in ratings.groupby("user_id", observed=True)
@@ -142,16 +191,21 @@ class NeighborhoodCF:
             neighbors = self.similarity.getrow(user)
             rated = self.binary[neighbors.indices, item].toarray().ravel() > 0
             indices, weights = neighbors.indices[rated], neighbors.data[rated]
-            residuals = self.centered[indices, item].toarray().ravel()
+            residuals = self.residual_matrix[indices, item].toarray().ravel()
         else:
             neighbors = self.similarity.getrow(item)
             rated = self.binary[user, neighbors.indices].toarray().ravel() > 0
             indices, weights = neighbors.indices[rated], neighbors.data[rated]
-            residuals = self.centered[user, indices].toarray().ravel()
+            residuals = self.residual_matrix[user, indices].toarray().ravel()
         count = int(len(weights))
         if count < self.min_neighbors or not np.abs(weights).sum():
             return Prediction(self._fallback_rating(movie_id), count, True)
-        score = self.user_means[user] + float(weights @ residuals / np.abs(weights).sum())
+        base = (
+            self.user_means[user]
+            if self.variant == "mean_centered"
+            else self.baseline.predict_raw(user_id, movie_id)
+        )
+        score = base + float(weights @ residuals / np.abs(weights).sum())
         return Prediction(float(np.clip(score, 1, 5)), count, False)
 
     def recommend(self, user_id: int, n: int = 10) -> list[Recommendation]:
@@ -177,6 +231,7 @@ class NeighborhoodCF:
                         0.0,
                         0,
                         True,
+                        self.popularity.scores[movie_id],
                     )
                     for movie_id in self.popularity.ranking
                     if movie_id not in seen
@@ -193,15 +248,24 @@ class NeighborhoodCF:
             user_rows = np.asarray([self.user_index[user_id] for user_id in batch_ids])
             if self.mode == "user":
                 weights = self.similarity[user_rows]
-                numerator = (weights @ self.centered).toarray()
+                numerator = (weights @ self.residual_matrix).toarray()
                 denominator = (absolute_similarity[user_rows] @ self.binary).toarray()
                 counts = (neighbor_indicator[user_rows] @ self.binary).toarray()
             else:
-                numerator = (self.centered[user_rows] @ self.similarity.T).toarray()
+                numerator = (self.residual_matrix[user_rows] @ self.similarity.T).toarray()
                 denominator = (self.binary[user_rows] @ absolute_similarity.T).toarray()
                 counts = (self.binary[user_rows] @ neighbor_indicator.T).toarray()
             supported = (counts >= self.min_neighbors) & (denominator > 0)
-            raw_predictions = np.broadcast_to(self.user_means[user_rows, None], numerator.shape).copy()
+            if self.variant == "mean_centered":
+                raw_predictions = np.broadcast_to(
+                    self.user_means[user_rows, None], numerator.shape
+                ).copy()
+            else:
+                raw_predictions = (
+                    self.baseline.global_mean
+                    + self.user_biases[user_rows, None]
+                    + self.item_biases[None, :]
+                )
             np.divide(numerator, denominator, out=numerator, where=denominator > 0)
             raw_predictions += numerator
             rating_estimates = np.clip(raw_predictions, 1, 5)
@@ -216,9 +280,35 @@ class NeighborhoodCF:
                     if movie_id in self.movie_index
                 ]
                 ranking_scores[local_row, seen_indices] = -np.inf
-                candidate_indices = select_top_indices(
-                    ranking_scores[local_row], self.movie_ids, n
-                )
+                if self.secondary_ordering == "legacy_id":
+                    finite = np.flatnonzero(np.isfinite(ranking_scores[local_row]))
+                    take = min(n, len(finite))
+                    if take < len(finite):
+                        finite = finite[
+                            np.argpartition(-ranking_scores[local_row, finite], take - 1)[:take]
+                        ]
+                    candidate_indices = finite[
+                        np.lexsort(
+                            (
+                                self.movie_ids[finite],
+                                -ranking_scores[local_row, finite],
+                            )
+                        )
+                    ]
+                else:
+                    candidate_indices = select_top_indices(
+                        ranking_scores[local_row],
+                        self.movie_ids,
+                        n,
+                        secondary_scores=(
+                            fallback_scores if self.secondary_ordering == "bayesian" else None
+                        ),
+                        evidence_strength=(
+                            denominator[local_row]
+                            if self.secondary_ordering == "bayesian"
+                            else None
+                        ),
+                    )
                 if len(candidate_indices) == 0:
                     result[user_id] = []
                     continue
@@ -230,6 +320,7 @@ class NeighborhoodCF:
                         float(denominator[local_row, index]) if supported[local_row, index] else 0.0,
                         int(counts[local_row, index]),
                         not bool(supported[local_row, index]),
+                        float(fallback_scores[index]),
                     )
                     for index in candidate_indices
                 ]

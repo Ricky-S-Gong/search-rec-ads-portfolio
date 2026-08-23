@@ -29,8 +29,22 @@ class BiasBaseline:
         return self
 
     def predict(self, user_id: int, movie_id: int) -> float:
-        score = self.global_mean + self.user_bias.get(user_id, 0.0) + self.item_bias.get(movie_id, 0.0)
-        return float(np.clip(score, 1, 5))
+        return float(np.clip(self.predict_raw(user_id, movie_id), 1, 5))
+
+    def predict_raw(self, user_id: int, movie_id: int) -> float:
+        """Return the unclipped baseline b_ui = mu + b_u + b_i."""
+        return float(
+            self.global_mean
+            + self.user_bias.get(user_id, 0.0)
+            + self.item_bias.get(movie_id, 0.0)
+        )
+
+    def residuals(self, ratings: pd.DataFrame) -> np.ndarray:
+        """Return training residuals r_ui - b_ui in input-row order."""
+        user_bias = ratings["user_id"].map(self.user_bias).fillna(0.0).to_numpy(dtype=float)
+        item_bias = ratings["movie_id"].map(self.item_bias).fillna(0.0).to_numpy(dtype=float)
+        baseline = self.global_mean + user_bias + item_bias
+        return ratings["rating"].to_numpy(dtype=float) - baseline
 
 
 class BayesianPopularity:
