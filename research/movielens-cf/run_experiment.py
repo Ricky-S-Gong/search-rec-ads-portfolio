@@ -365,8 +365,8 @@ def make_figures(profile: dict, models: list[dict], fitted: pd.DataFrame, output
     ax.set_facecolor("#07111f")
     ax.plot(np.arange(1, len(counts) + 1), counts, color="#a78bfa", linewidth=2)
     ax.fill_between(np.arange(1, len(counts) + 1), counts, color="#a78bfa", alpha=0.15)
-    ax.set_yscale("log"); ax.set_xlabel("Movies ordered by training popularity")
-    ax.set_ylabel("Ratings (log scale)"); ax.spines[["top", "right"]].set_visible(False)
+    ax.set_yscale("log"); ax.set_xlabel("Popularity ranking of movies")
+    ax.set_ylabel("Number of ratings"); ax.spines[["top", "right"]].set_visible(False)
     fig.tight_layout(); save_svg(fig, output / "popularity-long-tail.svg"); plt.close(fig)
 
 def run(data_dir: Path, output: Path, smoke: bool = False) -> dict:
