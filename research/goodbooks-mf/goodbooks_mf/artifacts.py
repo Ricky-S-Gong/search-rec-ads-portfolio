@@ -92,8 +92,8 @@ def write_bundle(
     return manifest
 
 
-def verify_bundle(output_dir: Path) -> dict:
-    """Refuse to train when any shared artifact differs from the frozen bundle."""
+def verify_bundle(output_dir: Path, expected_manifest_path: Path | None = None) -> dict:
+    """Refuse to train when artifacts or the canonical manifest differ."""
     manifest_path = output_dir / "manifest.json"
     if not manifest_path.exists():
         raise FileNotFoundError("manifest.json is required")
@@ -102,4 +102,10 @@ def verify_bundle(output_dir: Path) -> dict:
         path = output_dir / name
         if not path.exists() or _sha256(path) != expected:
             raise ValueError(f"checksum mismatch for {name}")
+    if expected_manifest_path is not None:
+        if not expected_manifest_path.exists():
+            raise FileNotFoundError(f"canonical manifest is required: {expected_manifest_path}")
+        expected_manifest = json.loads(expected_manifest_path.read_text(encoding="utf-8"))
+        if manifest != expected_manifest:
+            raise ValueError("local bundle does not match the canonical manifest")
     return manifest

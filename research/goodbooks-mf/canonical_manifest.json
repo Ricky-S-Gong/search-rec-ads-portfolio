@@ -1,0 +1,33 @@
+{
+  "config": {
+    "max_users": 5900,
+    "min_item_interactions": 10,
+    "min_item_ratings": 3,
+    "min_user_interactions": 20,
+    "min_user_ratings": 10,
+    "seed": 20260830,
+    "train_fraction": 0.8,
+    "validation_fraction": 0.1,
+    "version": "goodreads-poetry-v1"
+  },
+  "counts": {
+    "interactions": 261709,
+    "items": 5551,
+    "test": 44229,
+    "train": 191436,
+    "users": 5129,
+    "validation": 26044
+  },
+  "seed": 20260830,
+  "sha256": {
+    "interactions.parquet": "df6d97c2b376e74ffae21c78483d2864bcdaa18b692ee15bf838161bc4cb89bd",
+    "item_mapping.parquet": "61af10d7c43d394a1c1815d5ca92959f082fd8e3e716c8db665d408e6eba5832",
+    "test.parquet": "5f5384a34890043c33d7570ceda8b0f65a1cd2d2152ff12351020aa1f045ac38",
+    "train.parquet": "7f07d6add39027e19f7d93dacbe2be4c31bb036a6b500bacf76b80c623ab57cd",
+    "train_explicit.npz": "6c13b33285b4692a60caad3733a96c2a4670bf0d15a50f50a2cba9cc2659e0d7",
+    "train_implicit.npz": "cfa9fafc1c87d5c2f5e17cf3f082bbf92f82dd051c6c5f54528ee3334aa54eb3",
+    "user_mapping.parquet": "44a99125f04a2a1dc1c26a0c12fe9365978d685f6d68e3fceea72d4871c09aac",
+    "validation.parquet": "40ab726437afff933583dc40ffe8aa9a9a6e1af6da786a3b8691c9bd1216a6da"
+  },
+  "version": "goodreads-poetry-v1"
+}
