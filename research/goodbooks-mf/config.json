@@ -1,0 +1,11 @@
+{
+  "version": "goodreads-poetry-v1",
+  "seed": 20260830,
+  "min_user_interactions": 20,
+  "min_user_ratings": 10,
+  "min_item_interactions": 10,
+  "min_item_ratings": 3,
+  "max_users": 5900,
+  "train_fraction": 0.8,
+  "validation_fraction": 0.1
+}

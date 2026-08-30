@@ -6,4 +6,7 @@ repository are licensed under Creative Commons Attribution 4.0 International
 
 Third-party datasets, trademarks, quotations, and linked resources retain
 their original terms. The Spotify dataset is not redistributed by this
-repository because its Kaggle license metadata is unspecified.
+repository because its Kaggle license metadata is unspecified. Goodreads Book
+Graph source and processed records are also excluded: the dataset provider
+limits the data to academic use and asks users not to redistribute it or use it
+commercially.

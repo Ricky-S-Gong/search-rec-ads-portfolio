@@ -13,11 +13,13 @@ ROOT = Path(__file__).parents[1]
 TEST_ROOTS = (
     ROOT / "research" / "spotify-music" / "tests",
     ROOT / "research" / "movielens-cf" / "tests",
+    ROOT / "research" / "goodbooks-mf" / "tests",
 )
 
 
 def main() -> int:
     sys.path.insert(0, str(ROOT / "research" / "movielens-cf"))
+    sys.path.insert(0, str(ROOT / "research" / "goodbooks-mf"))
     failures: list[str] = []
     passed = 0
     with tempfile.TemporaryDirectory(prefix="portfolio-tests-") as temp:
