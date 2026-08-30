@@ -8,13 +8,18 @@ dependencies = [
   "pandas>=2.2",
   "scipy>=1.14",
   "scikit-learn>=1.5",
+  "pyarrow>=17",
 ]
 
 [dependency-groups]
 dev = ["pytest>=8.3,<9"]
 
 [tool.pytest.ini_options]
-testpaths = ["research/spotify-music/tests", "research/movielens-cf/tests"]
+testpaths = [
+  "research/spotify-music/tests",
+  "research/movielens-cf/tests",
+  "research/goodbooks-mf/tests",
+]
 
 [tool.uv]
 required-version = "==0.12.1"

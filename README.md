@@ -22,6 +22,10 @@ uv run python research/spotify-music/run_experiment.py \
   --data research/spotify-music/data/data.csv
 uv run python research/movielens-cf/download_data.py
 uv run python research/movielens-cf/run_experiment.py
+uv run python research/goodbooks-mf/download_data.py
+uv run python research/goodbooks-mf/prepare_data.py
+uv run python research/goodbooks-mf/verify_data.py
+uv run python research/goodbooks-mf/run_experiment.py
 .venv/bin/python research/run_python_tests.py
 ```
 
@@ -41,7 +45,7 @@ requests. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 这是 Ricky Gong 与 Ziqi Xu 联合构建的中英双语搜广推算法作品集。每个项目都会明确业务问题、数据边界、算法选择、可复现实验，以及算法适用和不适用的场景。
 
-当前 Spotify 内容推荐与 MovieLens 协同过滤项目全程使用 CPU。原始数据不会提交到仓库，页面只读取脚本生成的轻量产物。
+当前 Spotify 内容推荐、MovieLens 协同过滤与 Goodreads 矩阵分解项目全程使用 CPU。原始数据不会提交到仓库，页面只读取脚本生成的轻量产物。
 
 Code: MIT. Original prose and charts: CC BY 4.0. Third-party material retains
 its original terms.

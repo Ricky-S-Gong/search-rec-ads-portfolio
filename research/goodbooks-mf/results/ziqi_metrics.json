@@ -1,0 +1,51 @@
+{
+  "data_counts": {
+    "interactions": 261709,
+    "items": 5551,
+    "test": 44229,
+    "train": 191436,
+    "users": 5129,
+    "validation": 26044
+  },
+  "dataset_version": "goodreads-poetry-v1",
+  "models": {
+    "basic_mf": {
+      "best_epoch": 32,
+      "epochs_trained": 43,
+      "explicit_test_ratings": 17168,
+      "hyperparameters": {
+        "learning_rate": 0.01,
+        "n_epochs": 100,
+        "n_factors": 40,
+        "n_items": 5551,
+        "n_users": 5129,
+        "patience": 10,
+        "reg_lambda": 0.02,
+        "seed": 20260830
+      },
+      "mae": 0.882003,
+      "rmse": 1.149409,
+      "training_seconds": 42.793071
+    },
+    "funksvd": {
+      "best_epoch": 9,
+      "epochs_trained": 20,
+      "explicit_test_ratings": 17168,
+      "hyperparameters": {
+        "learning_rate": 0.01,
+        "n_epochs": 100,
+        "n_factors": 40,
+        "n_items": 5551,
+        "n_users": 5129,
+        "patience": 10,
+        "reg_lambda": 0.02,
+        "seed": 20260830
+      },
+      "mae": 0.668944,
+      "rmse": 0.861341,
+      "training_seconds": 24.518911
+    }
+  },
+  "ranking_metrics_status": "pending shared evaluation functions and candidate set",
+  "seed": 20260830
+}

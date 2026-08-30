@@ -1,5 +1,19 @@
 # Third-party notices
 
+## Goodreads Book Graph
+
+The Goodreads Poetry matrix-factorization research code targets the Goodreads
+Book Graph dataset collected by Mengting Wan and Julian McAuley. No raw or
+processed Goodreads records are included in this repository. The provider
+states that the dataset is for academic use only and must not be redistributed
+or used commercially.
+
+- Dataset: https://cseweb.ucsd.edu/~jmcauley/datasets/goodreads.html
+- Mengting Wan and Julian McAuley, “Item Recommendation on Monotonic Behavior
+  Chains,” RecSys 2018.
+- Mengting Wan, Rishabh Misra, Ndapa Nakashole, and Julian McAuley,
+  “Fine-Grained Spoiler Detection from Large-Scale Review Corpora,” ACL 2019.
+
 ## starsjs galaxy motion
 
 The homepage Canvas galaxy adapts the orbital star motion from
