@@ -4,6 +4,13 @@ Reproducible Goodreads Book Graph experiment implementing Ziqi's project scope:
 data ingestion, cleaning, k-core filtering, a frozen temporal split, shared
 Parquet/CSR artifacts, Basic MF, and biased FunkSVD.
 
+Detailed documentation:
+
+- [`ZIQI_IMPLEMENTATION_GUIDE.md`](ZIQI_IMPLEMENTATION_GUIDE.md): complete
+  implementation walkthrough and interview preparation.
+- [`TEAM_HANDOFF_RICKY_YUTAO.md`](TEAM_HANDOFF_RICKY_YUTAO.md): immutable data
+  contract and step-by-step continuation instructions for teammates and Codex.
+
 ## Reproduce the environment and data
 
 From the repository root:
@@ -34,9 +41,11 @@ uses explicit-rating boundaries so train, validation, and test each receive an
 explicit observation before cold validation/test items are removed.
 
 `manifest.json` records the configuration, seed, table counts, and SHA-256 of
-every Parquet and CSR file. Teammates should obtain the canonical processed
-bundle through access-controlled course storage and run `verify_data.py` before
-training. A checksum mismatch is a hard failure.
+every Parquet and CSR file. The repository's metadata-only
+`canonical_manifest.json` freezes those expected values. Teammates should
+obtain the canonical processed bundle through access-controlled course storage
+and run `verify_data.py` before training. A checksum or canonical-manifest
+mismatch is a hard failure.
 
 ## Data policy
 

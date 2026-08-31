@@ -51,3 +51,29 @@ def test_verify_bundle_detects_a_modified_artifact(tmp_path):
 
     with pytest.raises(ValueError, match="checksum"):
         verify_bundle(tmp_path)
+
+
+def test_verify_bundle_rejects_a_self_consistent_but_noncanonical_bundle(tmp_path):
+    interactions = pd.DataFrame(
+        {
+            "user_idx": [0], "item_idx": [0], "rating": [5],
+            "is_read": [True], "is_reviewed": [False],
+            "event_time": [pd.Timestamp("2017-01-01", tz="UTC")], "split": ["train"],
+        }
+    )
+    write_bundle(
+        tmp_path / "bundle",
+        interactions,
+        pd.DataFrame({"user_id": ["u"], "user_idx": [0]}),
+        pd.DataFrame({"item_id": ["b"], "item_idx": [0]}),
+        seed=42,
+        config={"version": "local-v1"},
+    )
+    canonical = tmp_path / "canonical.json"
+    canonical.write_text(
+        json.dumps({"version": "canonical-v1", "seed": 7, "counts": {}, "sha256": {}}),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="canonical manifest"):
+        verify_bundle(tmp_path / "bundle", expected_manifest_path=canonical)
