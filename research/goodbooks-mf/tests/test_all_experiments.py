@@ -249,13 +249,13 @@ def test_frozen_unified_test_uses_shared_rating_and_ranking_protocol(tmp_path):
         )
 
     table_path = tmp_path / "summary.csv"
-    chart_path = tmp_path / "summary.svg"
+    chart_path = tmp_path / "summary.png"
     write_summary_table(result, table_path)
     write_summary_chart(result, chart_path)
     assert table_path.read_text(encoding="utf-8").startswith(
         "model,best_validation_metric,rmse,mae,"
     )
-    assert chart_path.read_text(encoding="utf-8").lstrip().startswith("<?xml")
+    assert chart_path.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
 
 
 def test_config_rejects_candidate_seed_and_unknown_model(tmp_path):

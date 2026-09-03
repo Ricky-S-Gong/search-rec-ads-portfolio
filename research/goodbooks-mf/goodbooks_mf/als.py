@@ -132,4 +132,3 @@ class ALS:
         scores = np.asarray(self.predict(np.full(len(candidates), user_idx), candidates))
         order = np.lexsort((candidates, -scores))[:k]
         return [(int(candidates[index]), float(scores[index])) for index in order]
-

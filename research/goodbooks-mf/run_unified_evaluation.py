@@ -17,7 +17,7 @@ DEFAULT_DATA = ROOT / "data" / "processed" / "goodreads-poetry-v1"
 DEFAULT_FROZEN = ROOT / "results" / "yutao_frozen_config.json"
 DEFAULT_OUTPUT = ROOT / "results" / "yutao_unified_test_metrics.json"
 DEFAULT_TABLE = ROOT / "results" / "yutao_unified_test_metrics.csv"
-DEFAULT_CHART = ROOT / "results" / "yutao_unified_test_metrics.svg"
+DEFAULT_CHART = ROOT / "results" / "yutao_unified_test_metrics.png"
 CANONICAL_MANIFEST = ROOT / "canonical_manifest.json"
 
 
@@ -45,7 +45,7 @@ def write_summary_table(payload: dict, output_path: Path) -> None:
     ]
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         for row in payload["results"]:
             writer.writerow({field: row[field] for field in fields})
@@ -104,7 +104,7 @@ def write_summary_chart(payload: dict, output_path: Path) -> None:
     figure.suptitle("Goodreads Poetry: frozen shared-evaluation results")
     figure.tight_layout()
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    figure.savefig(output_path, format="svg", bbox_inches="tight")
+    figure.savefig(output_path, format=output_path.suffix.lstrip("."), bbox_inches="tight")
     plt.close(figure)
 
 

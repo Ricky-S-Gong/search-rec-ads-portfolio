@@ -63,4 +63,3 @@ def test_als_does_not_treat_unobserved_cells_as_zero_ratings():
         compact.predict(rows, cols),
         expanded.predict(rows, cols),
     )
-

@@ -132,4 +132,3 @@ class BiasAwareALS(ALS):
         rows, cols = matrix.nonzero()
         errors = matrix.data - self.predict(rows, cols)
         return float(np.sqrt(np.mean(np.square(errors))))
-

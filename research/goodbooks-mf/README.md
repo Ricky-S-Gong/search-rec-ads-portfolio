@@ -121,7 +121,7 @@ The complete metrics at K = 5, 10, and 20, timing fields, protocol metadata,
 and frozen config hash are stored in
 `results/yutao_unified_test_metrics.json`. The compact table is
 `results/yutao_unified_test_metrics.csv`; the generated comparison figure is
-`results/yutao_unified_test_metrics.svg`. These test results are for final
+`results/yutao_unified_test_metrics.png`. These test results are for final
 reporting only and must not be used to revise hyperparameters.
 
 The committed `config.json` is the data contract. It fixes the random seed,
