@@ -97,6 +97,33 @@ result file. These test metrics must not be used for further tuning. The shared
 evaluation runner extends this frozen result with ranking metrics without
 changing the selected hyperparameters.
 
+## Shared final evaluation for Yutao's models
+
+Ricky's shared evaluation is integrated without changing the frozen validation
+selection. Run it once with:
+
+```bash
+uv run python research/goodbooks-mf/run_unified_evaluation.py
+```
+
+It constructs one shared `RankingEvaluationData` object and reuses it for ALS,
+NMF with L2, and bias-aware ALS. The frozen full-data results evaluate 17,168
+explicit ratings from 5,129 users and ranking candidates for 4,765 eligible
+users:
+
+| Model | RMSE | MAE | Precision@10 | Recall@10 | NDCG@10 | Train seconds |
+|---|---:|---:|---:|---:|---:|---:|
+| Sparse explicit ALS | 1.119088 | 0.828761 | 0.001448 | 0.005637 | 0.002728 | 0.814 |
+| Masked NMF + L2 | 0.984062 | 0.719640 | 0.000441 | 0.001193 | 0.000835 | 0.931 |
+| Bias-aware residual ALS | 0.861570 | 0.675045 | 0.002036 | 0.007762 | 0.005978 | 0.812 |
+
+The complete metrics at K = 5, 10, and 20, timing fields, protocol metadata,
+and frozen config hash are stored in
+`results/yutao_unified_test_metrics.json`. The compact table is
+`results/yutao_unified_test_metrics.csv`; the generated comparison figure is
+`results/yutao_unified_test_metrics.svg`. These test results are for final
+reporting only and must not be used to revise hyperparameters.
+
 The committed `config.json` is the data contract. It fixes the random seed,
 k-core thresholds, maximum user count, and temporal split fractions. Every
 model must consume the generated bundle and must not independently filter or

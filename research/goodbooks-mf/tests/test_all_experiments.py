@@ -11,8 +11,10 @@ from goodbooks_mf.experiment import (
     load_experiment_config,
     load_test_after_freeze,
     run_frozen_rating_test,
+    run_frozen_unified_test,
     run_validation_selection,
 )
+from run_unified_evaluation import write_summary_chart, write_summary_table
 
 
 def tiny_bundle(tmp_path: Path) -> Path:
@@ -131,7 +133,9 @@ def test_validation_runner_supports_all_local_models_and_complete_schema(tmp_pat
         assert row["evaluation_split"] == "validation"
         assert row["evaluated_rating_count"] == 3
         assert row["precision_at_5"] is None
+        assert row["evaluated_rating_users"] is None
         assert row["evaluated_ranking_users"] is None
+        assert row["candidate_policy"] is None
         assert row["training_seconds"] >= 0
         assert row["inference_seconds"] >= 0
 
@@ -197,6 +201,61 @@ def test_frozen_rating_test_uses_selected_subset_and_refuses_overwrite(tmp_path)
     assert all(row["evaluated_rating_count"] == 3 for row in result["results"])
     with pytest.raises(FileExistsError, match="already exists"):
         run_frozen_rating_test(data_dir, frozen_path, output_path=output_path)
+
+
+def test_frozen_unified_test_uses_shared_rating_and_ranking_protocol(tmp_path):
+    data_dir = tiny_bundle(tmp_path)
+    selection = run_validation_selection(data_dir, tiny_config())
+    frozen_path = tmp_path / "frozen.json"
+    frozen = freeze_validation_configs(
+        selection,
+        frozen_path,
+        model_names={"als", "nmf", "bias_aware_als"},
+    )
+    output_path = tmp_path / "unified-test-results.json"
+
+    result = run_frozen_unified_test(
+        data_dir,
+        frozen_path,
+        output_path=output_path,
+    )
+
+    assert result["phase"] == "frozen_unified_test"
+    assert result["frozen_config_hash"] == frozen["config_hash"]
+    assert result["selection_source"] == "validation_only"
+    assert result["ranking_protocol"]["candidate_policy"] == (
+        "full_train_catalog_excluding_seen"
+    )
+    assert {row["model"] for row in result["results"]} == {
+        "als",
+        "nmf",
+        "bias_aware_als",
+    }
+    for row in result["results"]:
+        assert set(RESULT_FIELDS).issubset(row)
+        assert row["evaluated_rating_count"] == 3
+        assert row["evaluated_rating_users"] == 3
+        assert row["evaluated_ranking_users"] == 1
+        assert row["catalog_size"] == 3
+        assert row["candidate_policy"] == "full_train_catalog_excluding_seen"
+        assert row["precision_at_5"] >= 0
+        assert row["recall_at_10"] >= 0
+        assert row["ndcg_at_20"] >= 0
+    with pytest.raises(FileExistsError, match="already exists"):
+        run_frozen_unified_test(
+            data_dir,
+            frozen_path,
+            output_path=output_path,
+        )
+
+    table_path = tmp_path / "summary.csv"
+    chart_path = tmp_path / "summary.svg"
+    write_summary_table(result, table_path)
+    write_summary_chart(result, chart_path)
+    assert table_path.read_text(encoding="utf-8").startswith(
+        "model,best_validation_metric,rmse,mae,"
+    )
+    assert chart_path.read_text(encoding="utf-8").lstrip().startswith("<?xml")
 
 
 def test_config_rejects_candidate_seed_and_unknown_model(tmp_path):

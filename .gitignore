@@ -10,6 +10,7 @@ __pycache__/
 /data/
 research/**/data/
 *.csv
+!research/goodbooks-mf/results/yutao_unified_test_metrics.csv
 *.zip
 .env
 .env.*

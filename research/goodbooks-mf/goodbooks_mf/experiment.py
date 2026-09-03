@@ -1,9 +1,9 @@
 """Validation-only experiment orchestration for the frozen Goodreads bundle.
 
-This module intentionally keeps model selection separate from final test and
-ranking evaluation. The validation runner never deserializes ``test.parquet``;
-the future final-evaluation path can access it only through a frozen,
-checksum-protected configuration artifact.
+This module keeps model selection separate from final test evaluation. The
+validation runner never deserializes ``test.parquet``; final rating and ranking
+evaluation can access it only through a frozen, checksum-protected
+configuration artifact.
 """
 
 from __future__ import annotations
@@ -22,7 +22,8 @@ from scipy import sparse
 from .als import ALS
 from .artifacts import verify_bundle
 from .bias_aware_als import BiasAwareALS
-from .models import BasicMF, FunkSVD, rmse
+from .evaluation import evaluate_ranking, evaluate_ratings, prepare_ranking_data, rmse
+from .models import BasicMF, FunkSVD
 from .nmf import NMF
 
 
@@ -57,7 +58,10 @@ RESULT_FIELDS = (
     "ndcg_at_10",
     "ndcg_at_20",
     "evaluated_rating_count",
+    "evaluated_rating_users",
     "evaluated_ranking_users",
+    "candidate_policy",
+    "catalog_size",
     "training_seconds",
     "inference_seconds",
     "hyperparameters",
@@ -197,7 +201,10 @@ def _result_row(
         "ndcg_at_10": None,
         "ndcg_at_20": None,
         "evaluated_rating_count": int(len(actual)),
+        "evaluated_rating_users": None,
         "evaluated_ranking_users": None,
+        "candidate_policy": None,
+        "catalog_size": None,
         "training_seconds": float(training_seconds),
         "inference_seconds": float(inference_seconds),
         "hyperparameters": dict(parameters),
@@ -484,6 +491,116 @@ def run_frozen_rating_test(
         "data_counts": manifest["counts"],
         "test_accessed": True,
         "ranking_metrics_status": "pending Ricky shared evaluation and candidate set",
+        "results": results,
+    }
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True),
+        encoding="utf-8",
+    )
+    return payload
+
+
+def run_frozen_unified_test(
+    data_dir: Path,
+    frozen_config_path: Path,
+    *,
+    output_path: Path,
+    expected_manifest_path: Path | None = None,
+    parquet_reader: Callable[[Path], pd.DataFrame] = pd.read_parquet,
+) -> dict[str, Any]:
+    """Evaluate frozen ALS/NMF configs with the shared rating/ranking API.
+
+    Hyperparameters are read exclusively from the checksum-protected frozen
+    validation artifact. The shared ``RankingEvaluationData`` is constructed
+    once and reused by every model, ensuring identical users and candidates.
+    """
+    output_path = Path(output_path)
+    if output_path.exists():
+        raise FileExistsError(f"unified test result already exists: {output_path}")
+    artifact, manifest = _validated_frozen_artifact(
+        Path(data_dir),
+        Path(frozen_config_path),
+        expected_manifest_path,
+    )
+    unsupported = set(artifact["best_configs"]).difference(
+        {"als", "nmf", "bias_aware_als"}
+    )
+    if unsupported:
+        raise ValueError(
+            "Yutao unified test supports only ALS/NMF variants: "
+            + ", ".join(sorted(unsupported))
+        )
+
+    data_dir = Path(data_dir)
+    train = parquet_reader(data_dir / "train.parquet")
+    test = parquet_reader(data_dir / "test.parquet")
+    ranking_data = prepare_ranking_data(train, test)
+    explicit_matrix = sparse.load_npz(data_dir / "train_explicit.npz").tocsr()
+    n_users, n_items = explicit_matrix.shape
+
+    results: list[dict[str, Any]] = []
+    for model_name, selection in artifact["best_configs"].items():
+        parameters = selection["hyperparameters"]
+        model = _build_model(
+            model_name,
+            parameters,
+            n_users=n_users,
+            n_items=n_items,
+            seed=int(artifact["seed"]),
+        )
+        started = time.perf_counter()
+        model.fit(explicit_matrix)
+        training_seconds = time.perf_counter() - started
+
+        started = time.perf_counter()
+        rating_metrics = evaluate_ratings(model, test)
+        rating_inference_seconds = time.perf_counter() - started
+        started = time.perf_counter()
+        ranking_metrics = evaluate_ranking(model, ranking_data)
+        ranking_inference_seconds = time.perf_counter() - started
+
+        row = {
+            "dataset_version": manifest["version"],
+            "evaluation_split": "test",
+            "model": model_name,
+            "seed": int(manifest["seed"]),
+            "n_factors": parameters.get("n_factors"),
+            "learning_rate": parameters.get("learning_rate"),
+            "reg_lambda": parameters.get("reg_lambda"),
+            "iterations_or_epochs": _iterations(parameters),
+            "selection_metric": artifact["selection_metric"],
+            "best_validation_metric": float(selection["validation_metric"]),
+            **rating_metrics,
+            **ranking_metrics,
+            "training_seconds": float(training_seconds),
+            "inference_seconds": float(
+                rating_inference_seconds + ranking_inference_seconds
+            ),
+            "rating_inference_seconds": float(rating_inference_seconds),
+            "ranking_inference_seconds": float(ranking_inference_seconds),
+            "hyperparameters": dict(parameters),
+            "selected": True,
+        }
+        missing = set(RESULT_FIELDS).difference(row)
+        if missing:
+            raise AssertionError(f"incomplete result schema: {sorted(missing)}")
+        results.append(row)
+
+    payload = {
+        "schema_version": "goodbooks-unified-test-results-v1",
+        "phase": "frozen_unified_test",
+        "dataset_version": manifest["version"],
+        "seed": int(manifest["seed"]),
+        "frozen_config_hash": artifact["config_hash"],
+        "selection_source": "validation_only",
+        "data_counts": manifest["counts"],
+        "test_accessed": True,
+        "ranking_protocol": {
+            "candidate_policy": "full_train_catalog_excluding_seen",
+            "relevance": "rating >= 4 OR (rating == 0 AND is_read)",
+            "k_values": [5, 10, 20],
+        },
         "results": results,
     }
     output_path.parent.mkdir(parents=True, exist_ok=True)
