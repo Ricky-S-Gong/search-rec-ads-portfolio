@@ -24,6 +24,15 @@ def test_experiment_result_records_data_counts_hyperparameters_and_training_time
     payload = run(data_dir, tmp_path / "metrics.json", smoke=True)
 
     assert payload["data_counts"]["interactions"] == 9
+    assert payload["ranking_protocol"] == {
+        "candidate_policy": "full_train_catalog_excluding_seen",
+        "relevance": "rating >= 4 OR (rating == 0 AND is_read)",
+        "k_values": [5, 10, 20],
+    }
     for result in payload["models"].values():
         assert result["training_seconds"] >= 0
         assert result["hyperparameters"]["n_factors"] == 8
+        assert result["catalog_size"] == 3
+        assert "precision_at_5" in result
+        assert "recall_at_10" in result
+        assert "ndcg_at_20" in result

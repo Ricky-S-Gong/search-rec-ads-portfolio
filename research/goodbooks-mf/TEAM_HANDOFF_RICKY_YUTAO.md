@@ -224,17 +224,17 @@ goodbooks_mf/models.py::BasicMF
 goodbooks_mf/models.py::FunkSVD
 ```
 
-## 9. Ricky 的任务：统一 evaluation
+## 9. 统一 evaluation
 
-### 9.1 需要交付的函数
+### 9.1 公共接口
 
-建议位置：
+实现位置：
 
 ```text
 research/goodbooks-mf/goodbooks_mf/evaluation.py
 ```
 
-需要实现：
+公共函数：
 
 ```python
 rmse(actual, predicted)
@@ -243,8 +243,13 @@ precision_at_k(recommended, relevant, k)
 recall_at_k(recommended, relevant, k)
 ndcg_at_k(recommended, relevant, k)
 evaluate_ratings(model, test)
-evaluate_ranking(model, candidate_set, k_values=(5, 10, 20))
+prepare_ranking_data(train, test)
+evaluate_ranking(model, ranking_data, k_values=(5, 10, 20))
 ```
+
+`prepare_ranking_data` 只调用一次；返回的 `RankingEvaluationData` 应传给
+每个模型，保证所有模型共享相同的 catalog、test users、seen items 和
+relevant items。
 
 ### 9.2 固定 relevance
 
@@ -254,33 +259,23 @@ evaluate_ranking(model, candidate_set, k_values=(5, 10, 20))
 relevant = rating >= 4 OR (rating == 0 AND is_read == True)
 ```
 
-建议在主结果中同时记录 relevant 定义，防止结果脱离语义。
+主结果同时记录 relevant 定义，防止结果脱离语义。
 
-### 9.3 固定候选集
+### 9.3 固定全目录候选集
 
-需要由 Ricky 一次性生成并冻结：
-
-```text
-evaluation_candidates.parquet
-```
-
-建议字段：
+统一协议使用：
 
 ```text
-user_idx, item_idx, label, source
+full train catalog minus the user's train interactions
 ```
 
-其中：
-
-- positive：该用户 test relevant item；
-- negative：从 train catalog 中采样的未见且非 test-positive item；
-- 所有模型使用完全相同的 user/item pairs；
-- seed 必须是 `20260830` 或在统一配置中单独冻结；
-- 候选集中排除训练期已见 item；
-- 每个用户使用相同数量和相同 ID 的 negatives；
-- candidate artifact 也要加入 checksum manifest。
-
-如果计算允许，优先使用 full train catalog minus seen；如果必须 sampled negatives，应在报告中明确这会使指标依赖采样策略。
+- 不进行负采样；
+- catalog 只包含 train 中出现的 item；
+- 每位用户排除自己所有 train 交互 item；
+- 只评估至少有一个有效 test relevant item 的用户；
+- Top-K 使用 raw score，并以 `item_idx` 升序打破完全相同的分数；
+- 不生成或公开逐用户 candidate artifact。候选一致性由 canonical data
+  checksum、确定性代码和共享 `RankingEvaluationData` 保证。
 
 ### 9.4 指标细节
 
@@ -501,7 +496,7 @@ uv run pytest
 
 1. 合并 Ziqi 的 PR #25。
 2. 三个人下载私有 bundle 并通过 checksum。
-3. Ricky 先冻结 evaluation API、relevance 和 candidate artifact。
+3. 使用已冻结的 evaluation API、relevance 和全训练目录候选协议。
 4. Yutao 同时实现 ALS/NMF，但暂时只用 RMSE/MAE 调试。
 5. Ricky 实现 SVD++。
 6. 三个负责人将模型接到相同 evaluation API。
@@ -520,13 +515,11 @@ manifest.json 和现有 tests。不要修改 preprocessing、split、ID mapping�
 seed 或 goodreads-poetry-v1 数据。
 
 你的任务是：
-1. 先用测试定义统一 RMSE、MAE、Precision@K、Recall@K、NDCG@K。
-2. 固定 test users、relevance 规则和所有模型共享的 candidate set。
-3. candidate artifact 必须确定性生成并带 checksum。
-4. 实现 SVD++，隐式历史只能来自 train split。
-5. 接入现有 BasicMF/FunkSVD API。
-6. 输出统一 results row，不要根据 test 调参。
-7. 运行仓库全套测试并更新文档。
+1. 复用 goodbooks_mf/evaluation.py 和共享 RankingEvaluationData；不要复制指标实现。
+2. 实现 SVD++，隐式历史只能来自 train split。
+3. 接入现有 BasicMF/FunkSVD API 和全训练目录候选协议。
+4. 输出统一 results row，不要根据 test 调参。
+5. 运行仓库全套测试并更新文档。
 
 遇到不明确的 evaluation 规则时先在 PR/项目计划中确认，不能自行修改数据。
 ```
