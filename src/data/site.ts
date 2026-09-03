@@ -127,7 +127,7 @@ export const projects: ProjectMeta[] = [
     },
   },
   {
-    slug: 'movielens-collaborative-filtering', domain: 'recommendation', status: 'in-progress', compute: 'CPU',
+    slug: 'movielens-collaborative-filtering', domain: 'recommendation', status: 'complete', compute: 'CPU',
     algorithms: ['Bayesian popularity', 'User-CF', 'Item-CF'], dataset: 'MovieLens 1M · 1,000,209 ratings',
     authors: ['Ricky Gong', 'Ziqi Xu'],
     sourceUrl: 'https://grouplens.org/datasets/movielens/1m/',
@@ -251,7 +251,7 @@ export const roadmapTracks: RoadmapTrack[] = [
         title: { en: 'Collaborative signals', zh: '协同信号' },
         topics: { en: 'Popularity · User-CF · Item-CF · temporal evaluation', zh: '热门基线 · User-CF · Item-CF · 时间切分评估' },
         project: { en: 'MovieLens collaborative filtering', zh: 'MovieLens 协同过滤' },
-        status: 'in-progress', compute: 'CPU', href: '/projects/movielens-collaborative-filtering/',
+        status: 'complete', compute: 'CPU', href: '/projects/movielens-collaborative-filtering/',
       },
       {
         title: { en: 'Model-based recommendation', zh: '模型化推荐' },

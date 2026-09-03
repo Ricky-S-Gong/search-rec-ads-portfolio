@@ -6,11 +6,7 @@ from typing import Iterable
 import numpy as np
 import pandas as pd
 
-
-def rmse(actual: Iterable[float], predicted: Iterable[float]) -> float:
-    actual_array = np.asarray(actual, dtype=np.float64)
-    predicted_array = np.asarray(predicted, dtype=np.float64)
-    return float(np.sqrt(np.mean(np.square(actual_array - predicted_array))))
+from .evaluation import rmse
 
 
 def _triplets(frame: pd.DataFrame) -> tuple[np.ndarray, np.ndarray, np.ndarray]:

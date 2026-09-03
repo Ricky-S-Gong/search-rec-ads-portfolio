@@ -65,7 +65,16 @@ implements:
 prediction = global_mean + user_bias + item_bias + user_factors @ item_factors
 ```
 
-Validation RMSE controls early stopping and restores the best epoch. Test
-RMSE/MAE are produced by `run_experiment.py`. Precision, Recall, and NDCG will
-be added by the shared evaluation owner once the frozen candidate set is
-available.
+Validation RMSE controls early stopping and restores the best epoch. Shared
+rating and ranking metrics live in `goodbooks_mf/evaluation.py` and are called
+by `run_experiment.py` for every model. Rating predictions are clipped to
+`[1, 5]`; ranking always uses raw scores.
+
+The ranking protocol evaluates every eligible test user against the complete
+train catalog after removing that user's train interactions. Relevance is
+`rating >= 4 OR (rating == 0 AND is_read)`, exact score ties are broken by
+ascending `item_idx`, and Precision, Recall, and NDCG are reported at 5, 10,
+and 20. There is no negative sampling or row-level candidate artifact. Call
+`prepare_ranking_data(train, test)` once and pass the returned
+`RankingEvaluationData` to `evaluate_ranking` for each model so every model is
+scored on the same protocol.
