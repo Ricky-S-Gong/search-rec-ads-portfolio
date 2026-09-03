@@ -24,10 +24,12 @@
 
 ### 等待团队集成
 
-- Precision@K、Recall@K、NDCG@K 需要 Ricky 提供统一 evaluation functions 和固定 candidate set。
+- 统一 evaluation functions 和全训练目录候选协议已经实现；私有 bundle
+  到位并验证后，需要重跑 Basic MF/FunkSVD 以生成正式 Top-K 指标。
 - 处理后的数据不能上传到公开 GitHub。需要课程允许的受限共享空间，才能完成三人访问配置。
 
-因此，Ziqi 可以独立完成的工程和模型工作已经完成；团队级 Top-K 指标与私有数据分发是尚未闭环的外部依赖。
+因此，Ziqi 可以独立完成的工程和模型工作已经完成；正式 Top-K 结果与
+私有数据分发是尚未闭环的外部依赖。
 
 ## 2. 问题定义
 

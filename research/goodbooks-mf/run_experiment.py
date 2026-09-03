@@ -7,31 +7,15 @@ import json
 import time
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 from goodbooks_mf.artifacts import verify_bundle
-from goodbooks_mf.models import BasicMF, FunkSVD, rmse
+from goodbooks_mf.evaluation import evaluate_ranking, evaluate_ratings, prepare_ranking_data
+from goodbooks_mf.models import BasicMF, FunkSVD
 
 
 ROOT = Path(__file__).parent
 DEFAULT_DATA = ROOT / "data" / "processed" / "goodreads-poetry-v1"
-
-
-def mae(actual, predicted) -> float:
-    return float(np.mean(np.abs(np.asarray(actual) - np.asarray(predicted))))
-
-
-def evaluate(model, test: pd.DataFrame) -> dict:
-    explicit = test[test["rating"] > 0]
-    predictions = np.clip(
-        model.predict(explicit["user_idx"], explicit["item_idx"]), 1, 5
-    )
-    return {
-        "rmse": round(rmse(explicit["rating"], predictions), 6),
-        "mae": round(mae(explicit["rating"], predictions), 6),
-        "explicit_test_ratings": int(len(explicit)),
-    }
 
 
 def run(data_dir: Path, output_path: Path, smoke: bool = False) -> dict:
@@ -60,12 +44,14 @@ def run(data_dir: Path, output_path: Path, smoke: bool = False) -> dict:
         "basic_mf": BasicMF(**common),
         "funksvd": FunkSVD(**common),
     }
+    ranking_data = prepare_ranking_data(train, test)
     results = {}
     for name, model in models.items():
         started = time.perf_counter()
         model.fit(train, validation)
         results[name] = {
-            **evaluate(model, test),
+            **evaluate_ratings(model, test),
+            **evaluate_ranking(model, ranking_data),
             "best_epoch": model.best_epoch,
             "epochs_trained": model.n_epochs_trained,
             "training_seconds": round(time.perf_counter() - started, 6),
@@ -76,7 +62,11 @@ def run(data_dir: Path, output_path: Path, smoke: bool = False) -> dict:
         "seed": manifest["seed"],
         "data_counts": manifest["counts"],
         "models": results,
-        "ranking_metrics_status": "pending shared evaluation functions and candidate set",
+        "ranking_protocol": {
+            "candidate_policy": "full_train_catalog_excluding_seen",
+            "relevance": "rating >= 4 OR (rating == 0 AND is_read)",
+            "k_values": [5, 10, 20],
+        },
     }
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")

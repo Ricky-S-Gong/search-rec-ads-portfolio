@@ -67,11 +67,10 @@ Current validation-only selected rows are:
 | Masked NMF with optional L2 regularization | 0.897692 | 0.675072 |
 | Bias-aware residual ALS | 0.843333 | 0.661293 |
 
-These are validation-selection results, not final test metrics. Precision,
-Recall, NDCG, and evaluated ranking users remain `null` until Ricky's shared
-evaluation functions and frozen candidate artifact are available. Do not
-implement a parallel temporary Top-K definition. The subsequent frozen rating
-test is documented below.
+These are validation-selection results, not final test metrics. Hyperparameters
+are selected from these validation rows only. Final rating and ranking metrics
+use the shared evaluation implementation described below; no model owns a
+separate Top-K definition.
 
 ## Yutao frozen rating test
 
@@ -94,8 +93,9 @@ The one-time explicit-rating test evaluated 17,168 ratings and produced:
 The immutable inputs and aggregate results are recorded in
 `results/yutao_frozen_config.json` and `results/yutao_test_metrics.json`.
 The test-result command refuses to replace an existing frozen configuration or
-result file. These test metrics must not be used for further tuning. Ranking
-metrics remain pending Ricky's shared evaluation and candidate artifact.
+result file. These test metrics must not be used for further tuning. The shared
+evaluation runner extends this frozen result with ranking metrics without
+changing the selected hyperparameters.
 
 The committed `config.json` is the data contract. It fixes the random seed,
 k-core thresholds, maximum user count, and temporal split fractions. Every
@@ -141,6 +141,16 @@ prediction = global_mean + user_bias + item_bias + user_factors @ item_factors
 
 Validation RMSE controls SGD early stopping and restores the best epoch. All
 models expose raw-score prediction and deterministic recommendation methods;
-rating evaluation clips only at metric time. Precision, Recall, and NDCG will
-be added by the shared evaluation owner once the frozen candidate set is
-available.
+rating evaluation clips only at metric time. Shared
+rating and ranking metrics live in `goodbooks_mf/evaluation.py` and are called
+for every model. Rating predictions are clipped to `[1, 5]`; ranking always
+uses raw scores.
+
+The ranking protocol evaluates every eligible test user against the complete
+train catalog after removing that user's train interactions. Relevance is
+`rating >= 4 OR (rating == 0 AND is_read)`, exact score ties are broken by
+ascending `item_idx`, and Precision, Recall, and NDCG are reported at 5, 10,
+and 20. There is no negative sampling or row-level candidate artifact. Call
+`prepare_ranking_data(train, test)` once and pass the returned
+`RankingEvaluationData` to `evaluate_ranking` for each model so every model is
+scored on the same protocol.
