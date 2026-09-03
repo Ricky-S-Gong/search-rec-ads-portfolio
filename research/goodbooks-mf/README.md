@@ -1,8 +1,8 @@
 # Goodreads Poetry matrix factorization
 
-Reproducible Goodreads Book Graph experiment implementing Ziqi's project scope:
-data ingestion, cleaning, k-core filtering, a frozen temporal split, shared
-Parquet/CSR artifacts, Basic MF, and biased FunkSVD.
+Reproducible Goodreads Book Graph experiment implementing the shared frozen
+data pipeline plus Basic MF, FunkSVD, sparse explicit ALS, masked NMF, and an
+additional bias-aware residual ALS diagnostic.
 
 Detailed documentation:
 
@@ -23,6 +23,79 @@ uv run python research/goodbooks-mf/verify_data.py
 uv run python research/goodbooks-mf/run_experiment.py
 uv run pytest
 ```
+
+`run_experiment.py` is Ziqi's original Basic MF/FunkSVD result reproduction and
+reads the frozen test split. Teammates who are still selecting new model
+configurations must not use that script for tuning.
+
+## Phase-one unified validation runner
+
+Yutao's phase-one runner trains candidates on the frozen train split and ranks
+them using explicit-rating RMSE or MAE from the frozen validation split only:
+
+```bash
+uv run python research/goodbooks-mf/verify_data.py
+uv run python research/goodbooks-mf/run_all_experiments.py
+```
+
+The committed candidate schema is `experiment_config.json`. It fixes dataset
+version `goodreads-poetry-v1`, seed `20260830`, rating clipping to `[1, 5]`, and
+the auditable candidate list for each local model. A candidate cannot override
+the top-level seed.
+
+The runner:
+
+1. verifies the bundle against `canonical_manifest.json`;
+2. deserializes only `train.parquet`, `validation.parquet`, and
+   `train_explicit.npz`;
+3. trains every configured candidate on train;
+4. selects within each model using validation only;
+5. writes complete phase-one rows to `results/validation_selection.json`.
+
+The test artifact is checksum-verified as part of the bundle, but
+`test.parquet` is not deserialized. Future test access is gated behind a frozen
+configuration with a matching dataset version, seed, and configuration hash.
+The phase-one command intentionally exposes no final-test option.
+
+Current validation-only selected rows are:
+
+| Model | Validation RMSE | Validation MAE |
+|---|---:|---:|
+| Basic MF | 1.022825 | 0.788908 |
+| FunkSVD | 0.844779 | 0.655388 |
+| Sparse explicit ALS | 1.014981 | 0.755570 |
+| Masked NMF with optional L2 regularization | 0.897692 | 0.675072 |
+| Bias-aware residual ALS | 0.843333 | 0.661293 |
+
+These are validation-selection results, not final test metrics. Precision,
+Recall, NDCG, and evaluated ranking users remain `null` until Ricky's shared
+evaluation functions and frozen candidate artifact are available. Do not
+implement a parallel temporary Top-K definition. The subsequent frozen rating
+test is documented below.
+
+## Yutao frozen rating test
+
+After the validation configuration review, the selected ALS, masked NMF, and
+bias-aware ALS configurations were frozen under seed `20260830` with config
+hash:
+
+```text
+c9c986bd86acfe24af91b465e773ac9039e16bbb97e51c8e66858aa6fc358cac
+```
+
+The one-time explicit-rating test evaluated 17,168 ratings and produced:
+
+| Model | Test RMSE | Test MAE |
+|---|---:|---:|
+| Sparse explicit ALS | 1.119088 | 0.828761 |
+| Masked NMF with L2 | 0.984062 | 0.719640 |
+| Bias-aware residual ALS | 0.861570 | 0.675045 |
+
+The immutable inputs and aggregate results are recorded in
+`results/yutao_frozen_config.json` and `results/yutao_test_metrics.json`.
+The test-result command refuses to replace an existing frozen configuration or
+result file. These test metrics must not be used for further tuning. Ranking
+metrics remain pending Ricky's shared evaluation and candidate artifact.
 
 The committed `config.json` is the data contract. It fixes the random seed,
 k-core thresholds, maximum user count, and temporal split fractions. Every
@@ -57,15 +130,17 @@ configuration, aggregate metrics, and documentation only.
 
 ## Model contract
 
-Both models train directly over observed `(user_idx, item_idx, rating)`
-triplets; they never construct or scan a dense user-item matrix. `FunkSVD`
+Basic MF and FunkSVD train over observed `(user_idx, item_idx, rating)`
+triplets. ALS, NMF, and bias-aware ALS consume the frozen sparse explicit CSR
+matrix. Missing CSR positions are never interpreted as rating zero. `FunkSVD`
 implements:
 
 ```text
 prediction = global_mean + user_bias + item_bias + user_factors @ item_factors
 ```
 
-Validation RMSE controls early stopping and restores the best epoch. Test
-RMSE/MAE are produced by `run_experiment.py`. Precision, Recall, and NDCG will
+Validation RMSE controls SGD early stopping and restores the best epoch. All
+models expose raw-score prediction and deterministic recommendation methods;
+rating evaluation clips only at metric time. Precision, Recall, and NDCG will
 be added by the shared evaluation owner once the frozen candidate set is
 available.
