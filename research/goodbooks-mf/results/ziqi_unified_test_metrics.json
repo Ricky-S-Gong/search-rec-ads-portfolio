@@ -1,0 +1,91 @@
+{
+  "data_counts": {
+    "interactions": 261709,
+    "items": 5551,
+    "test": 44229,
+    "train": 191436,
+    "users": 5129,
+    "validation": 26044
+  },
+  "dataset_version": "goodreads-poetry-v1",
+  "models": {
+    "basic_mf": {
+      "best_epoch": 32,
+      "candidate_policy": "full_train_catalog_excluding_seen",
+      "catalog_size": 5551,
+      "epochs_trained": 43,
+      "evaluated_ranking_users": 4765,
+      "evaluated_rating_count": 17168,
+      "evaluated_rating_users": 5129,
+      "hyperparameters": {
+        "learning_rate": 0.01,
+        "n_epochs": 100,
+        "n_factors": 40,
+        "n_items": 5551,
+        "n_users": 5129,
+        "patience": 10,
+        "reg_lambda": 0.02,
+        "seed": 20260830
+      },
+      "inference_seconds": 6.624272,
+      "mae": 0.8820027586908887,
+      "ndcg_at_10": 0.023946767423720927,
+      "ndcg_at_20": 0.03161065775600213,
+      "ndcg_at_5": 0.017937611111453935,
+      "precision_at_10": 0.008646379853095545,
+      "precision_at_20": 0.007324239244491115,
+      "precision_at_5": 0.009779643231899292,
+      "ranking_inference_seconds": 6.619993,
+      "rating_inference_seconds": 0.004279,
+      "recall_at_10": 0.03617832295543897,
+      "recall_at_20": 0.060527633099742684,
+      "recall_at_5": 0.020534919784657445,
+      "rmse": 1.1494089935786191,
+      "training_seconds": 26.085656
+    },
+    "funksvd": {
+      "best_epoch": 9,
+      "candidate_policy": "full_train_catalog_excluding_seen",
+      "catalog_size": 5551,
+      "epochs_trained": 20,
+      "evaluated_ranking_users": 4765,
+      "evaluated_rating_count": 17168,
+      "evaluated_rating_users": 5129,
+      "hyperparameters": {
+        "learning_rate": 0.01,
+        "n_epochs": 100,
+        "n_factors": 40,
+        "n_items": 5551,
+        "n_users": 5129,
+        "patience": 10,
+        "reg_lambda": 0.02,
+        "seed": 20260830
+      },
+      "inference_seconds": 6.724726,
+      "mae": 0.6689436975997434,
+      "ndcg_at_10": 0.004919915744073547,
+      "ndcg_at_20": 0.007130899224191944,
+      "ndcg_at_5": 0.0035095083522284315,
+      "precision_at_10": 0.0019937040923399753,
+      "precision_at_20": 0.0018992654774396625,
+      "precision_at_5": 0.0021406086044071346,
+      "ranking_inference_seconds": 6.721349,
+      "rating_inference_seconds": 0.003377,
+      "recall_at_10": 0.007368713845724069,
+      "recall_at_20": 0.014279590156085386,
+      "recall_at_5": 0.003764288181735806,
+      "rmse": 0.861341081689751,
+      "training_seconds": 14.270369
+    }
+  },
+  "ranking_protocol": {
+    "candidate_policy": "full_train_catalog_excluding_seen",
+    "k_values": [
+      5,
+      10,
+      20
+    ],
+    "relevance": "rating >= 4 OR (rating == 0 AND is_read)"
+  },
+  "seed": 20260830
+}

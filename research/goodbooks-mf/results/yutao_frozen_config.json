@@ -1,0 +1,41 @@
+{
+  "best_configs": {
+    "als": {
+      "hyperparameters": {
+        "n_factors": 4,
+        "n_iterations": 10,
+        "reg_lambda": 1.0
+      },
+      "selection_metric": "rmse",
+      "validation_metric": 1.0149814550211673
+    },
+    "bias_aware_als": {
+      "hyperparameters": {
+        "bias_iterations": 10,
+        "bias_reg_lambda": 10.0,
+        "n_factors": 4,
+        "n_iterations": 10,
+        "reg_lambda": 20.0
+      },
+      "selection_metric": "rmse",
+      "validation_metric": 0.8433334528974227
+    },
+    "nmf": {
+      "hyperparameters": {
+        "max_iter": 3,
+        "n_factors": 200,
+        "reg_lambda": 0.0003,
+        "tol": 0.0001
+      },
+      "selection_metric": "rmse",
+      "validation_metric": 0.897691940237343
+    }
+  },
+  "config_hash": "c9c986bd86acfe24af91b465e773ac9039e16bbb97e51c8e66858aa6fc358cac",
+  "dataset_version": "goodreads-poetry-v1",
+  "ranking_evaluation_status": "pending Ricky shared evaluation and candidate set",
+  "schema_version": "goodbooks-frozen-config-v1",
+  "seed": 20260830,
+  "selection_metric": "rmse",
+  "status": "frozen"
+}

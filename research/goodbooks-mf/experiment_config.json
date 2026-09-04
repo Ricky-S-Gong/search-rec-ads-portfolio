@@ -1,0 +1,182 @@
+{
+  "schema_version": "goodbooks-experiment-config-v1",
+  "dataset_version": "goodreads-poetry-v1",
+  "seed": 20260830,
+  "selection_metric": "rmse",
+  "rating_clip": [
+    1.0,
+    5.0
+  ],
+  "models": {
+    "basic_mf": {
+      "candidates": [
+        {
+          "n_factors": 40,
+          "learning_rate": 0.01,
+          "reg_lambda": 0.02,
+          "n_epochs": 100,
+          "patience": 10,
+          "min_delta": 0.0001
+        }
+      ]
+    },
+    "funksvd": {
+      "candidates": [
+        {
+          "n_factors": 40,
+          "learning_rate": 0.01,
+          "reg_lambda": 0.02,
+          "n_epochs": 100,
+          "patience": 10,
+          "min_delta": 0.0001
+        }
+      ]
+    },
+    "als": {
+      "candidates": [
+        {
+          "n_factors": 4,
+          "reg_lambda": 1.0,
+          "n_iterations": 5
+        },
+        {
+          "n_factors": 4,
+          "reg_lambda": 1.0,
+          "n_iterations": 10
+        },
+        {
+          "n_factors": 4,
+          "reg_lambda": 1.0,
+          "n_iterations": 20
+        },
+        {
+          "n_factors": 4,
+          "reg_lambda": 2.0,
+          "n_iterations": 10
+        },
+        {
+          "n_factors": 8,
+          "reg_lambda": 1.0,
+          "n_iterations": 5
+        },
+        {
+          "n_factors": 8,
+          "reg_lambda": 1.0,
+          "n_iterations": 10
+        }
+      ]
+    },
+    "nmf": {
+      "candidates": [
+        {
+          "n_factors": 160,
+          "max_iter": 2,
+          "reg_lambda": 0.0,
+          "tol": 0.0001
+        },
+        {
+          "n_factors": 160,
+          "max_iter": 3,
+          "reg_lambda": 0.0,
+          "tol": 0.0001
+        },
+        {
+          "n_factors": 160,
+          "max_iter": 3,
+          "reg_lambda": 0.0003,
+          "tol": 0.0001
+        },
+        {
+          "n_factors": 160,
+          "max_iter": 5,
+          "reg_lambda": 0.0003,
+          "tol": 0.0001
+        },
+        {
+          "n_factors": 200,
+          "max_iter": 2,
+          "reg_lambda": 0.0,
+          "tol": 0.0001
+        },
+        {
+          "n_factors": 200,
+          "max_iter": 3,
+          "reg_lambda": 0.0,
+          "tol": 0.0001
+        },
+        {
+          "n_factors": 200,
+          "max_iter": 3,
+          "reg_lambda": 0.0003,
+          "tol": 0.0001
+        },
+        {
+          "n_factors": 200,
+          "max_iter": 5,
+          "reg_lambda": 0.0003,
+          "tol": 0.0001
+        }
+      ]
+    },
+    "bias_aware_als": {
+      "candidates": [
+        {
+          "n_factors": 4,
+          "reg_lambda": 10.0,
+          "n_iterations": 5,
+          "bias_reg_lambda": 10.0,
+          "bias_iterations": 10
+        },
+        {
+          "n_factors": 4,
+          "reg_lambda": 10.0,
+          "n_iterations": 10,
+          "bias_reg_lambda": 10.0,
+          "bias_iterations": 10
+        },
+        {
+          "n_factors": 4,
+          "reg_lambda": 20.0,
+          "n_iterations": 5,
+          "bias_reg_lambda": 10.0,
+          "bias_iterations": 10
+        },
+        {
+          "n_factors": 4,
+          "reg_lambda": 20.0,
+          "n_iterations": 10,
+          "bias_reg_lambda": 10.0,
+          "bias_iterations": 10
+        },
+        {
+          "n_factors": 8,
+          "reg_lambda": 10.0,
+          "n_iterations": 5,
+          "bias_reg_lambda": 10.0,
+          "bias_iterations": 10
+        },
+        {
+          "n_factors": 8,
+          "reg_lambda": 10.0,
+          "n_iterations": 10,
+          "bias_reg_lambda": 10.0,
+          "bias_iterations": 10
+        },
+        {
+          "n_factors": 8,
+          "reg_lambda": 20.0,
+          "n_iterations": 5,
+          "bias_reg_lambda": 10.0,
+          "bias_iterations": 10
+        },
+        {
+          "n_factors": 8,
+          "reg_lambda": 20.0,
+          "n_iterations": 10,
+          "bias_reg_lambda": 10.0,
+          "bias_iterations": 10
+        }
+      ]
+    }
+  }
+}
