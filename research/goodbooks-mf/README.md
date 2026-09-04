@@ -124,6 +124,35 @@ and frozen config hash are stored in
 `results/yutao_unified_test_metrics.png`. These test results are for final
 reporting only and must not be used to revise hyperparameters.
 
+## Current team comparison
+
+Ziqi's committed Basic MF and FunkSVD implementations were reproduced with
+their frozen configuration and Ricky's shared rating/ranking evaluation. The
+rating results exactly reproduce the previously published aggregate values.
+Build the current team summary with:
+
+```bash
+uv run python research/goodbooks-mf/run_experiment.py \
+  --output research/goodbooks-mf/results/ziqi_unified_test_metrics.json
+uv run python research/goodbooks-mf/build_team_summary.py
+```
+
+| Model | Owner | RMSE | MAE | Precision@10 | Recall@10 | NDCG@10 | Train seconds |
+|---|---|---:|---:|---:|---:|---:|---:|
+| Basic MF | Ziqi | 1.149409 | 0.882003 | **0.008646** | **0.036178** | **0.023947** | 26.086 |
+| FunkSVD | Ziqi | **0.861341** | **0.668944** | 0.001994 | 0.007369 | 0.004920 | 14.270 |
+| ALS | Yutao | 1.119088 | 0.828761 | 0.001448 | 0.005637 | 0.002728 | 0.814 |
+| NMF + L2 | Yutao | 0.984062 | 0.719640 | 0.000441 | 0.001193 | 0.000835 | 0.931 |
+| Bias-aware ALS | Yutao, diagnostic | 0.861570 | 0.675045 | 0.002036 | 0.007762 | 0.005978 | 0.812 |
+
+All rows use 17,168 explicit test ratings, 5,129 rating users, 4,765 ranking
+users, and the 5,551-item train catalog. Basic MF has the weakest rating error
+but the strongest Top-K result, so rating prediction and ranking quality must
+be discussed separately. `results/team_model_comparison.{json,csv,png}` stores
+the normalized table and chart. The planned SVD++ row remains pending Ricky's
+implementation and shared-evaluation output; bias-aware ALS is explicitly
+marked as an additional diagnostic rather than a substitute for SVD++.
+
 The committed `config.json` is the data contract. It fixes the random seed,
 k-core thresholds, maximum user count, and temporal split fractions. Every
 model must consume the generated bundle and must not independently filter or

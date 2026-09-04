@@ -11,6 +11,7 @@ __pycache__/
 research/**/data/
 *.csv
 !research/goodbooks-mf/results/yutao_unified_test_metrics.csv
+!research/goodbooks-mf/results/team_model_comparison.csv
 *.zip
 .env
 .env.*

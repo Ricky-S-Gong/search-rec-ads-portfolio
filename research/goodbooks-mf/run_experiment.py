@@ -49,12 +49,26 @@ def run(data_dir: Path, output_path: Path, smoke: bool = False) -> dict:
     for name, model in models.items():
         started = time.perf_counter()
         model.fit(train, validation)
+        training_seconds = time.perf_counter() - started
+
+        started = time.perf_counter()
+        rating_metrics = evaluate_ratings(model, test)
+        rating_inference_seconds = time.perf_counter() - started
+        started = time.perf_counter()
+        ranking_metrics = evaluate_ranking(model, ranking_data)
+        ranking_inference_seconds = time.perf_counter() - started
         results[name] = {
-            **evaluate_ratings(model, test),
-            **evaluate_ranking(model, ranking_data),
+            **rating_metrics,
+            **ranking_metrics,
             "best_epoch": model.best_epoch,
             "epochs_trained": model.n_epochs_trained,
-            "training_seconds": round(time.perf_counter() - started, 6),
+            "training_seconds": round(training_seconds, 6),
+            "rating_inference_seconds": round(rating_inference_seconds, 6),
+            "ranking_inference_seconds": round(ranking_inference_seconds, 6),
+            "inference_seconds": round(
+                rating_inference_seconds + ranking_inference_seconds,
+                6,
+            ),
             "hyperparameters": common,
         }
     payload = {

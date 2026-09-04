@@ -31,6 +31,9 @@ def test_experiment_result_records_data_counts_hyperparameters_and_training_time
     }
     for result in payload["models"].values():
         assert result["training_seconds"] >= 0
+        assert result["rating_inference_seconds"] >= 0
+        assert result["ranking_inference_seconds"] >= 0
+        assert result["inference_seconds"] >= 0
         assert result["hyperparameters"]["n_factors"] == 8
         assert result["catalog_size"] == 3
         assert "precision_at_5" in result
