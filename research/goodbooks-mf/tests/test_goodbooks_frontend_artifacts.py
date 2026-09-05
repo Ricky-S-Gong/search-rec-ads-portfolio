@@ -113,3 +113,23 @@ def test_publisher_rejects_incomplete_or_inconsistent_team_summary(tmp_path: Pat
 
     with pytest.raises(ValueError, match="complete"):
         publish_frontend_artifact(bundle, summary_path, tmp_path / "metrics.json")
+
+
+def test_publisher_rejects_inconsistent_or_private_summary_fields(tmp_path: Path):
+    bundle = _bundle(tmp_path)
+    cases = [
+        (lambda summary: summary.update(dataset_version="wrong-v1"), "dataset_version"),
+        (lambda summary: summary.update(seed=8), "seed"),
+        (lambda summary: summary["ranking_protocol"].update(k_values=[10]), "ranking_protocol"),
+        (lambda summary: summary["results"][0].update(evaluated_ranking_users=1), "evaluation population"),
+        (lambda summary: summary["results"][5].update(model_role="planned"), "model roles"),
+        (lambda summary: summary["results"][0].update(rmse=float("nan")), "finite"),
+        (lambda summary: summary.update(candidate_list=[1, 2]), "private field"),
+    ]
+    for index, (mutation, message) in enumerate(cases):
+        summary = _summary()
+        mutation(summary)
+        summary_path = tmp_path / f"team-{index}.json"
+        summary_path.write_text(json.dumps(summary), encoding="utf-8")
+        with pytest.raises(ValueError, match=message):
+            publish_frontend_artifact(bundle, summary_path, tmp_path / "metrics.json")
