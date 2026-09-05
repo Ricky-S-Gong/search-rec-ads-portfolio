@@ -178,6 +178,23 @@ but its official row must not be generated until the private bundle is restored
 and `verify_data.py` succeeds. Bias-aware ALS is explicitly marked as an
 additional diagnostic rather than a substitute for SVD++.
 
+## Publish the portfolio artifact
+
+After all five planned models have completed their frozen evaluation and
+`build_team_summary.py` reports `status: complete`, publish the aggregate-only
+frontend artifact with:
+
+```bash
+uv run python research/goodbooks-mf/publish_frontend_artifacts.py
+```
+
+The command verifies the private bundle against the canonical manifest, rejects
+pending or inconsistent team summaries, and writes
+`public/artifacts/goodbooks/metrics.json`. It exports counts, field ranges,
+matrix statistics, protocol metadata, aggregate model metrics, and the
+NDCG@10-selected offline candidate. It never exports user IDs, book IDs,
+interactions, or per-user recommendation candidates.
+
 The committed `config.json` is the data contract. It fixes the random seed,
 k-core thresholds, maximum user count, and temporal split fractions. Every
 model must consume the generated bundle and must not independently filter or

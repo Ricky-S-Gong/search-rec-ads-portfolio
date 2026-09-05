@@ -1,0 +1,163 @@
+---
+import KatexMath from './KatexMath.astro';
+import FormulaLegend from './FormulaLegend.astro';
+import GoodBooksMetricsExplorer from './GoodBooksMetricsExplorer';
+import { type Lang } from '../data/site';
+
+interface Field { name: string; type: string; range?: [string | number, string | number]; values?: Array<string | boolean>; }
+interface Model {
+  model: string; model_label: string; model_role: string; owner: string; hyperparameters: Record<string, number>;
+  best_validation_rmse: number; rmse: number; mae: number; precision_at_10: number; recall_at_10: number; ndcg_at_10: number;
+  training_seconds: number; inference_seconds: number; evaluated_rating_count: number; evaluated_rating_users: number; evaluated_ranking_users: number;
+}
+interface Metrics {
+  dataset: {
+    version: string; seed: number; counts: Record<string, number>; fields: Field[]; explicit_counts: Record<string, number>;
+    matrices: Record<string, { shape: number[]; nonzero: number; value_range: number[] }>;
+    source: string; license_note: string;
+  };
+  evaluation: { candidate_policy: string; relevance: string; k_values: number[] };
+  models: Model[];
+  champion: { model: string; model_label: string; selection_value: number };
+}
+
+const { lang, metrics } = Astro.props as { lang: Lang; metrics: Metrics };
+const zh = lang === 'zh';
+const nav = zh
+  ? ['业务问题', '数据与切分', '矩阵分解', '五种模型', '统一评估', '结果比较', '上线实验']
+  : ['Business problem', 'Data and split', 'Matrix factorization', 'Five models', 'Shared evaluation', 'Comparison', 'Online experiment'];
+const counts = metrics.dataset.counts;
+const explicit = metrics.dataset.matrices.explicit;
+const implicit = metrics.dataset.matrices.implicit;
+const fieldCopy: Record<string, [string, string]> = zh ? {
+  user_idx: ['匿名用户的连续下标', '所有模型的用户行'], item_idx: ['图书的连续下标', '所有模型的物品列'],
+  rating: ['0 是未评分；1–5 是显式评分', '训练评分预测与 RMSE/MAE'], is_read: ['是否标记为已读', 'SVD++ 隐式历史与相关性'],
+  is_reviewed: ['是否写过评论', 'SVD++ 隐式历史'], event_time: ['标准化 UTC 事件时间', '每位用户从过去预测未来'],
+  split: ['冻结的数据分区', 'train / validation / test'],
+} : {
+  user_idx: ['Contiguous anonymous user index', 'User row for every model'], item_idx: ['Contiguous book index', 'Item column for every model'],
+  rating: ['0 is unrated; 1–5 are explicit ratings', 'Rating training and RMSE/MAE'], is_read: ['Whether the book was read', 'SVD++ history and relevance'],
+  is_reviewed: ['Whether the user wrote a review', 'SVD++ history'], event_time: ['Normalized UTC event time', 'Predict each user’s future from their past'],
+  split: ['Frozen data partition', 'train / validation / test'],
+};
+const pct = (value: number) => `${(value * 100).toFixed(2)}%`;
+const modelDetails = [
+  {
+    key: 'basic_mf', formula: String.raw`\hat r_{ui}=p_u^\top q_i`,
+    title: zh ? 'Basic MF：从共同评分中压缩偏好' : 'Basic MF: compress shared rating patterns',
+    body: zh ? '在已观测评分上用 SGD 学习用户向量和图书向量。两个向量的点积是预测分数；它是最小的 latent-factor 基线。' : 'SGD learns one vector per user and book from observed ratings only. Their dot product is the predicted score; this is the smallest latent-factor baseline.',
+    limit: zh ? '没有显式处理用户普遍打高分或图书普遍受欢迎的偏置。' : 'It does not explicitly separate generous raters or broadly liked books from taste.',
+  },
+  {
+    key: 'funksvd', formula: String.raw`\hat r_{ui}=\mu+b_u+b_i+p_u^\top q_i`,
+    title: zh ? 'FunkSVD：先解释系统性评分偏置' : 'FunkSVD: explain systematic rating bias first',
+    body: zh ? '在 Basic MF 上加入全局、用户和图书 bias。每个 epoch 用 validation RMSE 控制 early stopping，并恢复最佳 checkpoint。' : 'Adds global, user, and book biases to Basic MF. Validation RMSE controls early stopping and the best checkpoint is restored.',
+    limit: zh ? '仍然只把显式评分当作训练目标。' : 'It still uses explicit ratings as the training target.',
+  },
+  {
+    key: 'als', formula: String.raw`p_u=(Q_{I_u}^\top Q_{I_u}+\lambda I)^{-1}Q_{I_u}^\top r_u`,
+    title: zh ? 'ALS：交替解一系列 ridge regression' : 'ALS: alternate closed-form ridge regressions',
+    body: zh ? '固定图书向量时求每位用户的闭式解，再固定用户向量求图书解。只使用 CSR 中存储的显式评分。' : 'Fix item vectors and solve each user’s ridge regression, then reverse the roles. Only stored explicit CSR ratings enter the normal equations.',
+    limit: zh ? '无 bias 的显式 ALS 可能把评分尺度差异留给 latent factors。' : 'Bias-free explicit ALS can leave rating-scale differences for latent factors to absorb.',
+  },
+  {
+    key: 'nmf', formula: String.raw`\min_{P,Q\ge0}\sum_{(u,i)\in\Omega}(r_{ui}-p_u^\top q_i)^2+\lambda(\lVert P\rVert_F^2+\lVert Q\rVert_F^2)`,
+    title: zh ? 'Masked NMF：只允许非负的偏好组合' : 'Masked NMF: non-negative preference components',
+    body: zh ? '因子受非负约束，用 multiplicative updates 优化 masked reconstruction loss。未观测 CSR 位置始终是缺失值，不是评分 0。' : 'Factors remain non-negative and multiplicative updates optimize masked reconstruction loss. Unobserved CSR positions always remain missing, never rating zero.',
+    limit: zh ? '非负约束改善可读性，但会限制表达用户对不同因素的相反偏好。' : 'Non-negativity can aid interpretation but restrict opposing latent preferences.',
+  },
+  {
+    key: 'svdpp', formula: String.raw`\hat r_{ui}=\mu+b_u+b_i+q_i^\top\left[p_u+|N(u)|^{-1/2}\sum_{j\in N(u)}y_j\right]`,
+    title: zh ? 'SVD++：把已读和评论历史作为隐式信号' : 'SVD++: add read and review history as implicit signal',
+    body: zh ? '在 FunkSVD 上加入用户历史向量。N(u) 只由 train 中 is_read、is_reviewed 或 rating > 0 的图书组成，绝不从 validation/test 读取未来行为。' : 'Adds an implicit-history vector to FunkSVD. N(u) contains only train books with is_read, is_reviewed, or rating > 0; validation and test behavior never enters history.',
+    limit: zh ? '每次更新还要维护历史物品因子，训练成本通常更高。' : 'Updating implicit item factors generally makes training more expensive.',
+  },
+];
+const population = metrics.models[0];
+---
+
+<nav class="goodbooks-nav" aria-label={zh ? '项目章节' : 'Case study sections'}>
+  {nav.map((item, index) => <a href={`#gb-${index + 1}`}>{index + 1}. {item}</a>)}
+</nav>
+
+<div class="goodbooks-case-study">
+  <section id="gb-1" class="goodbooks-step">
+    <p class="step-label">01 / {zh ? '产品决策' : 'Product decision'}</p>
+    <h2>{zh ? '业务问题：为回访诗歌读者排序未知图书' : 'Business problem: rank unseen poetry books for returning readers'}</h2>
+    <p>{zh ? `设想 Goodreads 的 Poetry discovery shelf：一位已有阅读历史的用户回来后，系统必须从 ${counts.items.toLocaleString()} 本训练目录图书中排除已见项目，再选出十本候选。这里的决策不是“哪种算法最复杂”，而是在相同数据和候选协议下，哪种 latent-factor 模型最值得进入线上实验。` : `Imagine a Goodreads Poetry discovery shelf. When a reader returns with history, the system removes seen books from the ${counts.items.toLocaleString()}-book training catalog and ranks ten candidates. The decision is not which algorithm is most complex; it is which latent-factor model merits an online experiment under one shared protocol.`}</p>
+    <div class="observatory" aria-label={zh ? '合成的稀疏矩阵到推荐排序示意图' : 'Synthetic sparse-matrix-to-ranking illustration'}>
+      <div><small>{zh ? '观测评分矩阵 R' : 'Observed matrix R'}</small><b class="matrix-grid" aria-hidden="true">{Array.from({ length: 25 }, (_, i) => <i class={i % 4 === 0 || i === 7 || i === 18 ? 'rated' : ''}></i>)}</b></div>
+      <span aria-hidden="true">≈</span>
+      <div><small>{zh ? '用户因子 P' : 'User factors P'}</small><b class="factor-lines"><i></i><i></i><i></i></b></div>
+      <span aria-hidden="true">×</span>
+      <div><small>{zh ? '图书因子 Qᵀ' : 'Book factors Qᵀ'}</small><b class="factor-lines wide"><i></i><i></i><i></i></b></div>
+      <span aria-hidden="true">→</span>
+      <div><small>{zh ? '未见图书 Top-10' : 'Unseen-book Top-10'}</small><b class="rank-lines"><i></i><i></i><i></i></b></div>
+    </div>
+    <aside><h3>{zh ? '证据边界' : 'Evidence boundary'}</h3><p>{zh ? '离线 NDCG 衡量历史相关项目是否被排在前面；它不等于收藏、阅读、留存或收入。数据没有曝光、点击和当前生产日志，线上影响必须通过未来实验验证。' : 'Offline NDCG measures whether historically relevant books rank near the top. It is not a measure of saves, reading, retention, or revenue; those require future online experimentation.'}</p></aside>
+  </section>
+
+  <section id="gb-2" class="goodbooks-step">
+    <p class="step-label">02 / {zh ? '冻结数据' : 'Frozen data'}</p>
+    <h2>{zh ? '数据、变量与时间边界' : 'Data, variables, and temporal boundary'}</h2>
+    <p>{zh ? `处理后的 ${metrics.dataset.version} 含 ${counts.users.toLocaleString()} 位匿名用户、${counts.items.toLocaleString()} 本图书和 ${counts.interactions.toLocaleString()} 条去重 interaction。原始和处理后的行级记录都不进入网站；只发布以下聚合事实。` : `The processed ${metrics.dataset.version} contains ${counts.users.toLocaleString()} anonymous users, ${counts.items.toLocaleString()} books, and ${counts.interactions.toLocaleString()} deduplicated interactions. Neither raw nor processed rows enter this site; only the aggregate facts below are public.`}</p>
+    <div class="data-table"><table><thead><tr><th>{zh ? '字段' : 'Field'}</th><th>{zh ? '类型 / 值域' : 'Type / range'}</th><th>{zh ? '含义' : 'Meaning'}</th><th>{zh ? '用途' : 'Use'}</th></tr></thead><tbody>{metrics.dataset.fields.map((field) => <tr><th><code>{field.name}</code></th><td><code>{field.type}</code><br />{field.range ? field.range.join(' – ') : field.values?.join(' / ')}</td><td>{fieldCopy[field.name][0]}</td><td>{fieldCopy[field.name][1]}</td></tr>)}</tbody></table></div>
+    <div class="stat-grid">
+      {(['train', 'validation', 'test'] as const).map((split) => <article><span>{split}</span><strong>{counts[split].toLocaleString()}</strong><small>{metrics.dataset.explicit_counts[split].toLocaleString()} {zh ? '条显式评分' : 'explicit ratings'}</small></article>)}
+      <article><span>{zh ? '显式 CSR' : 'Explicit CSR'}</span><strong>{explicit.shape.join(' × ')}</strong><small>{explicit.nonzero.toLocaleString()} {zh ? '个非零 1–5 评分' : 'stored 1–5 ratings'}</small></article>
+      <article><span>{zh ? '隐式 CSR' : 'Implicit CSR'}</span><strong>{implicit.shape.join(' × ')}</strong><small>{implicit.nonzero.toLocaleString()} {zh ? '个 binary 1' : 'binary ones'}</small></article>
+    </div>
+    <p>{zh ? 'Pipeline 先做确定性去重和 fixed-point k-core，再用固定 seed 连续编码 ID。每位用户按 event_time 做 80/10/10 temporal split；validation/test 的冷图书被移除，所以模型只能从过去预测未来。' : 'The pipeline deduplicates deterministically, runs fixed-point k-core filtering, and encodes IDs with one fixed seed. Each user receives an 80/10/10 temporal split; cold validation/test items are removed, so models predict future behavior only from the past.'}</p>
+    <aside><h3>{zh ? '数据限制与许可' : 'Data limitations and license'}</h3><p>{zh ? <>来源为 <a href="https://mengtingwan.github.io/data/goodreads.html" target="_blank" rel="noreferrer">{metrics.dataset.source}</a>，仅限学术使用，不可再分发或商用。公开书架存在曝光偏差，缺失并非随机；纯协同过滤不能解决新用户或新图书冷启动。</> : <>Source: <a href="https://mengtingwan.github.io/data/goodreads.html" target="_blank" rel="noreferrer">{metrics.dataset.source}</a>. {metrics.dataset.license_note} Public shelves are exposure-biased, missingness is not random, and pure collaborative filtering cannot solve new-user or new-book cold start.</>}</p></aside>
+  </section>
+
+  <section id="gb-3" class="goodbooks-step">
+    <p class="step-label">03 / {zh ? '共同语言' : 'Shared language'}</p>
+    <h2>{zh ? '矩阵分解：只从观测评分学习低维表示' : 'Matrix factorization: learn compact representations from observed ratings'}</h2>
+    <p>{zh ? '评分矩阵极度稀疏，因此不填补所有空格，也不把空格解释为 0 分。模型只在已观测集合 Ω 上最小化误差，学习每位用户的向量 pᵤ 和每本书的向量 qᵢ；点积给出个性化评分预测。' : 'The rating matrix is sparse, so empty cells are neither filled nor interpreted as zero. Models minimize error only on observed set Ω, learn a vector pᵤ per user and qᵢ per book, then use their dot product as a personalized rating prediction.'}</p>
+    <div class="formula-grid"><article><KatexMath latex={String.raw`R\approx PQ^\top,\qquad \min_{P,Q}\sum_{(u,i)\in\Omega}(r_{ui}-p_u^\top q_i)^2+\lambda(\lVert P\rVert_F^2+\lVert Q\rVert_F^2)`} display label="Observed-only matrix factorization objective" /><FormulaLegend label={zh ? '符号' : 'Symbols'} entries={[{ latex: String.raw`\Omega`, description: zh ? '已观测评分位置；不包含缺失项。' : 'Observed rating positions; missing cells are excluded.' }, { latex: String.raw`\lambda`, description: zh ? '正则化强度，防止稀疏数据记忆训练集。' : 'Regularization strength against memorizing sparse training data.' }]} /></article><article><h3>{zh ? '二维手算例子' : 'A two-dimensional hand calculation'}</h3><KatexMath latex={String.raw`p_u=[0.6,0.2],\quad q_i=[0.5,0.8],\quad \hat r_{ui}=0.6(0.5)+0.2(0.8)=0.46`} display /><p>{zh ? '这个数字只是合成教学例子。latent dimension 可能捕捉共现模式，但不会自动获得“爱情诗”或“现代主义”等天然语义标签。' : 'This is a synthetic teaching example. Latent dimensions can encode co-occurrence patterns, but do not automatically receive semantic labels such as “love poetry” or “modernism.”'}</p></article></div>
+  </section>
+
+  <section id="gb-4" class="goodbooks-step">
+    <p class="step-label">04 / {zh ? '模型图谱' : 'Model atlas'}</p>
+    <h2>{zh ? '五种正式算法，分别增加一种能力或约束' : 'Five planned algorithms, each adding one capability or constraint'}</h2>
+    <p>{zh ? '所有模型复用同一数据版本、seed、时间切分和 evaluation。展开任意模型可查看实际实现对应的公式、训练方式和限制。' : 'Every model shares the same data version, seed, temporal split, and evaluation. Expand a model to see the formula, training mechanism, and limitation implemented here.'}</p>
+    <div class="model-details">{modelDetails.map((detail, index) => { const model = metrics.models.find((row) => row.model === detail.key); return <details open={index === 0}><summary><span>{detail.title}</span><small>{model ? Object.entries(model.hyperparameters).map(([key, value]) => `${key}=${value}`).join(' · ') : ''}</small></summary><div><KatexMath latex={detail.formula} display label={`${detail.key} formula`} /><p>{detail.body}</p><p class="limit"><strong>{zh ? '限制：' : 'Limit: '}</strong>{detail.limit}</p></div></details>; })}</div>
+    <aside><h3>{zh ? '额外诊断：Bias-aware ALS' : 'Additional diagnostic: Bias-aware ALS'}</h3><p>{zh ? '该实现保留 ALS 的交替优化，同时额外建模 global/user/item bias。它会完整展示在结果表中，但不是原计划五模型之一，也不会参与 offline champion 选择。' : 'This implementation retains alternating optimization while adding global, user, and item biases. It appears in the complete comparison, but is not one of the five planned models and never selects the offline champion.'}</p></aside>
+  </section>
+
+  <section id="gb-5" class="goodbooks-step">
+    <p class="step-label">05 / {zh ? '统一评估' : 'Shared evaluation'}</p>
+    <h2>{zh ? '同一候选集、同一相关性定义、同一用户群体' : 'One candidate set, relevance definition, and user population'}</h2>
+    <div class="formula-grid"><article><h3>{zh ? '评分预测' : 'Rating prediction'}</h3><p>{zh ? '只评估 rating > 0 的 test 行；预测值只在 RMSE/MAE 计算时截断到 [1,5]。这些指标衡量评分误差，不保证 Top-10 排序好。' : 'Only test rows with rating > 0 are evaluated; predictions are clipped to [1,5] only for RMSE/MAE. These metrics measure rating error, not Top-10 quality.'}</p><KatexMath latex={String.raw`\mathrm{RMSE}=\sqrt{\frac1N\sum(\tilde r_{ui}-r_{ui})^2},\qquad \mathrm{MAE}=\frac1N\sum|\tilde r_{ui}-r_{ui}|`} display /></article><article><h3>{zh ? '排序质量' : 'Ranking quality'}</h3><p>{zh ? `候选为完整 train catalog 去除用户已见图书；没有负采样。相关定义为 ${metrics.evaluation.relevance}。raw score 排序，同分以 item_idx 升序打破。` : `Candidates are the complete train catalog minus seen books; there is no negative sampling. Relevance is ${metrics.evaluation.relevance}. Raw scores rank, with item_idx ascending as the tie-break.`}</p><KatexMath latex={String.raw`\mathrm{NDCG@K}=\frac{\sum_{j=1}^{K}\frac{\mathrm{rel}_j}{\log_2(j+1)}}{\mathrm{IDCG@K}`} display /></article></div>
+    <p>{zh ? `指标报告 K=${metrics.evaluation.k_values.join(' / ')}。RMSE/MAE 在 ${population.evaluated_rating_count.toLocaleString()} 条显式 test 评分、${population.evaluated_rating_users.toLocaleString()} 位用户上计算；只纳入至少有一个有效 relevant candidate 的 ${population.evaluated_ranking_users.toLocaleString()} 位 ranking users，因此所有模型在同一群体上比较 macro Precision、Recall 和 NDCG。` : `Metrics report K=${metrics.evaluation.k_values.join(' / ')}. RMSE/MAE use ${population.evaluated_rating_count.toLocaleString()} explicit test ratings from ${population.evaluated_rating_users.toLocaleString()} users; only ${population.evaluated_ranking_users.toLocaleString()} users with a valid relevant candidate enter the macro Precision, Recall, and NDCG population, so every model uses the same users.`}</p>
+  </section>
+
+  <section id="gb-6" class="goodbooks-step">
+    <p class="step-label">06 / {zh ? '横向比较' : 'Comparison'}</p>
+    <h2>{zh ? '先按同一指标比较，再选择线上候选' : 'Compare within one metric before choosing an online candidate'}</h2>
+    <p>{zh ? `线上候选是五个正式模型中 NDCG@10 最高的 ${metrics.champion.model_label}（${pct(metrics.champion.selection_value)}）。这不是“所有维度绝对最优”的宣言：RMSE、Recall、训练成本和目录分布回答的是不同问题。` : `The online candidate is ${metrics.champion.model_label}, the planned model with the highest NDCG@10 (${pct(metrics.champion.selection_value)}). This is not a claim of universal superiority: RMSE, Recall, training cost, and catalog distribution answer different questions.`}</p>
+    <GoodBooksMetricsExplorer client:visible lang={lang} models={metrics.models} champion={metrics.champion.model} />
+  </section>
+
+  <section id="gb-7" class="goodbooks-step">
+    <p class="step-label">07 / {zh ? '从离线到线上' : 'From offline to online'}</p>
+    <h2>{zh ? '上线不是把 NDCG 当作业务结果' : 'Launching does not turn NDCG into a business result'}</h2>
+    <div class="rollout-grid"><article><span>0</span><h3>{zh ? '离线与 shadow gate' : 'Offline and shadow gate'}</h3><p>{zh ? '校验 checksum、schema、non-finite score、seen-item leakage、空结果和 artifact 新鲜度；只生成不展示。' : 'Validate checksums, schema, non-finite scores, seen-item leakage, empty results, and artifact freshness; generate without exposing recommendations.'}</p></article><article><span>1</span><h3>5% canary</h3><p>{zh ? '至少 10 次 Poetry interaction 的合格用户按匿名 user ID stable hash 分流。48 小时只看错误、P95 latency、空列表和负反馈护栏。' : 'Eligible users have at least 10 Poetry interactions and receive a stable hash assignment. For 48 hours, inspect only errors, P95 latency, empty lists, and negative-feedback guardrails.'}</p></article><article><span>2</span><h3>50/50 A/B test</h3><p>{zh ? '对照组使用当前 editorial/popularity ranking，实验组使用离线冠军。主指标是首次合格曝光后 7 天内至少收藏一本推荐图书的用户比例。' : 'Control uses current editorial/popularity ranking and treatment uses the offline champion. The primary metric is the share of users who save at least one recommended book within seven days of their first eligible exposure.'}</p></article><article><span>3</span><h3>{zh ? '放量与长期 holdout' : 'Ramp and long-term holdout'}</h3><p>{zh ? '成功后升至 95% treatment、保留 5% holdout 观察 30 日阅读启动；无报警后再升至 100%，同时保留 feature flag 和上一版本回滚。' : 'After success, ramp to 95% treatment and retain a 5% holdout for 30-day reading starts; move to 100% only without alerts, keeping a feature flag and previous artifact for rollback.'}</p></article></div>
+    <div class="ab-grid"><article><h3>{zh ? '预注册分析' : 'Pre-registered analysis'}</h3><ul><li>{zh ? '双侧 α=0.05、80% power、5% relative MDE；按 control baseline 先算样本量。' : 'Two-sided α=0.05, 80% power, and a 5% relative MDE; calculate sample size from the control baseline first.'}</li><li>{zh ? '至少运行两个完整自然周，停止入组后等待 7 天使主指标成熟。' : 'Run at least two complete calendar weeks, then wait seven days after enrollment closes for the primary outcome to mature.'}</li><li>{zh ? '检查 sample-ratio mismatch、事件缺失和组间曝光不平衡。' : 'Check sample-ratio mismatch, event loss, and exposure imbalance.'}</li></ul></article><article><h3>{zh ? '成功与回滚' : 'Success and rollback'}</h3><ul><li>{zh ? '主指标显著提升且 point estimate ≥ +5% relative lift。' : 'The primary metric is significantly positive with a point estimate of at least +5% relative lift.'}</li><li>{zh ? 'P95 latency 不恶化超过 10%；空列表 ≤0.5%；seen-item leakage 必须为 0。' : 'P95 latency cannot regress by more than 10%; empty lists must stay at or below 0.5%; seen-item leakage must remain zero.'}</li><li>{zh ? '隐藏/负反馈恶化不得超过 5%，coverage 不得低于 control 的 95%；任一硬护栏失败立即回滚。' : 'Hide/negative feedback cannot worsen by more than 5%, and coverage cannot fall below 95% of control; any hard-guardrail failure rolls back immediately.'}</li></ul></article></div>
+    <aside><h3>{zh ? '持续监控' : 'Continuous monitoring'}</h3><p>{zh ? '数据层看交互量、空值、分布和新鲜度；模型层看 score、coverage、长尾、重复和 fallback；系统层看 P50/P95、错误和产物年龄；产品层看 7 日收藏、详情点击、30 日阅读启动与负反馈。线上事件不回写为离线 test 指标。' : 'Monitor interaction volume, nulls, distributions, and freshness; score, coverage, tail exposure, repeats, and fallback; P50/P95, errors, and artifact age; then seven-day saves, detail clicks, 30-day reading starts, and negative feedback. Online events never become offline test metrics.'}</p></aside>
+  </section>
+</div>
+
+<style>
+  .goodbooks-nav{position:sticky;top:68px;z-index:5;display:flex;gap:.35rem;width:min(calc(100% - 2 * var(--page-gutter)),var(--max));margin:0 auto 2rem;padding:.65rem;overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:rgba(7,17,31,.94)}.goodbooks-nav a{flex:0 0 auto;padding:.35rem .55rem;color:var(--muted);font:.7rem 'IBM Plex Mono',monospace;text-decoration:none}.goodbooks-nav a:hover{color:var(--starlight)}
+  .goodbooks-case-study{width:min(calc(100% - 2 * var(--page-gutter)),var(--reading-max));margin-inline:auto}.goodbooks-step{display:grid;gap:1.15rem;padding:4.5rem 0;border-top:1px solid var(--line);scroll-margin-top:130px}.goodbooks-step h2{font:600 var(--title-step-size)/1.15 var(--title-font);letter-spacing:-.03em}.goodbooks-step h3{margin:0;font-size:1.08rem}.goodbooks-step>p,.goodbooks-step li{color:var(--muted);font-size:1.02rem}.step-label{color:var(--rec)!important;font:.72rem 'IBM Plex Mono',monospace!important;text-transform:uppercase}
+  aside{padding:1.1rem 1.2rem;border-left:3px solid var(--search);background:rgba(53,208,226,.06)}aside h3{margin:0 0 .35rem}aside p{color:var(--muted)}
+  .observatory{display:grid;grid-template-columns:1fr auto .8fr auto .8fr auto 1fr;gap:.7rem;align-items:center;padding:1rem;border:1px solid var(--line);border-radius:18px;background:linear-gradient(145deg,rgba(167,139,250,.08),rgba(7,17,31,.85))}.observatory>div{display:grid;gap:.7rem;min-width:0}.observatory small{color:var(--muted);font:.62rem 'IBM Plex Mono',monospace;text-transform:uppercase}.observatory>span{color:var(--rec);font:600 1.5rem 'IBM Plex Mono',monospace}.matrix-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:3px}.matrix-grid i{aspect-ratio:1;border:1px solid rgba(156,176,200,.22);border-radius:2px}.matrix-grid i.rated{border-color:var(--ads);background:var(--ads);box-shadow:0 0 8px rgba(247,185,85,.45)}.factor-lines,.rank-lines{display:grid;gap:6px}.factor-lines i{height:8px;border-radius:999px;background:linear-gradient(90deg,var(--search),transparent)}.factor-lines.wide i{background:linear-gradient(90deg,transparent,var(--rec))}.rank-lines i{height:9px;border-radius:999px;background:linear-gradient(90deg,var(--rec),var(--complete))}.rank-lines i:nth-child(2){width:80%}.rank-lines i:nth-child(3){width:63%}
+  .data-table{overflow-x:auto;border:1px solid var(--line);border-radius:14px}.data-table table{width:100%;min-width:720px;border-collapse:collapse}.data-table th,.data-table td{padding:.75rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:.85rem}.data-table thead th{color:var(--muted);font:.68rem 'IBM Plex Mono',monospace;text-transform:uppercase}.data-table tbody tr:last-child>*{border-bottom:0}.data-table code{font:.76rem 'IBM Plex Mono',monospace;color:var(--starlight)}
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}.stat-grid article{display:grid;gap:.3rem;padding:.9rem;border:1px solid var(--line);border-radius:12px;background:var(--deep)}.stat-grid span{color:var(--rec);font:.68rem 'IBM Plex Mono',monospace;text-transform:uppercase}.stat-grid strong{font:600 1.35rem var(--title-font);font-variant-numeric:tabular-nums}.stat-grid small{color:var(--muted)}
+  .formula-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.formula-grid>article{display:grid;align-content:start;gap:.75rem;padding:1rem;border:1px solid var(--line);border-radius:14px;background:rgba(12,27,48,.58)}.formula-grid p,.limit{color:var(--muted)}
+  .model-details{display:grid;gap:.75rem}.model-details details{border:1px solid var(--line);border-radius:14px;background:rgba(12,27,48,.5)}.model-details summary{display:flex;justify-content:space-between;gap:1rem;padding:1rem;cursor:pointer}.model-details summary span{font-weight:600}.model-details summary small{color:var(--muted);font:.65rem 'IBM Plex Mono',monospace;text-align:right}.model-details details>div{display:grid;gap:.8rem;padding:0 1rem 1rem}.model-details details p{color:var(--muted)}
+  .rollout-grid,.ab-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}.rollout-grid article,.ab-grid article{display:grid;gap:.55rem;padding:1rem;border:1px solid var(--line);border-radius:14px;background:rgba(12,27,48,.55)}.rollout-grid span{color:var(--rec);font:600 1.4rem 'IBM Plex Mono',monospace}.rollout-grid p,.ab-grid li{color:var(--muted);font-size:.9rem}.ab-grid ul{display:grid;gap:.45rem;margin:0;padding-left:1.1rem}
+  @media(max-width:760px){.formula-grid,.rollout-grid,.ab-grid{grid-template-columns:1fr}.stat-grid{grid-template-columns:repeat(2,1fr)}.observatory{grid-template-columns:1fr auto 1fr}.observatory>span:nth-of-type(2),.observatory>span:nth-of-type(3),.observatory>div:nth-of-type(3),.observatory>div:nth-of-type(4){display:none}}@media(max-width:460px){.stat-grid{grid-template-columns:1fr}.goodbooks-step{padding-block:3.5rem}}
+</style>
