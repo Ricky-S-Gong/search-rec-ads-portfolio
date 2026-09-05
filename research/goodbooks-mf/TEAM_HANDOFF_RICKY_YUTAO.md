@@ -320,6 +320,21 @@ N(u) = train 中 is_read OR is_reviewed OR rating > 0 的 items
 
 不能使用 validation/test interactions 构造 `N(u)`，否则产生 leakage。
 
+当前实现位于 `goodbooks_mf/svdpp.py`，提供与其他模型一致的
+`fit(train, validation)`、`predict(...)` 和 `recommend(...)` API。正式流程为：
+
+```bash
+uv run python research/goodbooks-mf/run_all_experiments.py \
+  --models svdpp \
+  --output research/goodbooks-mf/results/ricky_validation_selection.json
+uv run python research/goodbooks-mf/run_svdpp_evaluation.py
+uv run python research/goodbooks-mf/build_team_summary.py
+```
+
+第二条命令先生成带 hash 的 `ricky_frozen_config.json`，再且仅再读取一次
+test，生成 `ricky_unified_test_metrics.json`；如果冻结配置或结果已存在会
+直接拒绝覆盖。以上正式命令只能在私有 bundle 通过 `verify_data.py` 后运行。
+
 ## 10. Yutao 的任务：ALS
 
 建议位置：
@@ -498,7 +513,7 @@ uv run pytest
 2. 三个人下载私有 bundle 并通过 checksum。
 3. 使用已冻结的 evaluation API、relevance 和全训练目录候选协议。
 4. Yutao 同时实现 ALS/NMF，但暂时只用 RMSE/MAE 调试。
-5. Ricky 实现 SVD++。
+5. Ricky 的 SVD++ 代码与合成流程测试已完成；私有 bundle 到位后运行正式选参和一次性 test。
 6. 三个负责人将模型接到相同 evaluation API。
 7. Yutao 用统一 runner 重跑所有最佳 validation configs。
 8. 全员审查结果 schema、数据版本和候选集 hash。

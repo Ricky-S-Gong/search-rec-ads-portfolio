@@ -14,7 +14,11 @@ from goodbooks_mf.experiment import (
     run_frozen_unified_test,
     run_validation_selection,
 )
+from run_svdpp_evaluation import run as run_svdpp_evaluation
 from run_unified_evaluation import write_summary_chart, write_summary_table
+
+
+ROOT = Path(__file__).parents[1]
 
 
 def tiny_bundle(tmp_path: Path) -> Path:
@@ -96,6 +100,24 @@ def tiny_config() -> dict:
     }
 
 
+def test_committed_svdpp_search_grid_is_fixed_and_complete():
+    config = load_experiment_config(ROOT / "experiment_config.json")
+    candidates = config["models"]["svdpp"]["candidates"]
+
+    assert len(candidates) == 8
+    assert {
+        (row["n_factors"], row["learning_rate"], row["reg_lambda"])
+        for row in candidates
+    } == {
+        (factors, rate, regularization)
+        for factors in (20, 40)
+        for rate in (0.005, 0.01)
+        for regularization in (0.02, 0.05)
+    }
+    assert {row["n_epochs"] for row in candidates} == {100}
+    assert {row["patience"] for row in candidates} == {10}
+
+
 def test_validation_runner_never_deserializes_test_split(tmp_path):
     data_dir = tiny_bundle(tmp_path)
     reads: list[str] = []
@@ -115,6 +137,37 @@ def test_validation_runner_never_deserializes_test_split(tmp_path):
     assert reads == ["train.parquet", "validation.parquet"]
     assert payload["phase"] == "validation_selection"
     assert payload["test_accessed"] is False
+
+
+def test_validation_runner_supports_svdpp_without_reading_test(tmp_path):
+    data_dir = tiny_bundle(tmp_path)
+    config = tiny_config()
+    config["models"] = {
+        "svdpp": {
+            "candidates": [
+                {
+                    "n_factors": 2,
+                    "learning_rate": 0.01,
+                    "reg_lambda": 0.02,
+                    "n_epochs": 2,
+                    "patience": 1,
+                    "min_delta": 0.0001,
+                }
+            ]
+        }
+    }
+    reads = []
+
+    def recording_reader(path):
+        reads.append(Path(path).name)
+        return pd.read_parquet(path)
+
+    payload = run_validation_selection(data_dir, config, parquet_reader=recording_reader)
+
+    assert reads == ["train.parquet", "validation.parquet"]
+    assert payload["test_accessed"] is False
+    assert set(payload["best_configs"]) == {"svdpp"}
+    assert payload["results"][0]["model"] == "svdpp"
 
 
 def test_validation_runner_supports_all_local_models_and_complete_schema(tmp_path):
@@ -256,6 +309,90 @@ def test_frozen_unified_test_uses_shared_rating_and_ranking_protocol(tmp_path):
         "model,best_validation_metric,rmse,mae,"
     )
     assert chart_path.read_bytes().startswith(b"\x89PNG\r\n\x1a\n")
+
+
+def test_frozen_svdpp_trains_before_test_is_read_and_uses_shared_protocol(tmp_path):
+    data_dir = tiny_bundle(tmp_path)
+    config = tiny_config()
+    config["models"] = {
+        "svdpp": {
+            "candidates": [
+                {
+                    "n_factors": 2,
+                    "learning_rate": 0.01,
+                    "reg_lambda": 0.02,
+                    "n_epochs": 2,
+                    "patience": 1,
+                    "min_delta": 0.0001,
+                }
+            ]
+        }
+    }
+    selection = run_validation_selection(data_dir, config)
+    frozen_path = tmp_path / "ricky-frozen.json"
+    frozen = freeze_validation_configs(selection, frozen_path, model_names={"svdpp"})
+    reads = []
+
+    def recording_reader(path):
+        reads.append(Path(path).name)
+        return pd.read_parquet(path)
+
+    result = run_frozen_unified_test(
+        data_dir,
+        frozen_path,
+        output_path=tmp_path / "ricky-test.json",
+        parquet_reader=recording_reader,
+    )
+
+    assert reads == ["train.parquet", "validation.parquet", "test.parquet"]
+    assert result["frozen_config_hash"] == frozen["config_hash"]
+    assert [row["model"] for row in result["results"]] == ["svdpp"]
+    assert set(RESULT_FIELDS).issubset(result["results"][0])
+    assert result["ranking_protocol"]["candidate_policy"] == (
+        "full_train_catalog_excluding_seen"
+    )
+
+
+def test_svdpp_entrypoint_freezes_once_and_refuses_overwrite(tmp_path):
+    data_dir = tiny_bundle(tmp_path)
+    config = tiny_config()
+    config["models"] = {
+        "svdpp": {
+            "candidates": [
+                {
+                    "n_factors": 2,
+                    "learning_rate": 0.01,
+                    "reg_lambda": 0.02,
+                    "n_epochs": 2,
+                    "patience": 2,
+                    "min_delta": 0.0001,
+                }
+            ]
+        }
+    }
+    selection_path = tmp_path / "ricky_validation_selection.json"
+    frozen_path = tmp_path / "ricky_frozen_config.json"
+    output_path = tmp_path / "ricky_unified_test_metrics.json"
+    run_validation_selection(data_dir, config, output_path=selection_path)
+
+    result = run_svdpp_evaluation(
+        data_dir,
+        selection_path,
+        frozen_path,
+        output_path,
+        expected_manifest_path=data_dir / "manifest.json",
+    )
+
+    assert result["frozen"]["best_configs"].keys() == {"svdpp"}
+    assert result["test"]["results"][0]["model"] == "svdpp"
+    with pytest.raises(FileExistsError, match="refusing to replace"):
+        run_svdpp_evaluation(
+            data_dir,
+            selection_path,
+            frozen_path,
+            output_path,
+            expected_manifest_path=data_dir / "manifest.json",
+        )
 
 
 def test_config_rejects_candidate_seed_and_unknown_model(tmp_path):
