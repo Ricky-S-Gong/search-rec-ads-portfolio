@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +22,22 @@ MODEL_ORDER = (
     "bias_aware_als",
 )
 PLANNED_MODELS = MODEL_ORDER[:-1]
+MODEL_ROLES = (*(("planned",) * len(PLANNED_MODELS)), "additional diagnostic")
+RANKING_PROTOCOL = {
+    "candidate_policy": "full_train_catalog_excluding_seen",
+    "relevance": "rating >= 4 OR (rating == 0 AND is_read)",
+    "k_values": [5, 10, 20],
+}
+PRIVATE_FIELD_NAMES = {
+    "user_mapping",
+    "item_mapping",
+    "candidate_list",
+    "candidates",
+    "row_level_interactions",
+    "records",
+    "local_path",
+    "file_path",
+}
 METRIC_FIELDS = (
     "rmse",
     "mae",
@@ -45,7 +62,19 @@ def _load_summary(path: Path) -> dict[str, Any]:
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
+def _reject_private_fields(value: Any) -> None:
+    if isinstance(value, dict):
+        for key, nested in value.items():
+            if str(key).lower() in PRIVATE_FIELD_NAMES:
+                raise ValueError(f"private field is not allowed in team summary: {key}")
+            _reject_private_fields(nested)
+    elif isinstance(value, list):
+        for nested in value:
+            _reject_private_fields(nested)
+
+
 def _require_complete_summary(summary: dict[str, Any], manifest: dict[str, Any]) -> list[dict[str, Any]]:
+    _reject_private_fields(summary)
     if summary.get("status") != "complete" or summary.get("pending_models"):
         raise ValueError("a complete team summary without pending models is required")
     for key, expected in (
@@ -55,28 +84,35 @@ def _require_complete_summary(summary: dict[str, Any], manifest: dict[str, Any])
     ):
         if summary.get(key) != expected:
             raise ValueError(f"team summary {key} does not match the verified bundle")
-    if summary.get("ranking_protocol", {}).get("candidate_policy") != "full_train_catalog_excluding_seen":
-        raise ValueError("team summary does not use the full-catalog candidate policy")
+    if summary.get("ranking_protocol") != RANKING_PROTOCOL:
+        raise ValueError("team summary ranking_protocol does not match the shared evaluation")
 
-    rows = {row.get("model"): row for row in summary.get("results", [])}
-    if tuple(rows) != MODEL_ORDER:
+    rows = summary.get("results", [])
+    if tuple(row.get("model") for row in rows) != MODEL_ORDER:
         raise ValueError("team summary must contain the six canonical model rows in order")
-    normalized = [rows[name] for name in MODEL_ORDER]
-    for row in normalized:
+    if tuple(summary.get("included_models", [])) != MODEL_ORDER:
+        raise ValueError("team summary included_models does not match the canonical model order")
+    if tuple(row.get("model_role") for row in rows) != MODEL_ROLES:
+        raise ValueError("team summary model roles do not match the planned and diagnostic models")
+    for row in rows:
         missing = set(METRIC_FIELDS).difference(row)
         if missing:
             raise ValueError(f"incomplete metrics for {row['model']}: {sorted(missing)}")
+        for field in METRIC_FIELDS + ("best_validation_rmse",):
+            value = row[field]
+            if not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
+                raise ValueError(f"team summary metric must be finite and non-negative: {row['model']}.{field}")
     populations = {
         tuple(row[field] for field in (
             "evaluated_rating_count",
             "evaluated_rating_users",
             "evaluated_ranking_users",
         ))
-        for row in normalized
+        for row in rows
     }
     if len(populations) != 1:
         raise ValueError("all model rows must use the same evaluation population")
-    return normalized
+    return rows
 
 
 def _field_profile(interactions: pd.DataFrame) -> list[dict[str, Any]]:
