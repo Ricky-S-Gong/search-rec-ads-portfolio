@@ -15,17 +15,19 @@ ROOT = Path(__file__).parent
 RESULTS = ROOT / "results"
 DEFAULT_ZIQI = RESULTS / "ziqi_unified_test_metrics.json"
 DEFAULT_YUTAO = RESULTS / "yutao_unified_test_metrics.json"
+DEFAULT_RICKY = RESULTS / "ricky_unified_test_metrics.json"
 DEFAULT_VALIDATION = RESULTS / "validation_selection.json"
 DEFAULT_OUTPUT = RESULTS / "team_model_comparison.json"
 DEFAULT_TABLE = RESULTS / "team_model_comparison.csv"
 DEFAULT_CHART = RESULTS / "team_model_comparison.png"
 
-MODEL_ORDER = ("basic_mf", "funksvd", "als", "nmf", "bias_aware_als")
+MODEL_ORDER = ("basic_mf", "funksvd", "als", "nmf", "svdpp", "bias_aware_als")
 MODEL_META = {
     "basic_mf": ("Basic MF", "Ziqi", "planned"),
     "funksvd": ("FunkSVD", "Ziqi", "planned"),
     "als": ("ALS", "Yutao", "planned"),
     "nmf": ("NMF + L2", "Yutao", "planned"),
+    "svdpp": ("SVD++", "Ricky", "planned"),
     "bias_aware_als": ("Bias-aware ALS", "Yutao", "additional diagnostic"),
 }
 METRIC_FIELDS = (
@@ -55,13 +57,17 @@ def _load(path: Path) -> dict[str, Any]:
 def combine_results(
     ziqi: dict[str, Any],
     yutao: dict[str, Any],
+    ricky: dict[str, Any],
     validation: dict[str, Any],
 ) -> dict[str, Any]:
     """Validate shared protocol metadata and return normalized model rows."""
     for key in ("dataset_version", "seed", "data_counts"):
-        if ziqi.get(key) != yutao.get(key):
+        if len({json.dumps(payload.get(key), sort_keys=True) for payload in (ziqi, yutao, ricky)}) != 1:
             raise ValueError(f"team result mismatch for {key}")
-    if ziqi.get("ranking_protocol") != yutao.get("ranking_protocol"):
+    if not all(
+        payload.get("ranking_protocol") == ziqi.get("ranking_protocol")
+        for payload in (yutao, ricky)
+    ):
         raise ValueError("team result mismatch for ranking_protocol")
     if validation.get("dataset_version") != ziqi["dataset_version"]:
         raise ValueError("validation dataset_version does not match test results")
@@ -70,6 +76,7 @@ def combine_results(
 
     source_rows = dict(ziqi["models"])
     source_rows.update({row["model"]: row for row in yutao["results"]})
+    source_rows.update({row["model"]: row for row in ricky["results"]})
     missing_models = set(MODEL_ORDER).difference(source_rows)
     if missing_models:
         raise ValueError(f"missing model results: {', '.join(sorted(missing_models))}")
@@ -90,7 +97,9 @@ def combine_results(
             "owner": owner,
             "model_role": role,
             "best_validation_rmse": (
-                validation_entry["validation_metric"] if validation_entry else None
+                validation_entry["validation_metric"]
+                if validation_entry
+                else source.get("best_validation_metric")
             ),
             **{field: source[field] for field in METRIC_FIELDS},
             "hyperparameters": source["hyperparameters"],
@@ -113,8 +122,8 @@ def combine_results(
         "data_counts": ziqi["data_counts"],
         "ranking_protocol": ziqi["ranking_protocol"],
         "included_models": list(MODEL_ORDER),
-        "pending_models": ["svdpp"],
-        "status": "awaiting Ricky SVD++ result",
+        "pending_models": [],
+        "status": "complete",
         "results": rows,
     }
 
@@ -201,13 +210,19 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Build the shared GoodBooks model report.")
     parser.add_argument("--ziqi", type=Path, default=DEFAULT_ZIQI)
     parser.add_argument("--yutao", type=Path, default=DEFAULT_YUTAO)
+    parser.add_argument("--ricky", type=Path, default=DEFAULT_RICKY)
     parser.add_argument("--validation", type=Path, default=DEFAULT_VALIDATION)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--table", type=Path, default=DEFAULT_TABLE)
     parser.add_argument("--chart", type=Path, default=DEFAULT_CHART)
     args = parser.parse_args()
 
-    payload = combine_results(_load(args.ziqi), _load(args.yutao), _load(args.validation))
+    payload = combine_results(
+        _load(args.ziqi),
+        _load(args.yutao),
+        _load(args.ricky),
+        _load(args.validation),
+    )
     args.output.write_text(json.dumps(payload, indent=2, sort_keys=True), encoding="utf-8")
     write_table(payload, args.table)
     write_chart(payload, args.chart)

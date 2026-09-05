@@ -2,7 +2,7 @@
 
 Reproducible Goodreads Book Graph experiment implementing the shared frozen
 data pipeline plus Basic MF, FunkSVD, sparse explicit ALS, masked NMF, and an
-additional bias-aware residual ALS diagnostic.
+SVD++ implementation, plus an additional bias-aware residual ALS diagnostic.
 
 Detailed documentation:
 
@@ -51,6 +51,21 @@ The runner:
 3. trains every configured candidate on train;
 4. selects within each model using validation only;
 5. writes complete phase-one rows to `results/validation_selection.json`.
+
+Ricky's SVD++ search uses the same runner but writes a separate selection
+artifact so the existing team selection is not replaced:
+
+```bash
+uv run python research/goodbooks-mf/run_all_experiments.py \
+  --models svdpp \
+  --output research/goodbooks-mf/results/ricky_validation_selection.json
+```
+
+The committed SVD++ grid contains the eight combinations of 20/40 factors,
+0.005/0.01 learning rate, and 0.02/0.05 regularization. All candidates use 100
+epochs, patience 10, minimum improvement `1e-4`, and seed `20260830`. Selection
+uses clipped validation RMSE only. Its implicit history is constructed only
+from train interactions satisfying `is_read OR is_reviewed OR rating > 0`.
 
 The test artifact is checksum-verified as part of the bundle, but
 `test.parquet` is not deserialized. Future test access is gated behind a frozen
@@ -129,13 +144,21 @@ reporting only and must not be used to revise hyperparameters.
 Ziqi's committed Basic MF and FunkSVD implementations were reproduced with
 their frozen configuration and Ricky's shared rating/ranking evaluation. The
 rating results exactly reproduce the previously published aggregate values.
-Build the current team summary with:
+After Ricky's private bundle has passed verification, freeze the selected
+SVD++ configuration and perform its one-time shared test evaluation with:
 
 ```bash
-uv run python research/goodbooks-mf/run_experiment.py \
-  --output research/goodbooks-mf/results/ziqi_unified_test_metrics.json
+uv run python research/goodbooks-mf/run_svdpp_evaluation.py
 uv run python research/goodbooks-mf/build_team_summary.py
 ```
+
+`run_svdpp_evaluation.py` refuses to overwrite either
+`ricky_frozen_config.json` or `ricky_unified_test_metrics.json`. It restores the
+best validation checkpoint before reading test and uses the existing shared
+rating/full-catalog ranking evaluation. The summary builder then requires
+matching dataset version, seed, candidate policy, and evaluated populations
+across all owners. Its five planned rows are Basic MF, FunkSVD, ALS, NMF, and
+SVD++; Bias-aware ALS remains a sixth diagnostic row.
 
 | Model | Owner | RMSE | MAE | Precision@10 | Recall@10 | NDCG@10 | Train seconds |
 |---|---|---:|---:|---:|---:|---:|---:|
@@ -149,9 +172,11 @@ All rows use 17,168 explicit test ratings, 5,129 rating users, 4,765 ranking
 users, and the 5,551-item train catalog. Basic MF has the weakest rating error
 but the strongest Top-K result, so rating prediction and ranking quality must
 be discussed separately. `results/team_model_comparison.{json,csv,png}` stores
-the normalized table and chart. The planned SVD++ row remains pending Ricky's
-implementation and shared-evaluation output; bias-aware ALS is explicitly
-marked as an additional diagnostic rather than a substitute for SVD++.
+the normalized table and chart. The committed table currently remains the
+pre-SVD++ snapshot: the model code and synthetic workflow tests are complete,
+but its official row must not be generated until the private bundle is restored
+and `verify_data.py` succeeds. Bias-aware ALS is explicitly marked as an
+additional diagnostic rather than a substitute for SVD++.
 
 The committed `config.json` is the data contract. It fixes the random seed,
 k-core thresholds, maximum user count, and temporal split fractions. Every

@@ -15,6 +15,7 @@ from .evaluation import (
 )
 from .models import BasicMF, FunkSVD
 from .nmf import NMF
+from .svdpp import SVDPP
 
 __all__ = [
     "ALS",
@@ -23,6 +24,7 @@ __all__ = [
     "FunkSVD",
     "NMF",
     "RankingEvaluationData",
+    "SVDPP",
     "evaluate_ranking",
     "evaluate_ratings",
     "mae",

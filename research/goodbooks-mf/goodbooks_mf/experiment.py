@@ -25,6 +25,7 @@ from .bias_aware_als import BiasAwareALS
 from .evaluation import evaluate_ranking, evaluate_ratings, prepare_ranking_data, rmse
 from .models import BasicMF, FunkSVD
 from .nmf import NMF
+from .svdpp import SVDPP
 
 
 SUPPORTED_MODELS = {
@@ -33,6 +34,7 @@ SUPPORTED_MODELS = {
     "als",
     "nmf",
     "bias_aware_als",
+    "svdpp",
 }
 
 RESULT_FIELDS = (
@@ -144,9 +146,13 @@ def _build_model(
     seed: int,
 ):
     kwargs = dict(parameters)
-    if name in {"basic_mf", "funksvd"}:
+    if name in {"basic_mf", "funksvd", "svdpp"}:
         kwargs.update(n_users=n_users, n_items=n_items, seed=seed)
-        model_class = BasicMF if name == "basic_mf" else FunkSVD
+        model_class = {
+            "basic_mf": BasicMF,
+            "funksvd": FunkSVD,
+            "svdpp": SVDPP,
+        }[name]
         return model_class(**kwargs)
     kwargs["seed"] = seed
     if name == "als":
@@ -263,7 +269,7 @@ def run_validation_selection(
                 seed=validated["seed"],
             )
             started = time.perf_counter()
-            if model_name in {"basic_mf", "funksvd"}:
+            if model_name in {"basic_mf", "funksvd", "svdpp"}:
                 model.fit(train, validation)
             else:
                 model.fit(explicit_matrix)
@@ -509,11 +515,12 @@ def run_frozen_unified_test(
     expected_manifest_path: Path | None = None,
     parquet_reader: Callable[[Path], pd.DataFrame] = pd.read_parquet,
 ) -> dict[str, Any]:
-    """Evaluate frozen ALS/NMF configs with the shared rating/ranking API.
+    """Evaluate frozen model configs with the shared rating/ranking API.
 
     Hyperparameters are read exclusively from the checksum-protected frozen
-    validation artifact. The shared ``RankingEvaluationData`` is constructed
-    once and reused by every model, ensuring identical users and candidates.
+    validation artifact. Models finish training before the test split is read.
+    The shared ``RankingEvaluationData`` is then constructed once and reused by
+    every model, ensuring identical users and candidates.
     """
     output_path = Path(output_path)
     if output_path.exists():
@@ -523,23 +530,27 @@ def run_frozen_unified_test(
         Path(frozen_config_path),
         expected_manifest_path,
     )
-    unsupported = set(artifact["best_configs"]).difference(
-        {"als", "nmf", "bias_aware_als"}
-    )
+    unsupported = set(artifact["best_configs"]).difference(SUPPORTED_MODELS)
     if unsupported:
-        raise ValueError(
-            "Yutao unified test supports only ALS/NMF variants: "
-            + ", ".join(sorted(unsupported))
-        )
+        raise ValueError("unsupported frozen models: " + ", ".join(sorted(unsupported)))
 
     data_dir = Path(data_dir)
     train = parquet_reader(data_dir / "train.parquet")
-    test = parquet_reader(data_dir / "test.parquet")
-    ranking_data = prepare_ranking_data(train, test)
-    explicit_matrix = sparse.load_npz(data_dir / "train_explicit.npz").tocsr()
-    n_users, n_items = explicit_matrix.shape
-
-    results: list[dict[str, Any]] = []
+    n_users = int(manifest["counts"]["users"])
+    n_items = int(manifest["counts"]["items"])
+    dataframe_models = {"basic_mf", "funksvd", "svdpp"}
+    needs_dataframe_fit = bool(set(artifact["best_configs"]) & dataframe_models)
+    validation = (
+        parquet_reader(data_dir / "validation.parquet")
+        if needs_dataframe_fit
+        else None
+    )
+    explicit_matrix = (
+        sparse.load_npz(data_dir / "train_explicit.npz").tocsr()
+        if set(artifact["best_configs"]) - dataframe_models
+        else None
+    )
+    trained: list[tuple[str, Any, float, Mapping[str, Any], float]] = []
     for model_name, selection in artifact["best_configs"].items():
         parameters = selection["hyperparameters"]
         model = _build_model(
@@ -550,9 +561,25 @@ def run_frozen_unified_test(
             seed=int(artifact["seed"]),
         )
         started = time.perf_counter()
-        model.fit(explicit_matrix)
+        if model_name in dataframe_models:
+            model.fit(train, validation)
+        else:
+            model.fit(explicit_matrix)
         training_seconds = time.perf_counter() - started
+        trained.append(
+            (
+                model_name,
+                model,
+                training_seconds,
+                parameters,
+                float(selection["validation_metric"]),
+            )
+        )
 
+    test = parquet_reader(data_dir / "test.parquet")
+    ranking_data = prepare_ranking_data(train, test)
+    results: list[dict[str, Any]] = []
+    for model_name, model, training_seconds, parameters, validation_metric in trained:
         started = time.perf_counter()
         rating_metrics = evaluate_ratings(model, test)
         rating_inference_seconds = time.perf_counter() - started
@@ -570,7 +597,7 @@ def run_frozen_unified_test(
             "reg_lambda": parameters.get("reg_lambda"),
             "iterations_or_epochs": _iterations(parameters),
             "selection_metric": artifact["selection_metric"],
-            "best_validation_metric": float(selection["validation_metric"]),
+            "best_validation_metric": validation_metric,
             **rating_metrics,
             **ranking_metrics,
             "training_seconds": float(training_seconds),

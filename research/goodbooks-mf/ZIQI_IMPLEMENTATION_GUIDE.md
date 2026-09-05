@@ -410,6 +410,20 @@ seed = 20260830
 
 ## 18. Step 14：正式实验结果
 
+SVD++ 由独立的 `goodbooks_mf/svdpp.py` 实现，不修改本节冻结的 Basic
+MF/FunkSVD。它只使用 train 构造隐式历史，并通过共享实验 runner 使用
+validation RMSE 选择八个固定候选。私有 bundle 验证通过后，运行：
+
+```bash
+uv run python research/goodbooks-mf/run_all_experiments.py \
+  --models svdpp \
+  --output research/goodbooks-mf/results/ricky_validation_selection.json
+uv run python research/goodbooks-mf/run_svdpp_evaluation.py
+```
+
+第二条命令冻结选中配置后才读取 test，并拒绝覆盖已经存在的正式产物。
+SVD++ 的最终数字必须从生成的 JSON 引用，不能手工填写。
+
 运行：
 
 ```bash
