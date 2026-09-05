@@ -1,0 +1,69 @@
+{
+  "data_counts": {
+    "interactions": 261709,
+    "items": 5551,
+    "test": 44229,
+    "train": 191436,
+    "users": 5129,
+    "validation": 26044
+  },
+  "dataset_version": "goodreads-poetry-v1",
+  "frozen_config_hash": "486c9bbaa40a5a90123827b7fef985b162b86e5deee7a204f70a95111396dd78",
+  "phase": "frozen_unified_test",
+  "ranking_protocol": {
+    "candidate_policy": "full_train_catalog_excluding_seen",
+    "k_values": [
+      5,
+      10,
+      20
+    ],
+    "relevance": "rating >= 4 OR (rating == 0 AND is_read)"
+  },
+  "results": [
+    {
+      "best_validation_metric": 0.8398035556180781,
+      "candidate_policy": "full_train_catalog_excluding_seen",
+      "catalog_size": 5551,
+      "dataset_version": "goodreads-poetry-v1",
+      "evaluated_ranking_users": 4765,
+      "evaluated_rating_count": 17168,
+      "evaluated_rating_users": 5129,
+      "evaluation_split": "test",
+      "hyperparameters": {
+        "learning_rate": 0.01,
+        "min_delta": 0.0001,
+        "n_epochs": 100,
+        "n_factors": 20,
+        "patience": 10,
+        "reg_lambda": 0.02
+      },
+      "inference_seconds": 5.599080166008207,
+      "iterations_or_epochs": 100,
+      "learning_rate": 0.01,
+      "mae": 0.6667816599939574,
+      "model": "svdpp",
+      "n_factors": 20,
+      "ndcg_at_10": 0.005446949062951412,
+      "ndcg_at_20": 0.008290265772695218,
+      "ndcg_at_5": 0.004187987299073646,
+      "precision_at_10": 0.0021615949632738675,
+      "precision_at_20": 0.002266526757607559,
+      "precision_at_5": 0.0026862539349422846,
+      "ranking_inference_seconds": 5.594020832999377,
+      "rating_inference_seconds": 0.005059333008830436,
+      "recall_at_10": 0.007854645645831377,
+      "recall_at_20": 0.01646786066158328,
+      "recall_at_5": 0.004602676092707572,
+      "reg_lambda": 0.02,
+      "rmse": 0.8605675934886212,
+      "seed": 20260830,
+      "selected": true,
+      "selection_metric": "rmse",
+      "training_seconds": 56.18252383300569
+    }
+  ],
+  "schema_version": "goodbooks-unified-test-results-v1",
+  "seed": 20260830,
+  "selection_source": "validation_only",
+  "test_accessed": true
+}
