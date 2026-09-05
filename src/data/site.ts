@@ -137,6 +137,18 @@ export const projects: ProjectMeta[] = [
       zh: '可复现的 User-CF 与 Item-CF 实验，包含时间切分、全目录 Top-10、覆盖率分析与 CPU 服务证据。',
     },
   },
+  {
+    slug: 'goodreads-poetry-matrix-factorization', domain: 'recommendation', status: 'complete', compute: 'CPU',
+    algorithms: ['Basic MF', 'FunkSVD', 'ALS', 'Masked NMF', 'SVD++'],
+    dataset: 'Goodreads Book Graph Poetry · 261,709 interactions',
+    authors: ['Ricky Gong', 'Ziqi Xu', 'Yutao Rao'],
+    sourceUrl: 'https://mengtingwan.github.io/data/goodreads.html',
+    title: { en: 'Goodreads Poetry matrix factorization', zh: 'Goodreads 诗歌矩阵分解推荐' },
+    summary: {
+      en: 'A frozen, temporal Goodreads Poetry benchmark comparing five matrix-factorization models under one full-catalog Top-10 protocol.',
+      zh: '在冻结的 Goodreads Poetry 时间切分上，以统一全目录 Top-10 协议比较五种矩阵分解模型。',
+    },
+  },
 ];
 
 export const profiles: ProfileMeta[] = [
@@ -255,9 +267,9 @@ export const roadmapTracks: RoadmapTrack[] = [
       },
       {
         title: { en: 'Model-based recommendation', zh: '模型化推荐' },
-        topics: { en: 'Matrix factorization · implicit feedback · negative sampling', zh: '矩阵分解 · 隐式反馈 · 负采样' },
-        project: { en: 'Latent-factor ranking benchmark', zh: '隐因子排序基准' },
-        status: 'planned', compute: 'CPU → GPU',
+        topics: { en: 'Matrix factorization · implicit feedback · full-catalog evaluation', zh: '矩阵分解 · 隐式反馈 · 全目录评估' },
+        project: { en: 'Goodreads Poetry matrix factorization', zh: 'Goodreads 诗歌矩阵分解推荐' },
+        status: 'complete', compute: 'CPU', href: '/projects/goodreads-poetry-matrix-factorization/',
       },
       {
         title: { en: 'Retrieval, ranking, and online systems', zh: '召回、排序与在线系统' },

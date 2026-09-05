@@ -1,0 +1,23 @@
+{
+  "best_configs": {
+    "svdpp": {
+      "hyperparameters": {
+        "learning_rate": 0.01,
+        "min_delta": 0.0001,
+        "n_epochs": 100,
+        "n_factors": 20,
+        "patience": 10,
+        "reg_lambda": 0.02
+      },
+      "selection_metric": "rmse",
+      "validation_metric": 0.8398035556180781
+    }
+  },
+  "config_hash": "486c9bbaa40a5a90123827b7fef985b162b86e5deee7a204f70a95111396dd78",
+  "dataset_version": "goodreads-poetry-v1",
+  "ranking_evaluation_status": "pending Ricky shared evaluation and candidate set",
+  "schema_version": "goodbooks-frozen-config-v1",
+  "seed": 20260830,
+  "selection_metric": "rmse",
+  "status": "frozen"
+}

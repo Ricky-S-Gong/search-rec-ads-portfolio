@@ -1,23 +1,113 @@
 {
-  "data_counts": {
-    "interactions": 261709,
-    "items": 5551,
-    "test": 44229,
-    "train": 191436,
-    "users": 5129,
-    "validation": 26044
+  "champion": {
+    "model": "basic_mf",
+    "model_label": "Basic MF",
+    "selection_metric": "ndcg_at_10",
+    "selection_value": 0.023946767423720927
   },
-  "dataset_version": "goodreads-poetry-v1",
-  "included_models": [
-    "basic_mf",
-    "funksvd",
-    "als",
-    "nmf",
-    "svdpp",
-    "bias_aware_als"
-  ],
-  "pending_models": [],
-  "ranking_protocol": {
+  "dataset": {
+    "counts": {
+      "interactions": 261709,
+      "items": 5551,
+      "test": 44229,
+      "train": 191436,
+      "users": 5129,
+      "validation": 26044
+    },
+    "explicit_counts": {
+      "test": 17168,
+      "train": 117397,
+      "validation": 14601
+    },
+    "fields": [
+      {
+        "name": "user_idx",
+        "range": [
+          0,
+          5128
+        ],
+        "type": "int32"
+      },
+      {
+        "name": "item_idx",
+        "range": [
+          0,
+          5550
+        ],
+        "type": "int32"
+      },
+      {
+        "name": "rating",
+        "range": [
+          0,
+          5
+        ],
+        "type": "int64"
+      },
+      {
+        "name": "is_read",
+        "type": "bool",
+        "values": [
+          false,
+          true
+        ]
+      },
+      {
+        "name": "is_reviewed",
+        "type": "bool",
+        "values": [
+          false,
+          true
+        ]
+      },
+      {
+        "name": "event_time",
+        "range": [
+          "2007-02-04T04:43:16+00:00",
+          "2017-11-05T18:45:50+00:00"
+        ],
+        "type": "datetime64[us, UTC]"
+      },
+      {
+        "name": "split",
+        "type": "str",
+        "values": [
+          "train",
+          "validation",
+          "test"
+        ]
+      }
+    ],
+    "license_note": "Academic use only; do not redistribute or use commercially.",
+    "matrices": {
+      "explicit": {
+        "nonzero": 117397,
+        "shape": [
+          5129,
+          5551
+        ],
+        "value_range": [
+          1.0,
+          5.0
+        ]
+      },
+      "implicit": {
+        "nonzero": 119942,
+        "shape": [
+          5129,
+          5551
+        ],
+        "value_range": [
+          1.0,
+          1.0
+        ]
+      }
+    },
+    "seed": 20260830,
+    "source": "UCSD Goodreads Book Graph / Poetry",
+    "version": "goodreads-poetry-v1"
+  },
+  "evaluation": {
     "candidate_policy": "full_train_catalog_excluding_seen",
     "k_values": [
       5,
@@ -26,7 +116,7 @@
     ],
     "relevance": "rating >= 4 OR (rating == 0 AND is_read)"
   },
-  "results": [
+  "models": [
     {
       "best_validation_rmse": 1.0228248331365413,
       "evaluated_ranking_users": 4765,
@@ -212,7 +302,5 @@
       "training_seconds": 0.8120367909432389
     }
   ],
-  "schema_version": "goodbooks-team-comparison-v1",
-  "seed": 20260830,
-  "status": "complete"
+  "schema_version": "goodbooks-frontend-artifact-v1"
 }
