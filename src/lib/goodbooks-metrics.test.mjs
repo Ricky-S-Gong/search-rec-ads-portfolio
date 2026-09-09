@@ -66,3 +66,36 @@ test('published GoodBooks artifact preserves the canonical six model roles and B
   ]);
   assert.equal(artifact.models.every((model) => Number.isFinite(model.inference_seconds)), true);
 });
+
+test('GoodBooks teaching copy covers steps, model symbols, bias, and train-only history', async () => {
+  const source = await readFile(new URL('../components/GoodBooksCaseStudy.astro', import.meta.url), 'utf8');
+  const steps = [...source.matchAll(/<p class="step-label">(Step [1-7])<\/p>/g)].map((match) => match[1]);
+
+  assert.deepEqual(steps, ['Step 1', 'Step 2', 'Step 3', 'Step 4', 'Step 5', 'Step 6', 'Step 7']);
+  assert.match(source, /entries=\{modelSymbols\[detail\.key\]\}/);
+  for (const model of ['basic_mf', 'funksvd', 'als', 'nmf', 'svdpp', 'bias_aware_als']) {
+    assert.match(source, new RegExp(`\\n\\s{2}${model}: \\[`));
+  }
+  assert.match(source, /FunkSVD is the bias extension of this baseline/);
+  assert.match(source, /N\(u\)=\\\{A,B,C\\\}/);
+  assert.match(source, /validation\/test behavior cannot enter/);
+  assert.match(source, /raw score, not a real 1–5 star prediction/);
+  assert.match(source, /\.model-details details\{[^}]*min-width:0/);
+});
+
+test('GoodBooks formulas retain masked NMF and sequential bias-aware ALS semantics', async () => {
+  const source = await readFile(new URL('../components/GoodBooksCaseStudy.astro', import.meta.url), 'utf8');
+
+  assert.match(source, /\(M\\odot R\)Q/);
+  assert.match(source, /train_matrix @ Q/);
+  assert.match(source, /not a joint closed-form optimization/);
+  assert.match(source, /e_\{ui\}=r_\{ui\}-\\mu-b_u-b_i/);
+});
+
+test('recommendation roadmap keeps Two-Tower research-first with no fabricated kickoff date', async () => {
+  const source = await readFile(new URL('../data/site.ts', import.meta.url), 'utf8');
+
+  assert.match(source, /Research Two-Tower and the business problem first/);
+  assert.match(source, /先研究双塔模型和业务问题/);
+  assert.match(source, /status: 'planned'/);
+});

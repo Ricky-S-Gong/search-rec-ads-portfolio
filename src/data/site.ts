@@ -273,7 +273,10 @@ export const roadmapTracks: RoadmapTrack[] = [
       },
       {
         title: { en: 'Retrieval, ranking, and online systems', zh: '召回、排序与在线系统' },
-        topics: { en: 'Two-Tower · reranking · hybrid signals · online experiments', zh: '双塔 · 重排 · 混合信号 · 在线实验' },
+        topics: {
+          en: 'Research Two-Tower and the business problem first · Ziqi and Yutao confirm kickoff timing afterward',
+          zh: '先研究双塔模型和业务问题 · 再由 Ziqi 与 Yutao 人工确认开题时间',
+        },
         project: { en: 'Real-time multi-objective study', zh: '实时多目标推荐实验' },
         status: 'planned', compute: 'GPU recommended',
       },

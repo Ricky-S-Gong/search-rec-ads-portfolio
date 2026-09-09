@@ -24,6 +24,7 @@ interface Metrics {
   models: Model[];
   champion: { model: string; model_label: string; selection_value: number };
 }
+interface LegendEntry { latex: string; description: string; }
 
 const { lang, metrics } = Astro.props as { lang: Lang; metrics: Metrics };
 const zh = lang === 'zh';
@@ -36,6 +37,10 @@ const implicit = metrics.dataset.matrices.implicit;
 const implicitCells = implicit.shape[0] * implicit.shape[1];
 const implicitDensity = implicit.nonzero / implicitCells;
 const modelDetail = (key: string) => metrics.models.find((model) => model.model === key)!;
+const legend = (latex: string, zhDescription: string, enDescription: string): LegendEntry => ({
+  latex,
+  description: zh ? zhDescription : enDescription,
+});
 const fieldCopy: Record<string, [string, string]> = zh ? {
   user_idx: ['匿名用户的连续下标', '所有模型的用户行'], item_idx: ['图书的连续下标', '所有模型的物品列'],
   rating: ['0 是未评分；1–5 是显式评分', '训练评分预测与 RMSE/MAE'], is_read: ['是否标记为已读', 'SVD++ 隐式历史与相关性'],
@@ -48,6 +53,34 @@ const fieldCopy: Record<string, [string, string]> = zh ? {
   split: ['Frozen data partition', 'train / validation / test'],
 };
 const pct = (value: number) => `${(value * 100).toFixed(2)}%`;
+const hyperparameterLabels: Record<string, string> = {
+  n_factors: 'k', learning_rate: 'η', reg_lambda: 'λ', bias_reg_lambda: 'λᵦ',
+  n_epochs: 'Eₘₐₓ', n_iterations: 'T₍ALS₎', bias_iterations: 'T₍bias₎',
+  patience: 'T₍patience₎', min_delta: 'Δₘᵢₙ', max_iter: 'Tₘₐₓ', tol: 'τ',
+  seed: 's', n_users: '|U|', n_items: '|I|',
+};
+const hyperparameterLatex: Record<string, string> = {
+  n_factors: 'k', learning_rate: String.raw`\eta`, reg_lambda: String.raw`\lambda`, bias_reg_lambda: String.raw`\lambda_b`,
+  n_epochs: String.raw`E_{\max}`, n_iterations: String.raw`T_{\mathrm{ALS}}`, bias_iterations: String.raw`T_{\mathrm{bias}}`,
+  patience: String.raw`T_{\mathrm{patience}}`, min_delta: String.raw`\Delta_{\min}`, max_iter: String.raw`T_{\max}`, tol: String.raw`\tau`,
+  seed: 's', n_users: String.raw`|U|`, n_items: String.raw`|I|`,
+};
+const hyperparameterDescriptions: Record<string, [string, string]> = {
+  n_factors: ['潜在空间维度', 'latent-space dimension'], learning_rate: ['SGD 学习率', 'SGD learning rate'],
+  reg_lambda: ['latent factor 与常规 bias 的 L2 正则强度', 'L2 strength for latent factors and ordinary biases'],
+  bias_reg_lambda: ['Bias-aware ALS 基线 bias 的正则强度', 'baseline-bias regularization for Bias-aware ALS'],
+  n_epochs: ['最大 SGD epoch 数', 'maximum SGD epochs'], n_iterations: ['ALS 交替求解轮数', 'ALS alternating-solve iterations'],
+  bias_iterations: ['bias 交替更新轮数', 'alternating bias-update iterations'], patience: ['early-stopping 等待轮数', 'early-stopping patience'],
+  min_delta: ['被视为改善的最小 RMSE 变化', 'minimum RMSE change counted as improvement'], max_iter: ['最大乘法更新轮数', 'maximum multiplicative-update iterations'],
+  tol: ['NMF 停止容差', 'NMF stopping tolerance'], seed: ['可复现随机种子', 'reproducibility seed'],
+  n_users: ['训练用户数', 'number of training users'], n_items: ['训练图书数', 'number of training books'],
+};
+const parameterSummary = (model: Model) => Object.entries(model.hyperparameters)
+  .map(([key, value]) => `${hyperparameterLabels[key] ?? key}=${value}`).join(' · ');
+const parameterLegend = (model: Model): LegendEntry[] => Object.entries(model.hyperparameters).map(([key, value]) => ({
+  latex: String.raw`${hyperparameterLatex[key] ?? String.raw`\texttt{${key}}`}=${value}`,
+  description: `${hyperparameterDescriptions[key]?.[zh ? 0 : 1] ?? (zh ? 'artifact 参数' : 'artifact parameter')} (${key})`,
+}));
 const modelDetails = [
   {
     key: 'basic_mf', formula: String.raw`\hat r_{ui}=p_u^\top q_i`,
@@ -111,12 +144,59 @@ modelDetails.push({
   limit: zh ? '仅作附加诊断，不能改变五个正式模型的选择规则。' : 'It is diagnostic only and cannot alter planned-model selection.',
 });
 const algorithmSteps: Record<string, { objective: string; update: string; lifecycle: [string, string] }> = {
-  basic_mf: { objective: String.raw`\min_{P,Q}\sum_{(u,i)\in\Omega}(r_{ui}-p_u^\top q_i)^2+\lambda(\lVert P\rVert_F^2+\lVert Q\rVert_F^2)`, update: String.raw`e_{ui}=r_{ui}-p_u^\top q_i,\quad p_u\leftarrow p_u+\eta(e_{ui}q_i-\lambda p_u),\quad q_i\leftarrow q_i+\eta(e_{ui}p_u-\lambda q_i)`, lifecycle: [zh ? '初始化：以 seed 生成均值 0、标准差 0.1 的用户/图书因子；无 bias。' : 'Initialize seeded user/item factors from N(0, 0.1); no biases.', zh ? '每个 epoch 随机遍历 observed triplet；validation RMSE 改善至少 min_delta 才保留快照，连续 patience 轮无改善即停。' : 'Shuffle observed triplets each epoch; checkpoint only validation-RMSE gains of min_delta and stop after patience stale epochs.'] },
-  funksvd: { objective: String.raw`\min\sum_{(u,i)\in\Omega}(r_{ui}-\mu-b_u-b_i-p_u^\top q_i)^2+\lambda(\lVert P\rVert_F^2+\lVert Q\rVert_F^2+\lVert b_u\rVert_2^2+\lVert b_i\rVert_2^2)`, update: String.raw`e=r_{ui}-\hat r_{ui};\quad b_u,b_i\leftarrow b_u,b_i+\eta(e-\lambda b);\quad p_u,q_i\leftarrow p_u,q_i+\eta(e\,[q_i,p_u]-\lambda[p_u,q_i])`, lifecycle: [zh ? '初始化：训练评分均值为 μ，bias 为 0，因子为 N(0,0.1)。' : 'Initialize μ from train ratings, zero biases, and N(0,0.1) factors.', zh ? '训练/早停与 Basic MF 相同；差别是同一 SGD 步同步更新两个 bias。' : 'Uses Basic-MF training and early stopping, but each SGD step also updates both biases.'] },
+  basic_mf: { objective: String.raw`\min_{P,Q}\sum_{(u,i)\in\Omega}(r_{ui}-p_u^\top q_i)^2+\lambda(\lVert P\rVert_F^2+\lVert Q\rVert_F^2)`, update: String.raw`e_{ui}=r_{ui}-p_u^\top q_i,\quad p_u\leftarrow p_u+\eta(e_{ui}q_i-\lambda p_u),\quad q_i\leftarrow q_i+\eta(e_{ui}p_u^{\mathrm{old}}-\lambda q_i)`, lifecycle: [zh ? '初始化：以 seed 生成均值 0、标准差 0.1 的用户/图书因子；无 bias。' : 'Initialize seeded user/item factors from N(0, 0.1); no biases.', zh ? '每个 epoch 随机遍历 observed triplet；validation RMSE 改善至少 min_delta 才保留快照，连续 patience 轮无改善即停。' : 'Shuffle observed triplets each epoch; checkpoint only validation-RMSE gains of min_delta and stop after patience stale epochs.'] },
+  funksvd: { objective: String.raw`\min\sum_{(u,i)\in\Omega}(r_{ui}-\mu-b_u-b_i-p_u^\top q_i)^2+\lambda\left(\lVert P\rVert_F^2+\lVert Q\rVert_F^2+\sum_u b_u^2+\sum_i b_i^2\right)`, update: String.raw`\begin{aligned}e_{ui}&=r_{ui}-(\mu+b_u+b_i+p_u^\top q_i),\\ b_u&\leftarrow b_u+\eta(e_{ui}-\lambda b_u),&b_i&\leftarrow b_i+\eta(e_{ui}-\lambda b_i),\\ p_u&\leftarrow p_u+\eta(e_{ui}q_i-\lambda p_u),&q_i&\leftarrow q_i+\eta(e_{ui}p_u^{\mathrm{old}}-\lambda q_i)\end{aligned}`, lifecycle: [zh ? '初始化：训练评分均值为 μ，bias 为 0，因子为 N(0,0.1)。' : 'Initialize μ from train ratings, zero biases, and N(0,0.1) factors.', zh ? '训练/早停与 Basic MF 相同；差别是同一 SGD 步同步更新两个 bias。' : 'Uses Basic-MF training and early stopping, but each SGD step also updates both biases.'] },
   als: { objective: String.raw`\min_{P,Q}\sum_{(u,i)\in\Omega}(r_{ui}-p_u^\top q_i)^2+\lambda(\lVert P\rVert_F^2+\lVert Q\rVert_F^2)`, update: String.raw`p_u=(Q_{I_u}^\top Q_{I_u}+\lambda I)^{-1}Q_{I_u}^\top r_u,\qquad q_i=(P_{U_i}^\top P_{U_i}+\lambda I)^{-1}P_{U_i}^\top r_i`, lifecycle: [zh ? '初始化：seed 控制的 N(0,0.1) 因子；CSR 的稀疏 0 从不当作评分。' : 'Initialize seeded N(0,0.1) factors; sparse zeros are never ratings.', zh ? '每轮先解所有用户、再解所有图书，固定 n_iterations；记录 observed RMSE，不做 validation early stopping。' : 'Each iteration solves all users, then all items, for fixed n_iterations; records observed RMSE without validation early stopping.'] },
   nmf: { objective: String.raw`\min_{P,Q\ge0}\sum_{(u,i)\in\Omega}(r_{ui}-p_u^\top q_i)^2+\lambda(\lVert P\rVert_F^2+\lVert Q\rVert_F^2)`, update: String.raw`P\leftarrow P\odot\frac{(M\odot R)Q}{(M\odot PQ^\top)Q+\lambda P+\epsilon},\qquad Q\leftarrow Q\odot\frac{(M\odot R)^\top P}{(M\odot PQ^\top)^\top P+\lambda Q+\epsilon}`, lifecycle: [zh ? '初始化：seed 控制的 [ε,1] 正数均匀分布，保持 P、Q 非负。' : 'Initialize seeded positive uniform factors in [ε, 1], preserving non-negativity.', zh ? '每轮先更新 P 再更新 Q；每 10 轮或最后一轮检查 observed RMSE，变化小于 tol 或达到 max_iter 即停。' : 'Update P then Q; inspect observed RMSE every ten iterations or last iteration, stopping at tol or max_iter.'] },
-  svdpp: { objective: String.raw`\min\sum_{(u,i)\in\Omega}(r_{ui}-\mu-b_u-b_i-q_i^\top[p_u+|N(u)|^{-1/2}\sum_{j\in N(u)}y_j])^2+\lambda(\lVert P\rVert_F^2+\lVert Q\rVert_F^2+\lVert Y\rVert_F^2+\lVert b\rVert_2^2)`, update: String.raw`x_u=p_u+|N(u)|^{-1/2}\sum_{j\in N(u)}y_j;\quad y_j\leftarrow y_j+\eta(e q_i/\sqrt{|N(u)|}-\lambda y_j)`, lifecycle: [zh ? '初始化：μ、零 bias 及 N(0,0.1) 的 p、q、y；N(u) 仅来自 train 的已读、评论或评分图书。' : 'Initialize μ, zero biases, and N(0,0.1) p, q, y; N(u) uses train-only read, review, or rated books.', zh ? '随机 SGD 同时更新 bias、p、q 与每个 y；每 epoch 重建用户表示，按 validation RMSE 早停并恢复最佳快照。' : 'Random SGD updates biases, p, q, and each y; rebuild user representations per epoch and early-stop on validation RMSE.'] },
+  svdpp: { objective: String.raw`\min\sum_{(u,i)\in\Omega}(r_{ui}-\mu-b_u-b_i-q_i^\top[p_u+|N(u)|^{-1/2}\sum_{j\in N(u)}y_j])^2+\lambda\left(\lVert P\rVert_F^2+\lVert Q\rVert_F^2+\lVert Y\rVert_F^2+\sum_u b_u^2+\sum_i b_i^2\right)`, update: String.raw`x_u=p_u+|N(u)|^{-1/2}\sum_{j\in N(u)}y_j;\quad y_j\leftarrow y_j+\eta(e_{ui}q_i/\sqrt{|N(u)|}-\lambda y_j)`, lifecycle: [zh ? '初始化：μ、零 bias 及 N(0,0.1) 的 p、q、y；N(u) 仅来自 train 的已读、评论或评分图书。' : 'Initialize μ, zero biases, and N(0,0.1) p, q, y; N(u) uses train-only read, review, or rated books.', zh ? '随机 SGD 同时更新 bias、p、q 与每个 y；每 epoch 重建用户表示，按 validation RMSE 早停并恢复最佳快照。' : 'Random SGD updates biases, p, q, and each y; rebuild user representations per epoch and early-stop on validation RMSE.'] },
   bias_aware_als: { objective: String.raw`\begin{aligned}\mu&=\frac{1}{|\Omega|}\sum_{(u,i)\in\Omega}r_{ui}\quad(\text{fixed}),\\ \min_{b_u,b_i}\;&\sum_{(u,i)\in\Omega}(r_{ui}-\mu-b_u-b_i)^2+\lambda_b\left(\sum_u b_u^2+\sum_i b_i^2\right),\\ e_{ui}&=r_{ui}-\mu-b_u-b_i,\\ \min_{P,Q}\;&\sum_{(u,i)\in\Omega}(e_{ui}-p_u^\top q_i)^2+\lambda(\lVert P\rVert_F^2+\lVert Q\rVert_F^2)\end{aligned}`, update: String.raw`\begin{aligned}b_u&=\frac{\sum_{i\in I_u}(r_{ui}-\mu-b_i)}{|I_u|+\lambda_b},& b_i&=\frac{\sum_{u\in U_i}(r_{ui}-\mu-b_u)}{|U_i|+\lambda_b},\\ p_u&=(Q_{I_u}^\top Q_{I_u}+\lambda I)^{-1}Q_{I_u}^\top e_u,& q_i&=(P_{U_i}^\top P_{U_i}+\lambda I)^{-1}P_{U_i}^\top e_i\end{aligned}`, lifecycle: [zh ? '初始化：μ 为观测评分均值，bias 为 0，残差 ALS 因子为 N(0,0.1)。' : 'Initialize μ from observed ratings, zero biases, and residual-ALS factors from N(0,0.1).', zh ? '先交替 bias_iterations 次，再对残差交替 ALS n_iterations 次；冷用户/图书因子置零。' : 'Run bias_iterations alternating bias updates, then n_iterations residual ALS updates; zero cold user/item factors.'] },
+};
+const modelSymbols: Record<string, LegendEntry[]> = {
+  basic_mf: [
+    legend(String.raw`u,\ i,\ k`, '用户、图书与潜在维度索引；k 也是向量长度。', 'User, book, and latent-dimension indices; k is also the vector length.'),
+    legend(String.raw`r_{ui},\ \hat r_{ui},\ e_{ui},\ p_u^{\mathrm{old}}`, '观测评分、预测 raw score、标量误差，以及当前 SGD 步更新前的用户向量副本。', 'Observed rating, predicted raw score, scalar error, and the saved user vector from before the current SGD update.'),
+    legend(String.raw`p_u,q_i\in\mathbb R^k`, '用户偏好向量与同一潜在空间中的图书向量。', 'User-preference and book vectors in the same latent space.'),
+    legend(String.raw`P\in\mathbb R^{|U|\times k},\ Q\in\mathbb R^{|I|\times k}`, '由全部用户向量和图书向量组成的矩阵。', 'Matrices containing every user vector and book vector.'),
+    legend(String.raw`\Omega,\ \lambda,\ \eta`, '已观测 train 评分集合、L2 正则强度与 SGD 学习率。', 'Observed train-rating set, L2 strength, and SGD learning rate.'),
+    legend(String.raw`(\cdot)^\top,\ \lVert\cdot\rVert_F`, '转置/点积记号与矩阵 Frobenius 范数。', 'Transpose/dot-product notation and the matrix Frobenius norm.'),
+  ],
+  funksvd: [
+    legend(String.raw`\mu,\ b_u,\ b_i`, 'train 显式评分均值、用户评分习惯偏置与图书总体偏置，三者都是标量。', 'Mean explicit train rating, user-rating bias, and book bias; all are scalars.'),
+    legend(String.raw`r_{ui},\ \hat r_{ui},\ e_{ui}`, '观测评分、带 bias 的预测与误差。', 'Observed rating, bias-aware prediction, and error.'),
+    legend(String.raw`p_u,q_i,p_u^{\mathrm{old}}\in\mathbb R^k`, '用户与图书 latent vectors，以及当前 SGD 步更新前的用户向量副本。', 'User and book latent vectors, plus the saved user vector from before the current SGD update.'),
+    legend(String.raw`P,Q,\Omega`, '用户因子矩阵、图书因子矩阵与已观测评分集合。', 'User-factor matrix, book-factor matrix, and observed-rating set.'),
+    legend(String.raw`\lambda,\ \eta,\ (\cdot)^\top`, 'L2 正则、SGD 学习率与转置/点积。', 'L2 regularization, SGD learning rate, and transpose/dot product.'),
+  ],
+  als: [
+    legend(String.raw`u,\ i,\ p_u,q_i\in\mathbb R^k`, '用户、图书及其 k 维 latent vectors。', 'User, book, and their k-dimensional latent vectors.'),
+    legend(String.raw`I_u,\ U_i`, '用户 u 评分过的图书集合，以及给图书 i 评分的用户集合。', 'Books rated by user u, and users who rated book i.'),
+    legend(String.raw`Q_{I_u},\ P_{U_i},\ r_u,\ r_i`, '对应观测邻域的因子子矩阵与评分向量。', 'Factor submatrices and rating vectors for the observed neighborhoods.'),
+    legend(String.raw`P,Q,\Omega,\lambda`, '因子矩阵、已观测集合与 ridge/L2 正则强度。', 'Factor matrices, observed set, and ridge/L2 strength.'),
+    legend(String.raw`I,\ (\cdot)^{-1},\ (\cdot)^\top`, 'k×k 单位矩阵、矩阵逆与转置。', 'k-by-k identity matrix, matrix inverse, and transpose.'),
+  ],
+  nmf: [
+    legend(String.raw`P\in\mathbb R_{\ge0}^{|U|\times k},\ Q\in\mathbb R_{\ge0}^{|I|\times k}`, '非负用户与图书因子矩阵。', 'Non-negative user and book factor matrices.'),
+    legend(String.raw`R,M\in\mathbb R^{|U|\times|I|}`, '评分矩阵与 observed-position 二进制 mask；M 的缺失位置为 0。', 'Rating matrix and binary observed-position mask; missing positions are zero in M.'),
+    legend(String.raw`\Omega,\ r_{ui},\ p_u^\top q_i`, '已观测位置、其评分与该位置的预测。', 'Observed positions, their ratings, and predictions at those positions.'),
+    legend(String.raw`\odot,\ (\cdot)^\top`, '逐元素乘法与矩阵转置。', 'Element-wise multiplication and matrix transpose.'),
+    legend(String.raw`\lambda,\ \epsilon=10^{-10}`, 'L2 正则与防止除零的 Python 实现常数；ε 未发布为 artifact 参数。', 'L2 strength and the Python safeguard against division by zero; ε is not published as an artifact parameter.'),
+  ],
+  svdpp: [
+    legend(String.raw`N(u),\ |N(u)|`, '用户 u 的 train-only 隐式历史集合及其图书数量。', 'User u’s train-only implicit-history set and its book count.'),
+    legend(String.raw`p_u,q_i,y_j\in\mathbb R^k`, '显式用户因子、目标图书因子和历史图书 j 的隐式贡献向量。', 'Explicit user factor, target-book factor, and implicit contribution from history book j.'),
+    legend(String.raw`Y\in\mathbb R^{|I|\times k},\ x_u`, '全部隐式图书因子组成的矩阵，以及合并显式与隐式信息后的用户表示。', 'Matrix of all implicit book factors, and the combined explicit-plus-implicit user representation.'),
+    legend(String.raw`\mu,b_u,b_i,e_{ui}`, 'train 均值、用户/图书 bias 和预测误差；均为标量。', 'Train mean, user/book biases, and prediction error; all are scalars.'),
+    legend(String.raw`\sum_{j\in N(u)},\ |N(u)|^{-1/2}`, '对历史图书求和，并按历史长度平方根归一化。', 'Sum over history books, normalized by the square root of history length.'),
+    legend(String.raw`P,Q,\Omega,\lambda,\eta`, '显式因子矩阵、观测评分集合、L2 正则与学习率。', 'Explicit factor matrices, observed-rating set, L2 strength, and learning rate.'),
+  ],
+  bias_aware_als: [
+    legend(String.raw`\mu,b_u,b_i`, '固定 observed-rating mean，以及交替估计的用户和图书 bias。', 'Fixed observed-rating mean and alternately estimated user and book biases.'),
+    legend(String.raw`e_{ui}=r_{ui}-\mu-b_u-b_i`, '从观测评分减去 baseline 后的残差；它可以为负。', 'Residual after subtracting the baseline from an observed rating; it may be negative.'),
+    legend(String.raw`I_u,U_i,\ |I_u|,|U_i|`, '用户/图书的观测邻域集合及其大小。', 'Observed user/item neighborhoods and their cardinalities.'),
+    legend(String.raw`P,Q,p_u,q_i,e_u,e_i`, '残差 ALS 的因子矩阵、向量和邻域残差向量。', 'Residual-ALS factor matrices, vectors, and neighborhood residual vectors.'),
+    legend(String.raw`\lambda_b,\lambda,I`, 'baseline bias 正则、残差因子正则与 k×k 单位矩阵。', 'Baseline-bias regularization, residual-factor regularization, and k-by-k identity matrix.'),
+    legend(String.raw`(\cdot)^\top,(\cdot)^{-1},\Omega`, '转置、矩阵逆与已观测评分集合。', 'Transpose, matrix inverse, and observed-rating set.'),
+  ],
 };
 const population = metrics.models[0];
 ---
@@ -127,7 +207,7 @@ const population = metrics.models[0];
 
 <div class="goodbooks-case-study">
   <section id="gb-1" class="goodbooks-step">
-    <p class="step-label">01 / {zh ? '产品决策' : 'Product decision'}</p>
+    <p class="step-label">Step 1</p>
     <h2>{zh ? '诗歌推荐决策' : 'Recommendation decision'}</h2>
     <p>{zh ? `设想 Goodreads 的 Poetry discovery shelf：一位已有阅读历史的用户回来后，系统必须从 ${counts.items.toLocaleString()} 本训练目录图书中排除已见项目，再选出十本候选。这里的决策不是“哪种算法最复杂”，而是在相同数据和候选协议下，哪种 latent-factor 模型最值得进入线上实验。` : `Imagine a Goodreads Poetry discovery shelf. When a reader returns with history, the system removes seen books from the ${counts.items.toLocaleString()}-book training catalog and ranks ten candidates. The decision is not which algorithm is most complex; it is which latent-factor model merits an online experiment under one shared protocol.`}</p>
     <div class="observatory" aria-label={zh ? '合成的稀疏矩阵到推荐排序示意图' : 'Synthetic sparse-matrix-to-ranking illustration'}>
@@ -143,7 +223,7 @@ const population = metrics.models[0];
   </section>
 
   <section id="gb-2" class="goodbooks-step">
-    <p class="step-label">02 / {zh ? '冻结数据' : 'Frozen data'}</p>
+    <p class="step-label">Step 2</p>
     <h2>{zh ? '数据与切分' : 'Data and split'}</h2>
     <p>{zh ? `处理后的 ${metrics.dataset.version} 含 ${counts.users.toLocaleString()} 位匿名用户、${counts.items.toLocaleString()} 本图书和 ${counts.interactions.toLocaleString()} 条去重 interaction。原始和处理后的行级记录都不进入网站；只发布以下聚合事实。` : `The processed ${metrics.dataset.version} contains ${counts.users.toLocaleString()} anonymous users, ${counts.items.toLocaleString()} books, and ${counts.interactions.toLocaleString()} deduplicated interactions. Neither raw nor processed rows enter this site; only the aggregate facts below are public.`}</p>
     <div class="data-table"><table><thead><tr><th>{zh ? '字段' : 'Field'}</th><th>{zh ? '类型 / 值域' : 'Type / range'}</th><th>{zh ? '含义' : 'Meaning'}</th><th>{zh ? '用途' : 'Use'}</th></tr></thead><tbody>{metrics.dataset.fields.map((field) => <tr><th><code>{field.name}</code></th><td><code>{field.type}</code><br />{field.range ? field.range.join(' – ') : field.values?.join(' / ')}</td><td>{fieldCopy[field.name][0]}</td><td>{fieldCopy[field.name][1]}</td></tr>)}</tbody></table></div>
@@ -159,22 +239,23 @@ const population = metrics.models[0];
   </section>
 
   <section id="gb-3" class="goodbooks-step">
-    <p class="step-label">03 / {zh ? '共同语言' : 'Shared language'}</p>
+    <p class="step-label">Step 3</p>
     <h2>{zh ? '分解原理' : 'MF basics'}</h2>
     <p>{zh ? '评分矩阵极度稀疏，因此不填补所有空格，也不把空格解释为 0 分。模型只在已观测集合 Ω 上最小化误差，学习每位用户的向量 pᵤ 和每本书的向量 qᵢ；点积给出个性化评分预测。' : 'The rating matrix is sparse, so empty cells are neither filled nor interpreted as zero. Models minimize error only on observed set Ω, learn a vector pᵤ per user and qᵢ per book, then use their dot product as a personalized rating prediction.'}</p>
-    <div class="formula-grid"><article><KatexMath latex={String.raw`R\approx PQ^\top,\qquad \min_{P,Q}\sum_{(u,i)\in\Omega}(r_{ui}-p_u^\top q_i)^2+\lambda(\lVert P\rVert_F^2+\lVert Q\rVert_F^2)`} display label="Observed-only matrix factorization objective" /><FormulaLegend label={zh ? '符号' : 'Symbols'} entries={[{ latex: String.raw`\Omega`, description: zh ? '已观测评分位置；不包含缺失项。' : 'Observed rating positions; missing cells are excluded.' }, { latex: String.raw`\lambda`, description: zh ? '正则化强度，防止稀疏数据记忆训练集。' : 'Regularization strength against memorizing sparse training data.' }]} /></article><article><h3>{zh ? '二维手算例子' : 'A two-dimensional hand calculation'}</h3><KatexMath latex={String.raw`p_u=[0.6,0.2],\quad q_i=[0.5,0.8],\quad \hat r_{ui}=0.6(0.5)+0.2(0.8)=0.46`} display /><p>{zh ? '这个数字只是合成教学例子。latent dimension 可能捕捉共现模式，但不会自动获得“爱情诗”或“现代主义”等天然语义标签。' : 'This is a synthetic teaching example. Latent dimensions can encode co-occurrence patterns, but do not automatically receive semantic labels such as “love poetry” or “modernism.”'}</p></article></div>
+    <p>{zh ? <><KatexMath latex={String.raw`p_u`} /> 表示用户在若干潜在偏好方向上的强度，<KatexMath latex={String.raw`q_i`} /> 表示图书在同一空间中的位置；点积越大，二者越匹配。这些方向从交互共现中学习，不是人工命名的主题。</> : <><KatexMath latex={String.raw`p_u`} /> measures a user’s strength along learned preference directions, while <KatexMath latex={String.raw`q_i`} /> locates a book in the same space; a larger dot product means a stronger match. These directions are learned from interaction co-occurrence, not manually named topics.</>}</p>
+    <div class="formula-grid"><article><KatexMath latex={String.raw`R\approx PQ^\top,\qquad \min_{P,Q}\sum_{(u,i)\in\Omega}(r_{ui}-p_u^\top q_i)^2+\lambda(\lVert P\rVert_F^2+\lVert Q\rVert_F^2)`} display label="Observed-only matrix factorization objective" /><FormulaLegend label={zh ? '符号' : 'Symbols'} entries={[{ latex: String.raw`\Omega`, description: zh ? '已观测评分位置；不包含缺失项。' : 'Observed rating positions; missing cells are excluded.' }, { latex: String.raw`\lambda`, description: zh ? '正则化强度，防止稀疏数据记忆训练集。' : 'Regularization strength against memorizing sparse training data.' }]} /></article><article><h3>{zh ? '二维手算例子' : 'A two-dimensional hand calculation'}</h3><KatexMath latex={String.raw`p_u=[0.6,0.2],\quad q_i=[0.5,0.8],\quad \hat r_{ui}=0.6(0.5)+0.2(0.8)=0.46`} display /><p>{zh ? '0.46 是合成教学用的 raw score，不是真实的 1–5 星预测。latent dimension 可能捕捉共现模式，但不会自动获得“爱情诗”或“现代主义”等天然语义标签。' : '0.46 is a synthetic teaching raw score, not a real 1–5 star prediction. Latent dimensions can encode co-occurrence patterns, but do not automatically receive semantic labels such as “love poetry” or “modernism.”'}</p></article></div>
   </section>
 
   <section id="gb-4" class="goodbooks-step">
-    <p class="step-label">04 / {zh ? '六种算法' : 'Six models'}</p>
+    <p class="step-label">Step 4</p>
     <h2>{zh ? '六种算法' : 'Six models'}</h2>
     <p>{zh ? '六个模型共享数据版本、seed、时间切分与评估协议。每项均可用键盘展开；Bias-aware ALS 是完整展示的诊断模型，不参与冠军选择。' : 'All six models share the data version, seed, temporal split, and protocol. Each is keyboard-expandable; Bias-aware ALS is a fully documented diagnostic and never selects the champion.'}</p>
-    <div class="model-details">{modelDetails.map((detail, index) => { const model = modelDetail(detail.key); const steps = algorithmSteps[detail.key]; return <details open={index === 0}><summary aria-expanded={index === 0 ? 'true' : 'false'}><span>{detail.title}</span><small>{Object.entries(model.hyperparameters).map(([key, value]) => `${key}=${value}`).join(' · ')} · <b class="detail-state" data-open={zh ? '收起算法' : 'Hide algorithm'} data-closed={zh ? '查看算法' : 'View algorithm'}>{zh ? '查看算法' : 'View algorithm'}</b></small></summary><div><p>{detail.body}</p><h3>{zh ? '预测与目标' : 'Prediction and objective'}</h3><KatexMath latex={detail.formula} display label={`${detail.key} prediction`} /><KatexMath latex={steps.objective} display label={`${detail.key} objective`} /><h3>{zh ? '更新与停止' : 'Updates and stopping'}</h3><KatexMath latex={steps.update} display label={`${detail.key} update`} /><ul class="model-facts"><li>{detail.input}</li><li>{steps.lifecycle[0]}</li><li>{detail.training}</li><li>{steps.lifecycle[1]}</li><li>{zh ? `正则化：artifact 的 reg_lambda=${model.hyperparameters.reg_lambda ?? '—'}。` : `Regularization: artifact reg_lambda=${model.hyperparameters.reg_lambda ?? '—'}.`}</li><li>{detail.advantage}</li><li>{detail.serving}</li></ul><p class="limit"><strong>{zh ? '限制：' : 'Limit: '}</strong>{detail.limit}</p></div></details>; })}</div>
+    <div class="model-details">{modelDetails.map((detail, index) => { const model = modelDetail(detail.key); const steps = algorithmSteps[detail.key]; return <details data-model={detail.key} open={index === 0}><summary aria-expanded={index === 0 ? 'true' : 'false'}><span>{detail.title}</span><small>{parameterSummary(model)} · <b class="detail-state" data-open={zh ? '收起算法' : 'Hide algorithm'} data-closed={zh ? '查看算法' : 'View algorithm'}>{zh ? '查看算法' : 'View algorithm'}</b></small></summary><div><p>{detail.body}</p>{detail.key === 'basic_mf' && <aside class="teaching-note"><h3>{zh ? '从无 bias 到带 bias' : 'From no bias to bias'}</h3><p>{zh ? 'Basic MF 只使用 latent-factor 点积，不包含 bias。FunkSVD 是这个基线的 bias 扩展，不是第七个模型。' : 'Basic MF uses only the latent-factor dot product. FunkSVD is the bias extension of this baseline, not a seventh model.'}</p><KatexMath latex={String.raw`\underbrace{p_u^\top q_i}_{\text{Basic MF}}\quad\longrightarrow\quad\underbrace{\mu+b_u+b_i+p_u^\top q_i}_{\text{FunkSVD}}`} display /><ul><li>{zh ? 'μ 是 train 显式评分均值。' : 'μ is the mean explicit train rating.'}</li><li>{zh ? 'b_u 与 b_i 初始化为 0，分别学习用户打分习惯和图书总体偏置。' : 'b_u and b_i start at zero and learn user rating habits and overall book bias.'}</li><li>{zh ? '两个 bias 与 latent factors 在同一 SGD 步更新，并接受 L2 正则。' : 'Both biases update with the latent factors in each SGD step and receive L2 regularization.'}</li></ul></aside>}<h3>{zh ? '预测与目标' : 'Prediction and objective'}</h3><KatexMath latex={detail.formula} display label={`${detail.key} prediction`} /><KatexMath latex={steps.objective} display label={`${detail.key} objective`} /><h3>{zh ? '更新与停止' : 'Updates and stopping'}</h3><KatexMath latex={steps.update} display label={`${detail.key} update`} /><FormulaLegend label={zh ? '符号说明' : 'Symbols'} entries={modelSymbols[detail.key]} /><FormulaLegend label={zh ? 'Artifact 参数' : 'Artifact parameters'} entries={parameterLegend(model)} />{(detail.key === 'basic_mf' || detail.key === 'funksvd') && <p class="implementation-note">{zh ? '停止阈值 Δ_min=10^-4 来自 Python 实现默认值，未作为这两个模型的 artifact 字段单独发布。' : 'The stopping threshold Δ_min=10^-4 is the Python implementation default and is not separately published in these models’ artifact fields.'}</p>}{detail.key === 'svdpp' && <aside class="teaching-note"><h3>{zh ? '合成用户历史示例' : 'Synthetic user-history example'}</h3><p>{zh ? '用户 u 在 train 中给 A 打分、标记 B 已读、评论 C，因此 N(u)={A,B,C}；validation/test 行不能进入该集合。' : 'User u rates A, reads B, and reviews C in train, so N(u)={A,B,C}; validation/test behavior cannot enter this set.'}</p><KatexMath latex={String.raw`N(u)=\{A,B,C\},\qquad x_u=p_u+|N(u)|^{-1/2}\sum_{j\in N(u)}y_j`} display /><p>{zh ? '除以历史长度的平方根可以控制不同历史长度的表示尺度。y_j 是历史图书对用户表示的隐式贡献，不是评分或人工主题标签。' : 'Dividing by the square root of history length controls representation scale across users. y_j is a history book’s implicit contribution to the user representation, not a rating or manual topic label.'}</p></aside>}{detail.key === 'nmf' && <p class="implementation-note">{zh ? '实现对应：CSR 只存 observed ratings，所以稀疏 train_matrix @ Q 与公式 (M ⊙ R)Q 等价；空位置是缺失，不是评分 0。' : 'Implementation correspondence: because the CSR stores only observed ratings, sparse train_matrix @ Q is equivalent to (M ⊙ R)Q; empty positions are missing, not rating zero.'}</p>}{detail.key === 'bias_aware_als' && <p class="implementation-note">{zh ? '这是顺序执行的两阶段过程：固定 observed-rating mean，先交替估计 bias，再构造残差并运行 ALS；不是一次联合闭式优化。' : 'This is a sequential two-stage process: fix the observed-rating mean, alternate bias estimates, then build residuals and run ALS; it is not a joint closed-form optimization.'}</p>}<ul class="model-facts"><li>{detail.input}</li><li>{steps.lifecycle[0]}</li><li>{detail.training}</li><li>{steps.lifecycle[1]}</li><li>{zh ? `正则化：artifact 的 λ=${model.hyperparameters.reg_lambda ?? '—'}。` : `Regularization: artifact λ=${model.hyperparameters.reg_lambda ?? '—'}.`}</li><li>{detail.advantage}</li><li>{detail.serving}</li></ul><p class="limit"><strong>{zh ? '限制：' : 'Limit: '}</strong>{detail.limit}</p></div></details>; })}</div>
     <p>{zh ? <>共同服务规则：在 train catalog 的未见、可用图书上计算 raw score，分数降序，<KatexMath latex={String.raw`\texttt{item\_idx}`} /> 升序打破同分，返回 Top-10；历史不足或空结果回退 editorial/popularity。</> : <>Shared serving rule: score unseen, available train-catalog books by raw score, break ties by ascending <KatexMath latex={String.raw`\texttt{item\_idx}`} />, return Top-10, and fall back to editorial/popularity for insufficient history or empty results.</>}</p>
   </section>
 
   <section id="gb-5" class="goodbooks-step">
-    <p class="step-label">05 / {zh ? '评估口径' : 'Evaluation'}</p>
+    <p class="step-label">Step 5</p>
     <h2>{zh ? '评估口径' : 'Evaluation'}</h2>
     <div class="formula-grid"><article><h3>{zh ? '评分预测' : 'Rating prediction'}</h3><p>{zh ? '只评估 test 中 rating > 0 的行；预测仅在 RMSE/MAE 计算时截断到 1–5。' : 'Only test rows with rating > 0 are evaluated; predictions are clipped to 1–5 only for RMSE/MAE.'}</p><KatexMath latex={String.raw`\mathrm{RMSE}=\sqrt{\frac1N\sum(\tilde r_{ui}-r_{ui})^2},\qquad \mathrm{MAE}=\frac1N\sum|\tilde r_{ui}-r_{ui}|`} display /></article><article><h3>{zh ? '排序定义' : 'Ranking definitions'}</h3><p>{zh ? '候选是完整 train catalog 去除已见图书，无负采样；相关集合包含 test 中高分或未评分但已读的有效候选。' : 'Candidates are the full train catalog minus seen books, with no negative sampling; relevant items are valid test candidates with high ratings or unread ratings marked read.'}</p><KatexMath latex={String.raw`L_u^N=\mathrm{TopN}(u),\quad G_u=\{i:r_{ui}\ge4\ \lor\ (r_{ui}=0\land\mathrm{read}_{ui})\}`} display /><KatexMath latex={String.raw`\mathrm{P@N}_u=\frac{|L_u^N\cap G_u|}{N},\quad \mathrm{R@N}_u=\frac{|L_u^N\cap G_u|}{|G_u|}`} display /><KatexMath latex={String.raw`\mathrm{DCG@N}_u=\sum_{j=1}^{N}\frac{\mathrm{rel}_{uj}}{\log_2(j+1)},\quad \mathrm{IDCG@N}_u=\sum_{j=1}^{\min(N,|G_u|)}\frac1{\log_2(j+1)},\quad \mathrm{NDCG@N}_u=\frac{\mathrm{DCG@N}_u}{\mathrm{IDCG@N}_u}`} display /></article></div>
     <p>{zh ? 'P@N 衡量前 N 个位置的命中密度，R@N 衡量相关图书被找回的比例，NDCG@N 额外奖励更靠前的命中。P@N 始终除以 N；没有相关图书时 Recall/NDCG 为 0，IDCG=0 时 NDCG 也为 0。只纳入至少有一个有效相关候选的用户，所有模型在该固定人群上做 macro average。' : 'P@N measures hit density, R@N measures relevant-item recovery, and NDCG@N rewards earlier hits. P@N always divides by N; no relevant items or IDCG=0 produces Recall/NDCG of 0. Every model uses the same users with at least one valid relevant candidate and macro-averages user metrics.'}</p>
@@ -182,7 +263,7 @@ const population = metrics.models[0];
   </section>
 
   <section id="gb-6" class="goodbooks-step">
-    <p class="step-label">06 / {zh ? '模型结果' : 'Results'}</p>
+    <p class="step-label">Step 6</p>
     <h2>{zh ? '模型结果' : 'Results'}</h2>
     <p>{zh ? `线上候选是五个正式模型中 NDCG@10 最高的 ${metrics.champion.model_label}（${pct(metrics.champion.selection_value)}）。这不是“所有维度绝对最优”的宣言：RMSE、Recall、训练成本和目录分布回答的是不同问题。` : `The online candidate is ${metrics.champion.model_label}, the planned model with the highest NDCG@10 (${pct(metrics.champion.selection_value)}). This is not a claim of universal superiority: RMSE, Recall, training cost, and catalog distribution answer different questions.`}</p>
     <GoodBooksMetricsExplorer client:visible lang={lang} models={metrics.models} champion={metrics.champion.model} />
@@ -191,7 +272,7 @@ const population = metrics.models[0];
   </section>
 
   <section id="gb-7" class="goodbooks-step">
-    <p class="step-label">07 / {zh ? '上线实验' : 'Experiment'}</p>
+    <p class="step-label">Step 7</p>
     <h2>{zh ? '上线实验' : 'Experiment'}</h2>
     <div class="serving-flow" aria-label={zh ? '生产推荐流程示意' : 'Production recommendation flow'}><span>{zh ? '离线训练与批量打分' : 'Offline training and batch scoring'}</span><i aria-hidden="true">→</i><span>{zh ? '过滤已见与不可用图书' : 'Filter seen and unavailable books'}</span><i aria-hidden="true">→</i><span>{zh ? '返回 Top-10' : 'Return Top-10'}</span><i aria-hidden="true">→</i><span>{zh ? '空结果回退 editorial/popularity' : 'Fallback to editorial/popularity'}</span></div>
     <aside><h3>{zh ? '这个仓库的边界' : 'Repository boundary'}</h3><p>{zh ? '这里只展示 production blueprint；仓库没有线上推理服务、实时 Goodreads API、曝光日志或真实 A/B 结果。' : 'This is a production blueprint only: the repository has no online inference service, real-time Goodreads API, exposure logs, or real A/B-test results.'}</p></aside>
@@ -224,9 +305,9 @@ const population = metrics.models[0];
   .data-table{overflow-x:auto;border:1px solid var(--line);border-radius:14px}.data-table table{width:100%;min-width:720px;border-collapse:collapse}.data-table th,.data-table td{padding:.75rem;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:.85rem}.data-table thead th{color:var(--muted);font:.68rem 'IBM Plex Mono',monospace;text-transform:uppercase}.data-table tbody tr:last-child>*{border-bottom:0}.data-table code{font:.76rem 'IBM Plex Mono',monospace;color:var(--starlight)}
   .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem}.stat-grid article{display:grid;gap:.3rem;padding:.9rem;border:1px solid var(--line);border-radius:12px;background:var(--deep)}.stat-grid span{color:var(--rec);font:.68rem 'IBM Plex Mono',monospace;text-transform:uppercase}.stat-grid strong{font:600 1.35rem var(--title-font);font-variant-numeric:tabular-nums}.stat-grid small{color:var(--muted)}
   .formula-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.formula-grid>article{display:grid;align-content:start;gap:.75rem;padding:1rem;border:1px solid var(--line);border-radius:14px;background:rgba(12,27,48,.58)}.formula-grid p,.limit{color:var(--muted)}.katex-math-block{max-width:100%;overflow-x:auto;overflow-y:hidden}
-  .model-details{display:grid;gap:.75rem}.model-details details{border:1px solid var(--line);border-radius:14px;background:rgba(12,27,48,.5)}.model-details summary{display:flex;justify-content:space-between;gap:1rem;padding:1rem;cursor:pointer}.model-details summary:focus-visible{outline:2px solid var(--search);outline-offset:3px}.model-details summary span{font-weight:600}.model-details summary small{color:var(--muted);font:.65rem 'IBM Plex Mono',monospace;text-align:right}.model-details details>div{display:grid;gap:.8rem;padding:0 1rem 1rem}.model-details details p,.model-facts{color:var(--muted)}.model-facts{display:grid;gap:.35rem;margin:0;padding-left:1.2rem;font-size:.9rem}
+  .model-details{display:grid;gap:.75rem;min-width:0}.model-details details{min-width:0;border:1px solid var(--line);border-radius:14px;background:rgba(12,27,48,.5)}.model-details summary{display:flex;justify-content:space-between;gap:1rem;min-width:0;padding:1rem;cursor:pointer}.model-details summary:focus-visible{outline:2px solid var(--search);outline-offset:3px}.model-details summary span{min-width:0;font-weight:600}.model-details summary small{min-width:0;overflow-wrap:anywhere;color:var(--muted);font:.65rem 'IBM Plex Mono',monospace;text-align:right}.model-details details>div{display:grid;gap:.8rem;min-width:0;overflow:hidden;padding:0 1rem 1rem}.model-details details p,.model-facts{color:var(--muted)}.model-facts{display:grid;gap:.35rem;margin:0;padding-left:1.2rem;font-size:.9rem}
   .table-scroll-hint{margin:0;color:var(--muted);font:.72rem 'IBM Plex Mono',monospace}.comparison-table{overflow:auto;border:1px solid var(--line);border-radius:14px}.comparison-table table{width:100%;min-width:1280px;border-collapse:collapse;font-variant-numeric:tabular-nums}.comparison-table th,.comparison-table td{padding:.6rem .7rem;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;font:.72rem 'IBM Plex Mono',monospace}.comparison-table thead th{color:var(--muted);text-transform:uppercase;position:sticky;top:0;z-index:2;background:rgba(12,27,48,.96)}.comparison-table thead tr:first-child th{text-align:center}.comparison-table .group-start{border-left:2px solid var(--line)}.comparison-table tbody th{position:sticky;left:0;z-index:1;text-align:left;background:var(--deep);color:var(--starlight)}.comparison-table td.is-best{color:var(--complete);font-weight:800}.comparison-table tbody tr.is-diagnostic>*{color:var(--muted)}.comparison-table tbody tr.is-diagnostic td.is-best{color:var(--complete)}.comparison-table small{display:block;margin-top:.2rem;color:var(--complete);font-size:.56rem;text-transform:uppercase}.comparison-table tr.is-diagnostic small{color:var(--muted)}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
   .serving-flow{display:flex;align-items:stretch;gap:.5rem;overflow-x:auto;padding:1rem;border:1px solid var(--line);border-radius:14px;background:linear-gradient(145deg,rgba(167,139,250,.08),rgba(7,17,31,.85))}.serving-flow span{display:grid;place-items:center;min-width:150px;padding:.6rem;color:var(--starlight);text-align:center;font-size:.82rem}.serving-flow i{align-self:center;color:var(--search);font-style:normal}
   .rollout-grid,.ab-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}.rollout-grid article,.ab-grid article,.experiment-spec article{display:grid;gap:.55rem;padding:1rem;border:1px solid var(--line);border-radius:14px;background:rgba(12,27,48,.55)}.rollout-grid span{color:var(--rec);font:600 1.4rem 'IBM Plex Mono',monospace}.rollout-grid p,.ab-grid li,.experiment-spec p{color:var(--muted);font-size:.9rem}.ab-grid ul{display:grid;gap:.45rem;margin:0;padding-left:1.1rem}.experiment-spec{display:grid;gap:.75rem}.experiment-spec article{grid-template-columns:1fr}.experiment-spec :global(.katex-math-block){overflow-x:auto}
-  @media(max-width:760px){.formula-grid,.rollout-grid,.ab-grid{grid-template-columns:1fr}.stat-grid{grid-template-columns:repeat(2,1fr)}.observatory{grid-template-columns:1fr auto 1fr}.observatory>span:nth-of-type(2),.observatory>span:nth-of-type(3),.observatory>div:nth-of-type(3),.observatory>div:nth-of-type(4){display:none}}@media(max-width:460px){.stat-grid{grid-template-columns:1fr}.goodbooks-step{padding-block:3.5rem}}
+  @media(max-width:760px){.formula-grid,.rollout-grid,.ab-grid{grid-template-columns:1fr}.stat-grid{grid-template-columns:repeat(2,1fr)}.observatory{grid-template-columns:1fr auto 1fr}.observatory>span:nth-of-type(2),.observatory>span:nth-of-type(3),.observatory>div:nth-of-type(3),.observatory>div:nth-of-type(4){display:none}}@media(max-width:460px){.stat-grid{grid-template-columns:1fr}.goodbooks-step{padding-block:3.5rem}.model-details summary{flex-direction:column}.model-details summary small{text-align:left}}
 </style>
