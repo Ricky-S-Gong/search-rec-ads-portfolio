@@ -1,6 +1,7 @@
 import pandas as pd
 
 from kuairand_twotower.data import normalize_events, split_events
+from prepare_kuairand_data import prepare
 
 
 def test_normalize_events_preserves_official_unix_millisecond_timestamps():
@@ -32,3 +33,19 @@ def test_random_exposure_events_are_excluded_from_training_split():
     )
 
     assert split_events(events)["split"].tolist() == ["warmup", "train", "validation", "random"]
+
+
+def test_prepare_writes_parquet_events_and_manifest(tmp_path):
+    raw_dir = tmp_path / "KuaiRand-Pure" / "data"
+    raw_dir.mkdir(parents=True)
+    pd.DataFrame(
+        {
+            "user_id": [1], "video_id": [10], "date": [20220415], "time_ms": [1649980801000],
+            "tab": [1], "long_view": [1], "is_rand": [0],
+        }
+    ).to_csv(raw_dir / "log_standard_4_22_to_5_08_pure.csv", index=False)
+
+    manifest = prepare(raw_dir, tmp_path / "dataset")
+
+    assert manifest.exists()
+    assert (manifest.parent / "events.parquet").exists()

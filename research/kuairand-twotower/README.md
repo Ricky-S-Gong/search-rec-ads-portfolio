@@ -27,6 +27,21 @@ python research/kuairand-twotower/download_data.py \
 The downloader validates Zenodo's published MD5. Extract the verified archive
 beside it, then use `KuaiRand-1K/data/` as the raw data directory.
 
+## Use KuaiRand-Pure now
+
+Pure is the small smoke-test dataset: it is suitable for validating this data
+pipeline, but not for the final retrieval benchmark because its candidate pool
+and sequential history are reduced. After extracting your downloaded archive,
+run:
+
+```bash
+uv run python research/kuairand-twotower/prepare_kuairand_data.py \
+  --raw-dir /content/drive/MyDrive/kuairand/raw/KuaiRand-Pure/data \
+  --output-dir /content/drive/MyDrive/kuairand/datasets/kuairand-pure-v1
+```
+
+Use the same command with `KuaiRand-1K/data` later for the main experiment.
+
 ## Shared data contract
 
 `normalize_events` emits `request_id`, `user_id`, `item_id`,
