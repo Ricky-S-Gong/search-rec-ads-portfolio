@@ -55,6 +55,19 @@ PYTHONPATH=research/kuairand-twotower python research/kuairand-twotower/build_us
   --output /content/drive/MyDrive/kuairand/datasets/kuairand-pure-v1/user_histories.parquet
 ```
 
+## Prepare Item Tower features
+
+Use only static video metadata for this first model. The aggregate engagement
+statistics file is intentionally excluded because it can include future
+feedback relative to a training request.
+
+```bash
+PYTHONPATH=research/kuairand-twotower python research/kuairand-twotower/prepare_item_features.py \
+  --basic /content/drive/MyDrive/kuairand/raw/KuaiRand-Pure/data/video_features_basic_pure.csv \
+  --events /content/drive/MyDrive/kuairand/datasets/kuairand-pure-v1/events.parquet \
+  --output /content/drive/MyDrive/kuairand/datasets/kuairand-pure-v1/item_features.parquet
+```
+
 ## Shared data contract
 
 `normalize_events` emits `request_id`, `user_id`, `item_id`,

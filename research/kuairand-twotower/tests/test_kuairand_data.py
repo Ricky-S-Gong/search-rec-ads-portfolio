@@ -1,6 +1,8 @@
 import pandas as pd
+import pytest
 
 from kuairand_twotower.data import build_histories, normalize_events, split_events
+from prepare_item_features import prepare_item_features
 from prepare_kuairand_data import prepare
 
 
@@ -67,3 +69,34 @@ def test_build_histories_uses_only_strictly_prior_positive_nonrandom_events():
 
     assert histories["request_id"].tolist() == ["one", "three", "five"]
     assert histories["history_item_ids"].tolist() == [[], [10], [10, 12]]
+
+
+def test_prepare_item_features_uses_basic_metadata_and_checks_event_coverage(tmp_path):
+    basic = tmp_path / "video_features_basic_pure.csv"
+    events = tmp_path / "events.parquet"
+    output = tmp_path / "item_features.parquet"
+    pd.DataFrame(
+        {
+            "video_id": [10, 11],
+            "author_id": [1, 2],
+            "video_type": ["NORMAL", "AD"],
+            "video_duration": [100.0, 200.0],
+        }
+    ).to_csv(basic, index=False)
+    pd.DataFrame({"item_id": [10, 11]}).to_parquet(events, index=False)
+
+    prepare_item_features(basic, events, output)
+
+    actual = pd.read_parquet(output)
+    assert actual["item_id"].tolist() == [10, 11]
+    assert "video_id" not in actual.columns
+
+
+def test_prepare_item_features_rejects_event_items_missing_from_metadata(tmp_path):
+    basic = tmp_path / "video_features_basic_pure.csv"
+    events = tmp_path / "events.parquet"
+    pd.DataFrame({"video_id": [10]}).to_csv(basic, index=False)
+    pd.DataFrame({"item_id": [10, 11]}).to_parquet(events, index=False)
+
+    with pytest.raises(ValueError, match="missing 1 event item IDs"):
+        prepare_item_features(basic, events, tmp_path / "item_features.parquet")
