@@ -3,6 +3,9 @@
 An in-progress neural candidate-retrieval project using KuaiRand-1K. The goal
 is to retrieve 100 eligible short videos from a user's strictly prior feedback.
 
+For the current Pure dataset, team handoff and next implementation tasks, see
+[DATA_HANDOFF.md](DATA_HANDOFF.md).
+
 ## Data and storage
 
 Raw data, processed Parquet files, checkpoints, and WandB runs are private and
