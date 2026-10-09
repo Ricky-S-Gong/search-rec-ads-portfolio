@@ -1,0 +1,48 @@
+# KuaiRand two-tower retrieval
+
+An in-progress neural candidate-retrieval project using KuaiRand-1K. The goal
+is to retrieve 100 eligible short videos from a user's strictly prior feedback.
+
+## Data and storage
+
+Raw data, processed Parquet files, checkpoints, and WandB runs are private and
+gitignored. Store them in the shared Drive; keep this repository for code,
+configuration, tests, and compact public results only.
+
+```text
+shared-drive/kuairand/
+├── raw/KuaiRand-1K.tar.gz
+├── datasets/kuairand-1k-v1/
+├── runs/<owner>/<run-id>/
+└── releases/<stage>/
+```
+
+## Get the official 1K archive
+
+```bash
+python research/kuairand-twotower/download_data.py \
+  --destination /content/drive/MyDrive/kuairand/raw/KuaiRand-1K.tar.gz
+```
+
+The downloader validates Zenodo's published MD5. Extract the verified archive
+beside it, then use `KuaiRand-1K/data/` as the raw data directory.
+
+## Shared data contract
+
+`normalize_events` emits `request_id`, `user_id`, `item_id`,
+`request_time_ms`, `tab`, `long_view`, and `is_random`. The official `time_ms`
+field is already a Unix timestamp in milliseconds. Time splits are fixed:
+warmup through Apr 14, train Apr 15–28, validation Apr 29–May 3, and test from
+May 4. Random-exposure rows are reserved for diagnostics, never training.
+
+## Colab setup
+
+```python
+from google.colab import drive
+drive.mount('/content/drive')
+!git clone https://github.com/Ricky-S-Gong/search-rec-ads-portfolio.git
+%cd search-rec-ads-portfolio
+!pip install -r research/kuairand-twotower/requirements-colab.txt
+```
+
+Do not commit `.env`, API keys, raw CSVs, Parquet files, or checkpoints.

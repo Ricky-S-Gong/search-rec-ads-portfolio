@@ -19,6 +19,7 @@ testpaths = [
   "research/spotify-music/tests",
   "research/movielens-cf/tests",
   "research/goodbooks-mf/tests",
+  "research/kuairand-twotower/tests",
 ]
 
 [tool.uv]
