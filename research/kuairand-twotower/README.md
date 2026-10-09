@@ -42,6 +42,18 @@ uv run python research/kuairand-twotower/prepare_kuairand_data.py \
 
 Use the same command with `KuaiRand-1K/data` later for the main experiment.
 
+## Build user histories
+
+Each request gets up to its 50 most recent **strictly prior**, non-random
+long-view video IDs. This prevents the model from seeing a request's own
+outcome or another request from exactly the same timestamp.
+
+```bash
+PYTHONPATH=research/kuairand-twotower python research/kuairand-twotower/build_user_histories.py \
+  --events /content/drive/MyDrive/kuairand/datasets/kuairand-pure-v1/events.parquet \
+  --output /content/drive/MyDrive/kuairand/datasets/kuairand-pure-v1/user_histories.parquet
+```
+
 ## Shared data contract
 
 `normalize_events` emits `request_id`, `user_id`, `item_id`,

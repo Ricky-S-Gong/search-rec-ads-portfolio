@@ -1,6 +1,6 @@
 import pandas as pd
 
-from kuairand_twotower.data import normalize_events, split_events
+from kuairand_twotower.data import build_histories, normalize_events, split_events
 from prepare_kuairand_data import prepare
 
 
@@ -49,3 +49,21 @@ def test_prepare_writes_parquet_events_and_manifest(tmp_path):
 
     assert manifest.exists()
     assert (manifest.parent / "events.parquet").exists()
+
+
+def test_build_histories_uses_only_strictly_prior_positive_nonrandom_events():
+    events = pd.DataFrame(
+        {
+            "request_id": ["one", "two", "three", "four", "five"],
+            "user_id": [7, 7, 7, 7, 7],
+            "item_id": [10, 11, 12, 13, 14],
+            "request_time_ms": [1, 2, 2, 3, 3],
+            "long_view": [True, False, True, True, True],
+            "is_random": [False, False, False, True, False],
+        }
+    )
+
+    histories = build_histories(events, limit=2)
+
+    assert histories["request_id"].tolist() == ["one", "two", "three", "five"]
+    assert histories["history_item_ids"].tolist() == [[], [10], [10], [10, 12]]
