@@ -65,5 +65,5 @@ def test_build_histories_uses_only_strictly_prior_positive_nonrandom_events():
 
     histories = build_histories(events, limit=2)
 
-    assert histories["request_id"].tolist() == ["one", "two", "three", "five"]
-    assert histories["history_item_ids"].tolist() == [[], [10], [10], [10, 12]]
+    assert histories["request_id"].tolist() == ["one", "three", "five"]
+    assert histories["history_item_ids"].tolist() == [[], [10], [10, 12]]

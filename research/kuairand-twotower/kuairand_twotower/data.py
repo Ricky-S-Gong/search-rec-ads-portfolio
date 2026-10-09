@@ -15,26 +15,27 @@ def build_histories(events: pd.DataFrame, limit: int = 50) -> pd.DataFrame:
     if limit < 1:
         raise ValueError("history limit must be positive")
 
-    rows: list[dict[str, object]] = []
-    ordered = events.sort_values(["user_id", "request_time_ms"], kind="stable")
-    for user_id, user_events in ordered.groupby("user_id", sort=False):
-        history: list[int] = []
-        for _, moment in user_events.groupby("request_time_ms", sort=False):
-            for event in moment.itertuples(index=False):
-                if not event.is_random:
-                    rows.append(
-                        {
-                            "request_id": event.request_id,
-                            "user_id": user_id,
-                            "history_item_ids": history[-limit:].copy(),
-                        }
-                    )
-            history.extend(
-                moment.loc[(moment["long_view"]) & (~moment["is_random"]), "item_id"]
-                .astype("int64")
-                .tolist()
+    positives = events.loc[(events["long_view"]) & (~events["is_random"])].sort_values(
+        ["user_id", "request_time_ms"], kind="stable"
+    )
+    output: list[pd.DataFrame] = []
+    for _, user_events in positives.groupby("user_id", sort=False):
+        times = user_events["request_time_ms"].to_numpy()
+        item_ids = user_events["item_id"].astype("int64").tolist()
+        previous_counts = times.searchsorted(times, side="left")
+        histories = [item_ids[max(0, count - limit):count] for count in previous_counts]
+        output.append(
+            pd.DataFrame(
+                {
+                    "request_id": user_events["request_id"].to_numpy(),
+                    "user_id": user_events["user_id"].to_numpy(),
+                    "history_item_ids": histories,
+                }
             )
-    return pd.DataFrame(rows, columns=["request_id", "user_id", "history_item_ids"])
+        )
+    return pd.concat(output, ignore_index=True) if output else pd.DataFrame(
+        columns=["request_id", "user_id", "history_item_ids"]
+    )
 
 
 def normalize_events(raw: pd.DataFrame, source: str) -> pd.DataFrame:
