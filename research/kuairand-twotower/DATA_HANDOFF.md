@@ -122,6 +122,10 @@ history_mask        [B, 50]  # bool，True 表示真实历史
 L2-normalized 的 64 维向量；目标视频和历史视频使用同一个调用方式：
 
 ```python
+import sys
+
+sys.path.insert(0, "/content/search-rec-ads-portfolio/research/kuairand-twotower")
+
 from kuairand_twotower.dataset import build_dataloader
 from kuairand_twotower.item_tower import ItemTower
 
