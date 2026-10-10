@@ -98,6 +98,52 @@ request_id, user_id, history_item_ids
 数据为 50）和 batch 的字段名。Yutao 可以现在并行完成 User Tower、训练
 循环和评估骨架；这两个文件完成后即可接入端到端训练。
 
+## 已交付的模型接口
+
+`kuairand_twotower.dataset.build_dataloader` 读取三张 Parquet 表并返回
+`(loader, schema)`。它只接受 `train` 或 `validation` split，并筛选
+`long_view=True`、`is_random=False` 的正样本。
+
+每个 batch 都有以下张量：
+
+```text
+target_categorical  [B, 8]
+target_numeric      [B, 4]
+history_categorical [B, 50, 8]
+history_numeric     [B, 50, 4]
+history_mask        [B, 50]  # bool，True 表示真实历史
+```
+
+8 个类别特征依次为 `item_id`、`author_id`、`video_type`、`upload_type`、
+`visible_status`、`music_id`、`music_type`、`tag`。4 个数值特征依次为
+时长、宽、高和上传日期。类别 ID 的 `0` 专门保留给 padding/unknown。
+
+`kuairand_twotower.item_tower.ItemTower` 接收 `schema` 的类别基数，输出
+L2-normalized 的 64 维向量；目标视频和历史视频使用同一个调用方式：
+
+```python
+from kuairand_twotower.dataset import build_dataloader
+from kuairand_twotower.item_tower import ItemTower
+
+loader, schema = build_dataloader(
+    "/content/drive/MyDrive/kuairand-Two-Tower/datasets/kuairand-pure-v1/events.parquet",
+    "/content/drive/MyDrive/kuairand-Two-Tower/datasets/kuairand-pure-v1/user_histories.parquet",
+    "/content/drive/MyDrive/kuairand-Two-Tower/datasets/kuairand-pure-v1/item_features.parquet",
+    split="train",
+    batch_size=32,
+    shuffle=True,
+)
+item_tower = ItemTower(schema.categorical_cardinalities, schema.numeric_feature_count)
+batch = next(iter(loader))
+target_vectors = item_tower(batch["target_categorical"], batch["target_numeric"])
+history_vectors = item_tower(batch["history_categorical"], batch["history_numeric"])
+print(target_vectors.shape, history_vectors.shape, batch["history_mask"].shape)
+```
+
+预期输出形状是 `torch.Size([32, 64])`、`torch.Size([32, 50, 64])` 和
+`torch.Size([32, 50])`。Yutao 将 `history_vectors` 与 `history_mask` 传给
+User Tower，并自行处理负采样、loss、训练和 W&B。
+
 ## 复现命令
 
 ```bash

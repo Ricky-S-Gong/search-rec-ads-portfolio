@@ -9,6 +9,7 @@ dependencies = [
   "scipy>=1.14",
   "scikit-learn>=1.5",
   "pyarrow>=17",
+  "torch>=2.4; sys_platform != 'darwin' or platform_machine != 'x86_64'",
 ]
 
 [dependency-groups]
