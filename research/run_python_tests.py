@@ -14,12 +14,14 @@ TEST_ROOTS = (
     ROOT / "research" / "spotify-music" / "tests",
     ROOT / "research" / "movielens-cf" / "tests",
     ROOT / "research" / "goodbooks-mf" / "tests",
+    ROOT / "research" / "kuairand" / "data_pipeline" / "tests",
 )
 
 
 def main() -> int:
     sys.path.insert(0, str(ROOT / "research" / "movielens-cf"))
     sys.path.insert(0, str(ROOT / "research" / "goodbooks-mf"))
+    sys.path.insert(0, str(ROOT / "research" / "kuairand" / "data_pipeline"))
     failures: list[str] = []
     passed = 0
     with tempfile.TemporaryDirectory(prefix="portfolio-tests-") as temp:

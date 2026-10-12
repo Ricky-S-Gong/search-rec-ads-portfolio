@@ -1,0 +1,9 @@
+raw/
+data/
+datasets/
+runs/
+releases/
+*.parquet
+*.npz
+*.pt
+*.zip

@@ -1,0 +1,25 @@
+{
+  "folder_url": "https://drive.google.com/drive/folders/1kIRBdE0kkHYe_uCSvgjvPMkEv0WwYN8h",
+  "files": {
+    "events.parquet": {
+      "id": "1eL51O_tBAWd4Vgm-HgfnD7-vZr3805Qo",
+      "bytes": 43217988,
+      "sha256": "c69b39c4561ad1d9f596aaedb84aff93a34e0f1842f491b7fcea11a84587c6e6"
+    },
+    "user_histories.parquet": {
+      "id": "1_ZVReF1lK_JYn6dY5QeeKb6mVS8F7bQp",
+      "bytes": 9792489,
+      "sha256": "6d7b37bc816027a4aea4f1877820e39278220ff884e6b449bd2b2c7108550512"
+    },
+    "item_features.parquet": {
+      "id": "136wSOXzHEHe5fvbQCW_Hc47PVGemsCn9",
+      "bytes": 215808,
+      "sha256": "debec7de2e0cf492f04f3228602ebdd484097a0ee0925384466287fe0b7b9ec2"
+    },
+    "manifest.json": {
+      "id": "1z5_-SYRrm0J8qPWLqTTp6VtGjeSkbGVQ",
+      "bytes": 333,
+      "sha256": "1dd6d9ccba766358297dbd39378237a8683d6accd3dd4e30141906a703d7633d"
+    }
+  }
+}

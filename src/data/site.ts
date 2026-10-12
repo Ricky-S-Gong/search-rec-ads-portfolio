@@ -116,6 +116,18 @@ export const copy = {
 
 export const projects: ProjectMeta[] = [
   {
+    slug: 'kuairand-twotower', domain: 'recommendation', status: 'planned', compute: 'GPU required',
+    algorithms: ['Two-Tower retrieval', 'In-batch negatives', 'ANN indexing'],
+    dataset: 'KuaiRand-1K · 11.7M interactions · 1,000 users',
+    authors: ['Ricky Gong', 'Ziqi Xu', 'Yutao Rao'],
+    sourceUrl: 'https://zenodo.org/records/10439422',
+    title: { en: 'KuaiRand two-tower retrieval', zh: 'KuaiRand 双塔召回' },
+    summary: {
+      en: 'An in-progress GPU retrieval system that learns user and video vectors from time-ordered short-video feedback, then retrieves eligible Top-100 candidates.',
+      zh: '进行中的 GPU 召回系统：从带时间顺序的短视频反馈中学习用户与视频向量，再召回合规的 Top-100 候选。',
+    },
+  },
+  {
     slug: 'spotify-content-recommender', domain: 'recommendation', status: 'complete', compute: 'CPU',
     algorithms: ['Popularity', 'Euclidean KNN', 'Cosine', 'Weighted cosine', 'K-Means retrieval'],
     dataset: 'Kaggle Spotify dataset · 170,653 tracks', authors: ['Ricky Gong', 'Ziqi Xu'],
@@ -273,9 +285,12 @@ export const roadmapTracks: RoadmapTrack[] = [
       },
       {
         title: { en: 'Retrieval, ranking, and online systems', zh: '召回、排序与在线系统' },
-        topics: { en: 'Two-Tower · reranking · hybrid signals · online experiments', zh: '双塔 · 重排 · 混合信号 · 在线实验' },
-        project: { en: 'Real-time multi-objective study', zh: '实时多目标推荐实验' },
-        status: 'planned', compute: 'GPU recommended',
+        topics: {
+          en: 'Research Two-Tower and the business problem first · temporal feedback · vector indexing · offline Recall@100',
+          zh: '先研究双塔模型和业务问题 · 时间反馈 · 向量索引 · 离线 Recall@100',
+        },
+        project: { en: 'KuaiRand two-tower retrieval', zh: 'KuaiRand 双塔召回' },
+        status: 'planned', compute: 'GPU required',
       },
     ],
   },

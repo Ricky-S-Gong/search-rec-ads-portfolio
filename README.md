@@ -36,6 +36,8 @@ the same existing Python test functions deterministically for local verification
 Raw datasets are gitignored. The site reads only compact, versioned artifacts
 from `public/artifacts/`.
 
+KuaiRand data and GPU training have a dedicated [project guide](research/kuairand/README.md).
+
 ## Collaboration
 
 Use GitHub Issues, `feature/<issue>-<name>` branches, and reviewed pull
@@ -44,6 +46,8 @@ requests. See [CONTRIBUTING.md](CONTRIBUTING.md).
 ## 中文
 
 这是 Ricky Gong 与 Ziqi Xu 联合构建的中英双语搜广推算法作品集。每个项目都会明确业务问题、数据边界、算法选择、可复现实验，以及算法适用和不适用的场景。
+
+KuaiRand 的数据、训练环境与 Colab 入口见[项目指南](research/kuairand/README.md)。
 
 当前 Spotify 内容推荐、MovieLens 协同过滤与 Goodreads 矩阵分解项目全程使用 CPU。原始数据不会提交到仓库，页面只读取脚本生成的轻量产物。
 

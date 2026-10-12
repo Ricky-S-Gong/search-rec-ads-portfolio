@@ -1,34 +1,17 @@
 import { useState } from 'react';
 import './GoodBooksMetricsExplorer.css';
+import {
+  barWidth,
+  formatGoodbooksMetric,
+  goodbooksMetricOptions,
+  selectBestPlannedModel,
+  type GoodBooksMetricKey,
+  type GoodBooksMetricRow,
+} from '../lib/goodbooks-metrics';
 
-type MetricKey = 'ndcg_at_10' | 'recall_at_10' | 'precision_at_10' | 'rmse' | 'mae' | 'training_seconds';
-
-export interface GoodBooksModelMetric {
-  model: string;
+export interface GoodBooksModelMetric extends GoodBooksMetricRow {
   model_label: string;
-  model_role: string;
-  ndcg_at_10: number;
-  recall_at_10: number;
-  precision_at_10: number;
-  rmse: number;
-  mae: number;
-  training_seconds: number;
 }
-
-const metrics: Array<{ key: MetricKey; higherIsBetter: boolean; label: [string, string] }> = [
-  { key: 'ndcg_at_10', higherIsBetter: true, label: ['NDCG@10', 'NDCG@10'] },
-  { key: 'recall_at_10', higherIsBetter: true, label: ['Recall@10', 'Recall@10'] },
-  { key: 'precision_at_10', higherIsBetter: true, label: ['Precision@10', 'Precision@10'] },
-  { key: 'rmse', higherIsBetter: false, label: ['RMSE', 'RMSE'] },
-  { key: 'mae', higherIsBetter: false, label: ['MAE', 'MAE'] },
-  { key: 'training_seconds', higherIsBetter: false, label: ['Training time', '训练时间'] },
-];
-
-const format = (key: MetricKey, value: number, zh: boolean) => {
-  if (key.endsWith('_at_10')) return `${(value * 100).toFixed(2)}%`;
-  if (key === 'training_seconds') return `${value.toFixed(2)} ${zh ? '秒' : 's'}`;
-  return value.toFixed(3);
-};
 
 export default function GoodBooksMetricsExplorer({
   lang,
@@ -40,19 +23,10 @@ export default function GoodBooksMetricsExplorer({
   champion: string;
 }) {
   const zh = lang === 'zh';
-  const [metricKey, setMetricKey] = useState<MetricKey>('ndcg_at_10');
-  const metric = metrics.find((entry) => entry.key === metricKey)!;
+  const [metricKey, setMetricKey] = useState<GoodBooksMetricKey>('ndcg_at_10');
+  const metric = goodbooksMetricOptions.find((entry) => entry.key === metricKey)!;
   const values = models.map((model) => model[metricKey]);
-  const low = Math.min(...values);
-  const high = Math.max(...values);
-  const span = high - low || 1;
-  const best = models
-    .filter((model) => model.model_role !== 'additional diagnostic')
-    .reduce((current, model) => (
-      metric.higherIsBetter
-        ? model[metricKey] > current[metricKey] ? model : current
-        : model[metricKey] < current[metricKey] ? model : current
-    ));
+  const best = selectBestPlannedModel(models, metricKey, metric.higherIsBetter);
 
   return (
     <section className="goodbooks-explorer" aria-label={zh ? '模型指标比较' : 'Model metric comparison'}>
@@ -62,7 +36,7 @@ export default function GoodBooksMetricsExplorer({
           <strong>{metric.higherIsBetter ? (zh ? '越高越好' : 'Higher is better') : (zh ? '越低越好' : 'Lower is better')}</strong>
         </div>
         <div className="goodbooks-explorer__controls" aria-label={zh ? '选择指标' : 'Select a metric'}>
-          {metrics.map((entry) => (
+          {goodbooksMetricOptions.map((entry) => (
             <button
               key={entry.key}
               type="button"
@@ -76,9 +50,6 @@ export default function GoodBooksMetricsExplorer({
       </div>
       <div className="goodbooks-explorer__rows">
         {models.map((model) => {
-          const normalized = metric.higherIsBetter
-            ? (model[metricKey] - low) / span
-            : (high - model[metricKey]) / span;
           const isBest = model.model === best.model;
           return (
             <article className={model.model_role === 'additional diagnostic' ? 'is-diagnostic' : ''} key={model.model}>
@@ -87,8 +58,8 @@ export default function GoodBooksMetricsExplorer({
                 {model.model === champion && <small>{zh ? '离线候选' : 'Offline candidate'}</small>}
                 {model.model_role === 'additional diagnostic' && <small>{zh ? '诊断' : 'Diagnostic'}</small>}
               </div>
-              <div className="goodbooks-explorer__bar" aria-hidden="true"><i style={{ width: `${18 + normalized * 82}%` }} /></div>
-              <strong className={isBest ? 'is-best' : ''}>{format(metricKey, model[metricKey], zh)}</strong>
+              <div className="goodbooks-explorer__bar" aria-hidden="true"><i style={{ width: `${barWidth(model[metricKey], values)}%` }} /></div>
+              <strong className={isBest ? 'is-best' : ''}>{formatGoodbooksMetric(metricKey, model[metricKey], zh)}</strong>
             </article>
           );
         })}
