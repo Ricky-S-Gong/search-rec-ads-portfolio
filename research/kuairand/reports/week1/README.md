@@ -1,6 +1,6 @@
 # Week 1 English technical report
 
-`technical_report_draft.tex` and its PDF are a measured **draft**, not a completed Stage 1 certificate. `report_evidence.json` and `evidence/` preserve the aggregate input facts. Corrected basic/enhanced CUDA results and matching interruption/recovery evidence must arrive before finalization.
+`technical_report_draft.tex` is the editable report revision with the completed Colab comparison: popularity, basic and enhanced evaluated on 30,589 requests, plus controlled CUDA recovery. `report_evidence.json` and `evidence/` preserve the matching aggregate facts, checksums and measured training curves. The filename is retained for editor continuity; stage completion does not certify online lift, multiple-seed stability or recovery after rebuilding a runtime.
 
 The standalone LaTeX source includes EDA plot coordinates, actual field examples and both tower diagrams. It can compile without external figures or BibTeX files. The generator writes a final filename only for a complete stage; otherwise `--allow-incomplete` is required and the draft label is visible throughout.
 

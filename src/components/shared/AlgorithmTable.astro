@@ -1,5 +1,5 @@
 ---
-import { algorithms, href, type Domain, type Lang } from '../data/site';
+import { algorithms, href, type Domain, type Lang } from '../../data/site';
 const { lang, domain } = Astro.props as { lang: Lang; domain: Domain };
 const labels = lang === 'en'
   ? { algorithm: 'Method', core: 'Core approach', signals: 'Required data', cold: 'Cold start', serve: 'Serving', best: 'Use when', limitation: 'Avoid when / limitation', project: 'Project' }

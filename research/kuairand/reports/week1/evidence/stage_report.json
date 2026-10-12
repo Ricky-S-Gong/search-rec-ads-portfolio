@@ -1,13 +1,8 @@
 {
   "schema_version": 1,
   "stage": "week1-pure",
-  "complete": false,
-  "blockers": [
-    "basic",
-    "enhanced",
-    "real CUDA model runs",
-    "matching CUDA interruption/resume verification"
-  ],
+  "complete": true,
+  "blockers": [],
   "protocol": {
     "manifest_sha256": "0c35d9c9f483bca90f909cd8bcf5f7f1c6c64e6c3aeea411ea3617d0cc92b7fc",
     "requests_sha256": "c622789c33544e0122abb8d151ff22a50d8bd2db91a99589fddfba6e7db28efd",
@@ -52,19 +47,144 @@
       },
       "performance": {
         "device": "cpu",
-        "platform": "macOS-26.6.2-arm64-arm-64bit",
+        "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
         "request_batch": 256,
         "warmup_batches": 1,
-        "encoding_seconds": 0.0012273325119167566,
-        "retrieval_seconds": 8.103060542256571,
-        "p50_batch_seconds": 0.06750833301339298,
-        "p95_batch_seconds": 0.07249264790443703,
+        "encoding_seconds": 0.0024737980008922023,
+        "retrieval_seconds": 13.566819147999468,
+        "p50_batch_seconds": 0.11359550149995812,
+        "p95_batch_seconds": 0.11630781925001657,
         "includes": "user feature tensor assembly, user encoding, GPU-to-CPU transfer if used, CPU exact retrieval; excludes initial model/data loading"
       },
       "evaluator_sha256": "a031fca9db8ae4099d93331162074c9522554b72947e43f77d185703c1f64ee9",
-      "training_code_sha256": "d0c01cd58368651c24d691b155c287ef9af888462623bcf81236cc1f64d28c6f",
+      "training_code_sha256": "143327677ec3df4098cb40a4210f8991398c3b41e25e29c646babe63f4bf47ff",
       "predictions_sha256": "6a133a5a90285fb6a0ac2bb3326eb893d23363e5b58eb84646fd343d9b6de029"
+    },
+    "basic": {
+      "schema_version": 1,
+      "model": "basic",
+      "protocol": {
+        "manifest_sha256": "0c35d9c9f483bca90f909cd8bcf5f7f1c6c64e6c3aeea411ea3617d0cc92b7fc",
+        "requests_sha256": "c622789c33544e0122abb8d151ff22a50d8bd2db91a99589fddfba6e7db28efd",
+        "validation_sha256": "e695218509a47971a5c26c260a6fc38a4e37a8fc45dc89b03b1318aa94cc70e7",
+        "candidates_sha256": "9b49e12466f88e9cbf0634b0f8e767104d17a7a4145b7bd730d2275d638c636d",
+        "k": 100,
+        "tie_break": "score descending, raw item_id ascending",
+        "calendar_timezone": "UTC",
+        "repeat_items_allowed": true,
+        "eligibility": "day after upload, UTC",
+        "test_used": false,
+        "raw_archive_sha256": "c814bf6f3624c0cfae83c57de3df26b2ed206e5c57bab4c4dcbfabbabe20cbf0"
+      },
+      "artifact": {
+        "checkpoint_sha256": "acbeb4c9153a6a5901fa79be08d6d7f16f5520736e75fa0a32b21b633be34272",
+        "vector_manifest_sha256": "4b9248885cc9d022a2dd46e2665a272884b39b8cf3c302fde0c178fb8130d3f1",
+        "binding": {
+          "config_sha256": "0c2a71e707379e357b4df72778f6dce04b3f6640fa7174a7e9d5639250445cf7",
+          "manifest_sha256": "0c35d9c9f483bca90f909cd8bcf5f7f1c6c64e6c3aeea411ea3617d0cc92b7fc",
+          "code_sha256": "143327677ec3df4098cb40a4210f8991398c3b41e25e29c646babe63f4bf47ff",
+          "torch": "2.14.1+cu130",
+          "python": "3.11.15",
+          "device_type": "cuda"
+        },
+        "run_id": "5d0da236b294",
+        "consumed": 124255,
+        "expected_samples": 124255
+      },
+      "metrics": {
+        "requests": 30589,
+        "recall_at_100": 0.02030141554153454,
+        "ndcg_at_100": 0.005488879400419089,
+        "target_coverage": 1.0,
+        "covered_recall_at_100": 0.02030141554153454,
+        "covered_ndcg_at_100": 0.005488879400419089,
+        "insufficient_k_rate": 0.0,
+        "unknown_user_rate": 0.039654777861322696,
+        "empty_history_rate": 0.01490731962470169
+      },
+      "performance": {
+        "device": "cuda",
+        "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
+        "request_batch": 256,
+        "warmup_batches": 1,
+        "encoding_seconds": 0.42657576200190306,
+        "retrieval_seconds": 25.620919958999366,
+        "p50_batch_seconds": 0.2072036909999042,
+        "p95_batch_seconds": 0.27742253930001654,
+        "includes": "user feature tensor assembly, user encoding, GPU-to-CPU transfer if used, CPU exact retrieval; excludes initial model/data loading"
+      },
+      "evaluator_sha256": "a031fca9db8ae4099d93331162074c9522554b72947e43f77d185703c1f64ee9",
+      "training_code_sha256": "143327677ec3df4098cb40a4210f8991398c3b41e25e29c646babe63f4bf47ff",
+      "predictions_sha256": "96e4d549ec35c67647d2f79f07f471f125327011c895936467b419ca9d3d2de3"
+    },
+    "enhanced": {
+      "schema_version": 1,
+      "model": "enhanced",
+      "protocol": {
+        "manifest_sha256": "0c35d9c9f483bca90f909cd8bcf5f7f1c6c64e6c3aeea411ea3617d0cc92b7fc",
+        "requests_sha256": "c622789c33544e0122abb8d151ff22a50d8bd2db91a99589fddfba6e7db28efd",
+        "validation_sha256": "e695218509a47971a5c26c260a6fc38a4e37a8fc45dc89b03b1318aa94cc70e7",
+        "candidates_sha256": "9b49e12466f88e9cbf0634b0f8e767104d17a7a4145b7bd730d2275d638c636d",
+        "k": 100,
+        "tie_break": "score descending, raw item_id ascending",
+        "calendar_timezone": "UTC",
+        "repeat_items_allowed": true,
+        "eligibility": "day after upload, UTC",
+        "test_used": false,
+        "raw_archive_sha256": "c814bf6f3624c0cfae83c57de3df26b2ed206e5c57bab4c4dcbfabbabe20cbf0"
+      },
+      "artifact": {
+        "checkpoint_sha256": "92d34958b807e3a5b8fefda8bf5a9d476b41cef589d88d76995c1e5a90024490",
+        "vector_manifest_sha256": "95823d65151a7cf206d71a4a8cda742a188319d5033bb20feefb32f8b2526e6e",
+        "binding": {
+          "config_sha256": "94d4c29a3727938f3fa8ee58732ef3bfeab36937437932e74df347ed0867730c",
+          "manifest_sha256": "0c35d9c9f483bca90f909cd8bcf5f7f1c6c64e6c3aeea411ea3617d0cc92b7fc",
+          "code_sha256": "143327677ec3df4098cb40a4210f8991398c3b41e25e29c646babe63f4bf47ff",
+          "torch": "2.14.1+cu130",
+          "python": "3.11.15",
+          "device_type": "cuda"
+        },
+        "run_id": "ce21055c8126",
+        "consumed": 124255,
+        "expected_samples": 124255
+      },
+      "metrics": {
+        "requests": 30589,
+        "recall_at_100": 0.019287979338978065,
+        "ndcg_at_100": 0.004111853792783134,
+        "target_coverage": 1.0,
+        "covered_recall_at_100": 0.019287979338978065,
+        "covered_ndcg_at_100": 0.004111853792783134,
+        "insufficient_k_rate": 0.0,
+        "unknown_user_rate": 0.039654777861322696,
+        "empty_history_rate": 0.01490731962470169
+      },
+      "performance": {
+        "device": "cuda",
+        "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
+        "request_batch": 256,
+        "warmup_batches": 1,
+        "encoding_seconds": 0.565113562000306,
+        "retrieval_seconds": 25.4857753290014,
+        "p50_batch_seconds": 0.20804408300000432,
+        "p95_batch_seconds": 0.26954029774982474,
+        "includes": "user feature tensor assembly, user encoding, GPU-to-CPU transfer if used, CPU exact retrieval; excludes initial model/data loading"
+      },
+      "evaluator_sha256": "a031fca9db8ae4099d93331162074c9522554b72947e43f77d185703c1f64ee9",
+      "training_code_sha256": "143327677ec3df4098cb40a4210f8991398c3b41e25e29c646babe63f4bf47ff",
+      "predictions_sha256": "1e8c44f8a961ed307f54432a89cf05f15488186592e1a21b9eaa5d741e7dd1a7"
     }
   },
-  "resume_verification": null
+  "resume_verification": {
+    "passed": true,
+    "device": "cuda",
+    "manifest_sha256": "0c35d9c9f483bca90f909cd8bcf5f7f1c6c64e6c3aeea411ea3617d0cc92b7fc",
+    "checkpoint_sha256": "92d34958b807e3a5b8fefda8bf5a9d476b41cef589d88d76995c1e5a90024490",
+    "resumed_checkpoint_sha256": "f893155ffddaadad414afd5662ccfb58ff264f5c08bc07a06ea127aa78e19cd8",
+    "interruption_step": 25,
+    "next_batch_at_interruption": 25,
+    "consumed": 124255,
+    "global_step": 486,
+    "tolerance": "exact tensor equality (rtol=0, atol=0)"
+  }
 }

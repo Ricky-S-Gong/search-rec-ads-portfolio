@@ -1,9 +1,9 @@
 ---
 import { Code } from 'astro:components';
 import SpotifyLab from './SpotifyLab';
-import KatexMath from './KatexMath.astro';
-import { href, type Lang } from '../data/site';
-import spotifyMetrics from '../../public/artifacts/spotify/metrics.json';
+import KatexMath from '../shared/KatexMath.astro';
+import { href, type Lang } from '../../data/site';
+import spotifyMetrics from '../../../public/artifacts/spotify/metrics.json';
 
 const { lang } = Astro.props as { lang: Lang };
 const zh = lang === 'zh';

@@ -1,14 +1,14 @@
 ---
 import { Code } from 'astro:components';
-import KatexMath from './KatexMath.astro';
-import FormulaLegend from './FormulaLegend.astro';
+import KatexMath from '../shared/KatexMath.astro';
+import FormulaLegend from '../shared/FormulaLegend.astro';
 import MovieLensFlow from './MovieLensFlow.astro';
 import MovieLensExplorer from './MovieLensExplorer';
-import { href, type Lang } from '../data/site';
-import metrics from '../../public/artifacts/movielens/metrics.json';
-import profileArtifact from '../../public/artifacts/movielens/profile.json';
-import comparisons from '../../public/artifacts/movielens/comparisons.json';
-import samples from '../../public/artifacts/movielens/samples.json';
+import { href, type Lang } from '../../data/site';
+import metrics from '../../../public/artifacts/movielens/metrics.json';
+import profileArtifact from '../../../public/artifacts/movielens/profile.json';
+import comparisons from '../../../public/artifacts/movielens/comparisons.json';
+import samples from '../../../public/artifacts/movielens/samples.json';
 
 const { lang } = Astro.props as { lang: Lang };
 const zh = lang === 'zh';
@@ -126,7 +126,7 @@ const bayesianFormula = String.raw`B_i=\frac{n_i\bar r_i+m\mu}{n_i+m}`;
 const hitFormula = String.raw`\mathrm{HitRate@10}=\frac{1}{|U|}\sum_{u\in U}\mathbf{1}[R_u^{10}\cap T_u\neq\varnothing]`;
 const recallFormula = String.raw`\mathrm{Recall@10}=\frac{1}{|U|}\sum_{u\in U}\frac{|R_u^{10}\cap T_u|}{|T_u|}`;
 const ndcgFormula = String.raw`\mathrm{NDCG@10}=\frac{1}{|U|}\sum_{u\in U}\frac{\sum_{p=1}^{10}\frac{rel_{u,p}}{\log_2(p+1)}}{\mathrm{IDCG}_{u,10}}`;
-const commands = `.venv/bin/python research/run_python_tests.py
+const commands = `.venv/bin/python scripts/run_python_tests.py
 npm test
 MPLCONFIGDIR=/tmp/movielens-mpl .venv/bin/python research/movielens-cf/run_experiment.py --smoke --output /tmp/movielens-smoke
 MPLCONFIGDIR=/tmp/movielens-mpl .venv/bin/python research/movielens-cf/run_experiment.py

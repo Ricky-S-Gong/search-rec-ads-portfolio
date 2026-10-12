@@ -1,5 +1,5 @@
 ---
-import { copy, domainNames, href, type Lang, type ProjectMeta } from '../data/site';
+import { copy, domainNames, href, type Lang, type ProjectMeta } from '../../data/site';
 const { project, lang } = Astro.props as { project: ProjectMeta; lang: Lang };
 const t = copy[lang];
 const projectHref = project.status === 'planned' ? href(`/${lang}/roadmap/`) : href(`/${lang}/projects/${project.slug}/`);

@@ -1,9 +1,9 @@
 ---
-import KatexMath from './KatexMath.astro';
-import FormulaLegend from './FormulaLegend.astro';
+import KatexMath from '../shared/KatexMath.astro';
+import FormulaLegend from '../shared/FormulaLegend.astro';
 import GoodBooksMetricsExplorer from './GoodBooksMetricsExplorer';
-import { type Lang } from '../data/site';
-import { bestModelsForMetric, formatGoodbooksMetric, goodbooksTableMetrics } from '../lib/goodbooks-metrics';
+import { type Lang } from '../../data/site';
+import { bestModelsForMetric, formatGoodbooksMetric, goodbooksTableMetrics } from '../../lib/goodbooks-metrics';
 
 interface Field { name: string; type: string; range?: [string | number, string | number]; values?: Array<string | boolean>; }
 interface Model {

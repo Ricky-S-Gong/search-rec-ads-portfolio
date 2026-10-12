@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { recommendationOverlap, sampleCounts, visibleRecommendations } from '../lib/movielens-demo.mjs';
+import { recommendationOverlap, sampleCounts, visibleRecommendations } from '../../lib/movielens-demo.mjs';
 import './MovieLensExplorer.css';
 
 type Movie = { movieId: number; title: string; genres: string[]; popularityBand: string };

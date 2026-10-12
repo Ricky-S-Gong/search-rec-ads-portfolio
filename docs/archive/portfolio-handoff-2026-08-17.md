@@ -1,3 +1,5 @@
+> Historical snapshot. Preserved for provenance; use the root README and `docs/workspace.md` for current paths and commands.
+
 # SAR Portfolio Handoff
 
 Last updated: 2026-08-17
@@ -137,7 +139,7 @@ git diff --check
 The audited Codex desktop environment has previously shown cases where the `pytest` launcher hangs before collection. If that recurs, use the repository fallback runner:
 
 ```bash
-.venv/bin/python research/run_python_tests.py
+.venv/bin/python scripts/run_python_tests.py
 ```
 
 The fallback runs the same project test modules; document which command was used. Do not claim tests passed unless they were run in the current session.

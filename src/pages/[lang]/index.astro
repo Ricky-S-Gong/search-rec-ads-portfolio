@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import ProjectTabs from '../../components/ProjectTabs.astro';
-import CosmicHero from '../../components/CosmicHero.astro';
+import ProjectTabs from '../../components/shared/ProjectTabs.astro';
+import CosmicHero from '../../components/cosmos/CosmicHero.astro';
 import { copy, href, languages, type Lang } from '../../data/site';
 export const getStaticPaths = () => languages.map((lang) => ({ params: { lang } }));
 const lang = Astro.params.lang as Lang;

@@ -1,4 +1,4 @@
-# Yutao: Pure training and Colab / Pure 训练与 Colab
+# KuaiRand-Pure training and Colab / Pure 训练与 Colab
 
 This module publishes the code previously run from a Drive source ZIP. It consumes Ziqi's Pure handoff and pinned Item Tower snapshot; it adds the User Tower, training loop, W&B, checkpoints, validation loss, and export. The existing `../data_pipeline/` data project remains the team data pipeline.
 
@@ -16,8 +16,8 @@ Open [notebooks/week1_baseline.ipynb](notebooks/week1_baseline.ipynb) in Colab. 
 
 ```bash
 cd research/kuairand/training
-python3 -m pip install uv==0.12.18
-uv sync --locked
+python3 -m pip install uv==0.12.1
+uv sync --locked --python 3.11.15
 uv run --locked python run.py check-env
 uv run --locked pytest tests -q
 ```

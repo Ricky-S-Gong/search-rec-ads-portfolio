@@ -1,10 +1,12 @@
 {
   "schema_version": 1,
-  "stage_report_sha256": "5922d4b7a9f49874d6a5b61219f3ae3c54e0e210bf4d0798d124ea6ce6d7c5e2",
+  "stage_report_sha256": "4c14b0ac9bf87f6abc60c1080b8b94d5d82184a6784b3ad88e5df006bfbdc469",
   "evaluation_sha256": {
-    "popularity": "9b46c8a4cf972005070128345db28df00b642e40726ece40f2e7f81c19703641"
+    "popularity": "d0d9769cddce652ec83038732de44bbcd10bacaf118f13543f51f25fff3b813f",
+    "basic": "5fe81f657d807028a0b9e732b7744bb0678ae7f951ad4fe93850821c1e45fa9c",
+    "enhanced": "3bf69ed59c8b71159d090182f9d08d90b1570945e0e9cf0082b81d1f3d74b556"
   },
-  "complete": false,
+  "complete": true,
   "protocol": {
     "manifest_sha256": "0c35d9c9f483bca90f909cd8bcf5f7f1c6c64e6c3aeea411ea3617d0cc92b7fc",
     "requests_sha256": "c622789c33544e0122abb8d151ff22a50d8bd2db91a99589fddfba6e7db28efd",

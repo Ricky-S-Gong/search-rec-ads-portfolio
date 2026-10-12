@@ -502,7 +502,7 @@ uv run pytest
 如果本地 pytest launcher 有环境问题，可以执行：
 
 ```bash
-.venv/bin/python research/run_python_tests.py
+.venv/bin/python scripts/run_python_tests.py
 ```
 
 但 PR 的 GitHub CI 必须成功。
@@ -525,7 +525,7 @@ uv run pytest
 
 ```text
 在 research/goodbooks-mf 中继续 Goodreads Poetry MF 项目。先阅读
-TEAM_HANDOFF_RICKY_YUTAO.md、ZIQI_IMPLEMENTATION_GUIDE.md、config.json、
+docs/team-handoff.md、docs/implementation-guide.md、config.json、
 manifest.json 和现有 tests。不要修改 preprocessing、split、ID mapping、
 seed 或 goodreads-poetry-v1 数据。
 
@@ -543,7 +543,7 @@ seed 或 goodreads-poetry-v1 数据。
 
 ```text
 在 research/goodbooks-mf 中继续 Goodreads Poetry MF 项目。先阅读
-TEAM_HANDOFF_RICKY_YUTAO.md、ZIQI_IMPLEMENTATION_GUIDE.md、config.json、
+docs/team-handoff.md、docs/implementation-guide.md、config.json、
 manifest.json 和现有 tests。不要修改 preprocessing、split、ID mapping、
 seed 或 goodreads-poetry-v1 数据。
 
