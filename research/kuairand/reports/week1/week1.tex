@@ -7,6 +7,7 @@
 \usepackage[unicode]{hyperref}\hypersetup{colorlinks=true,urlcolor=accent,linkcolor=accent}
 \usepackage{fancyhdr}\pagestyle{fancy}\fancyhf{}\fancyhead[L]{KuaiRand | 第一周技术报告}\fancyhead[R]{2026 年 10 月}\fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{.3pt}\renewcommand{\arraystretch}{1.3}
+\setlength{\intextsep}{9pt}
 \setlength{\parindent}{0pt}\setlength{\parskip}{.55em}\setlength{\emergencystretch}{2em}\linespread{1.16}
 \newcolumntype{Y}{>{\raggedright\arraybackslash}X}
 \newcommand{\note}[1]{\par\smallskip\noindent\colorbox{pale}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small #1}}\par\smallskip}
@@ -59,51 +60,78 @@ Pure 不是“更干净的全量数据”，也不是只含随机曝光：它同
 
 \subsection{真正进入模型的特征}
 \begin{table}[H]\centering\small
-\begin{tabularx}{\linewidth}{p{2.4cm}p{3.5cm}Y}\toprule
-输入 & 实际原始值示例 & 编码与维度\\\midrule
-用户 ID\newline\texttt{user\_id} & 20853、8286 & 训练词表索引，32 维 embedding；未知用户索引 0。\\
-场景\newline\texttt{tab} & 0、1、4；范围 0--14 & 类别索引，8 维 embedding。\\
-请求时间\newline\texttt{time\_ms} & 1649475963278 毫秒 & UTC 日、周周期的正弦与余弦，共 4 维。\\
-正反馈历史 & 最近最多 50 次已可用的视频 ID & 每个视频编码为 64 维；按 mask 求均值，得到 64 维。仅 Enhanced 使用。\\
-历史 mask & 长度 50 的有效位标记 & 历史左侧补 $-1$；padding 不参与均值；空历史输出零向量。\\
-物品 ID\newline\texttt{item\_id} & 0、1；原始 ID 0 编码为索引 1 & 训练词表索引，8 维 embedding；最终物品向量为 64 维。\\\bottomrule
+\begin{tabularx}{\linewidth}{p{3.2cm}p{3.3cm}Y}\toprule
+输入字段 & 实际原始值示例 & 编码与维度\\\midrule
+\mbox{\texttt{user\_id}} & 20853、8286 & 训练词表索引，32 维 embedding；未知用户索引 0。\\
+\mbox{\texttt{tab}} & 0、1、4；范围 0--14 & 类别索引，8 维 embedding。\\
+\mbox{\texttt{time\_ms}} & 1649475963278 毫秒 & UTC 日、周周期的正弦与余弦，共 4 维。\\
+\mbox{\texttt{history\_item\_ids}} & 最近最多 50 次已可用的视频 ID & 每个视频编码为 64 维；按 mask 求均值，得到 64 维。仅 Enhanced 使用。\\
+\mbox{\texttt{history\_mask}} & 长度 50 的有效位标记 & 历史左侧补 $-1$；padding 不参与均值；空历史输出零向量。\\
+\mbox{\texttt{item\_id}} & 0、1；原始 ID 0 编码为索引 1 & 训练词表索引，8 维 embedding；最终物品向量为 64 维。\\\bottomrule
 \end{tabularx}\caption{Basic 和 Enhanced 共享 ID-only 物品塔；差别是用户塔是否加入历史。}\end{table}
 请求时间示例经过周期编码约为 $(0.834,\,0.552,\,-0.997,\,-0.083)$。这些数值描述周期位置，不是标准化后的年份或日期。训练期未出现、但位于合法候选库中的物品也映射到未知类别。
 
+ID 本身只是查表索引，不带语义或数值距离。模型为每个 ID 保存一个可训练向量，并通过长观看交互的反向传播学习偏好与协同信号；信息来自交互，不来自编号。新用户或新视频没有足够交互时，ID embedding 难以泛化，需要历史或内容特征补充。
+
 \subsection{本次没有使用的字段}
-作者、类型、标签、音乐、可见状态、视频时长与分辨率等物品属性来自无历史版本的元数据快照，无法证明在请求时可用，故不进入正式模型。\texttt{upload\_dt} 只用于候选资格：日期粒度为天的视频，从上传次日 UTC 零点起可推荐；资格信息缺失则排除。
+时间有效性审计检查：在请求时刻 $t$，这个字段是否已经存在、能够获取，且取值对应当时，而非后来的状态。反馈完成后才知道的信息不能用于预测同一次观看；今天的可见状态也不能直接当作过去的状态。
+
+作者、类型、标签、音乐、视频时长和分辨率有内容信息，不是无用特征。可见状态等字段可能变化；时长与分辨率通常更稳定，但仍需核验来源、版本和发布时可用性。当前快照没有逐请求历史版本，因此本阶段保守地统一排除，未证明这些字段一定泄漏。旧历史模型曾使用内容字段；本次 Enhanced 仅增强历史，后续通过审计再逐项加入内容做消融。\texttt{upload\_dt} 仍只作为上传次日可推荐的资格代理，缺失则排除。
 
 标签、随机标记、请求 ID 和 split 用于过滤或评估，不作为模型输入。已有处理包括字段统一、切分和元数据准备；本阶段补充了整行去重、反馈完成时间历史、训练词表审计，以及活跃度、热门集中度、历史长度、缺失和未知类别统计。
 
 \clearpage
-\section{模型、损失与训练配置}
+\section{模型与损失}
 \subsection{两组架构}
 \begin{figure}[H]\centering
-\begin{minipage}[t]{.47\linewidth}\centering\textbf{用户塔}\par\medskip
-\begin{tikzpicture}[node distance=5mm,box/.style={draw=accent,fill=pale,rounded corners=2pt,align=center,text width=6.2cm,minimum height=9mm,font=\small},>=Stealth]
-\node[box] (a) {用户 ID 32 + 场景 8 + 时间 4};
-\node[box,below=of a] (b) {Basic：44 维\\Enhanced：44 + 历史 64 = 108 维};
-\node[box,below=of b] (c) {MLP：$44/108\to128\to64\to64$\\中间层 ReLU};
-\node[box,below=of c] (d) {L2 归一化，输出 64 维};
-\draw[->](a)--(b);\draw[->](b)--(c);\draw[->](c)--(d);
+\begin{tikzpicture}[>=Stealth,box/.style={draw=accent,fill=pale,rounded corners=2pt,align=center,minimum height=6mm,font=\small},layer/.style={box,text width=6.5cm},item/.style={box,text width=5.2cm},raw/.style={box,text width=1.85cm},history/.style={item,dashed,fill=white},arrow/.style={->,draw=accent}]
+\node[font=\bfseries] at (-4,0.65) {用户塔};
+\node[font=\bfseries] at (4,0.65) {物品塔（两组相同）};
+\node[raw] (uid) at (-6.35,0) {user\_id $[B]$};
+\node[raw] (tab) at (-4,0) {tab $[B]$};
+\node[raw] (time) at (-1.65,0) {time\_ms $[B]$};
+\node[raw] (ue) at (-6.35,-.85) {Embedding\\$[B,32]$};
+\node[raw] (te) at (-4,-.85) {Embedding\\$[B,8]$};
+\node[raw] (cyc) at (-1.65,-.85) {周期编码\\$[B,4]$};
+\draw[arrow](uid)--(ue);\draw[arrow](tab)--(te);\draw[arrow](time)--(cyc);
+\node[layer] (base) at (-4,-1.8) {拼接用户、场景、时间 $\to[B,44]$};
+\draw[arrow](ue.south)--(-6.35,-1.35)--(base.north);
+\draw[arrow](te)--(base);
+\draw[arrow](cyc.south)--(-1.65,-1.35)--(base.north);
+\node[layer] (input) at (-4,-2.75) {Basic：$[B,44]$\\Enhanced：拼接历史 $h$ 后 $[B,108]$};
+\draw[arrow](base)--(input);
+\node[layer] (u1) at (-4,-3.65) {Linear：$44/108\to128$，输出 $[B,128]$};
+\node[layer] (ur1) at (-4,-4.4) {ReLU，输出 $[B,128]$};
+\node[layer] (ud1) at (-4,-5.15) {Dropout（$p=0$），输出 $[B,128]$};
+\node[layer] (u2) at (-4,-5.9) {Linear：$128\to64$，输出 $[B,64]$};
+\node[layer] (ur2) at (-4,-6.65) {ReLU，输出 $[B,64]$};
+\node[layer] (ud2) at (-4,-7.4) {Dropout（$p=0$），输出 $[B,64]$};
+\node[layer] (u3) at (-4,-8.15) {Linear：$64\to64$，输出 $[B,64]$};
+\node[layer] (un) at (-4,-8.9) {转 FP32、L2 归一化 $\to u:[B,64]$};
+\foreach \a/\b in {input/u1,u1/ur1,ur1/ud1,ud1/u2,u2/ur2,ur2/ud2,ud2/u3,u3/un}{\draw[arrow](\a)--(\b);}
+\node[item] (iid) at (4,0) {item\_id $[B]$};
+\node[item] (dict) at (4,-.85) {冻结词表映射 $[B]$};
+\node[item] (ie) at (4,-1.8) {Embedding，输出 $[B,8]$};
+\node[item] (i1) at (4,-2.75) {Linear：$8\to64$，输出 $[B,64]$};
+\node[item] (ir) at (4,-3.65) {ReLU，输出 $[B,64]$};
+\node[item] (i2) at (4,-4.4) {Linear：$64\to64$，输出 $[B,64]$};
+\node[item] (inorm) at (4,-5.15) {物品塔内部 L2 归一化，输出 $[B,64]$};
+\node[item] (iout) at (4,-5.9) {目标接口：FP32 + L2 $v:[B,64]$};
+\foreach \a/\b in {iid/dict,dict/ie,ie/i1,i1/ir,ir/i2,i2/inorm,inorm/iout}{\draw[arrow](\a)--(\b);}
+\node[history] (hist) at (4,-6.85) {历史 ID + mask\\$[B,50]$，仅 Enhanced};
+\node[history] (shared) at (4,-7.75) {共享上述物品塔参数 $\to[B,50,64]$};
+\node[history] (pool) at (4,-8.65) {按 mask 求均值 $\to h:[B,64]$};
+\draw[arrow,dashed](hist)--(shared);\draw[arrow,dashed](shared)--(pool);
+\draw[arrow,dashed](pool.west)--(.25,-8.65)--(.25,-2.75)--(input.east);
+\node[box,text width=5cm] (score) at (0,-10) {匹配分数：$s(u,i)=u^\top v$};
+\draw[arrow](un.south)--(-4,-10)--(score.west);
+\draw[arrow](iout.east)--(7.15,-5.9)--(7.15,-10)--(score.east);
 \end{tikzpicture}
-\end{minipage}\hfill
-\begin{minipage}[t]{.47\linewidth}\centering\textbf{物品塔（两组相同）}\par\medskip
-\begin{tikzpicture}[node distance=5mm,box/.style={draw=accent,fill=pale,rounded corners=2pt,align=center,text width=6.2cm,minimum height=9mm,font=\small},>=Stealth]
-\node[box] (a) {原始视频 ID};
-\node[box,below=of a] (b) {冻结词表 $\to$ 8 维 embedding};
-\node[box,below=of b] (c) {MLP：$8\to64\to64$\\中间层 ReLU};
-\node[box,below=of c] (d) {L2 归一化，输出 64 维};
-\draw[->](a)--(b);\draw[->](b)--(c);\draw[->](c)--(d);
-\end{tikzpicture}
-\end{minipage}
-\caption{Enhanced 增强的是用户历史，没有加入未经时间审计的物品内容。历史与目标共享物品塔参数。}
+\caption{按真实执行顺序逐层展开。实线为用户与目标编码；虚线为 Enhanced 历史分支。$B$ 为 batch 大小，历史长度最多 50。}
 \end{figure}
-用户、物品的匹配分为归一化向量点积：
-\[
- s(u,i)=f_\theta(u,t,h)^\top g_\phi(i),\qquad
- \|f_\theta\|_2=\|g_\phi\|_2=1.
-\]
+用户塔有两次 ReLU，分别位于两个隐藏 Linear 后；末尾 Linear 后直接归一化，没有额外 ReLU。物品 MLP 则是 Linear、ReLU、Linear，随后归一化。Dropout 模块在代码中保留，但 $p=0$ 不改变输入；BN 关闭。目标物品统一接口的再次归一化是数值保护，不增加可训练层；历史路径直接复用物品塔。
+
+\textbf{语义边界：}当前模型没有读取视频画面、音频、标题或字幕，也未使用标签等内容属性。ID embedding 学到的是交互偏好和协同关系，可能间接反映共同主题，但不构成直接的视频内容语义理解。要增加内容能力，应加入时间有效的标签、文本或视觉/音频表示，并通过消融检验收益。
 
 \subsection{监督信号与损失}
 每个 batch 包含 $B$ 条真实长观看用户--物品对，对角线为正目标。设 $D_i$ 是与第 $i$ 个目标视频重复的非对角位置，则
@@ -113,6 +141,8 @@ Pure 不是“更干净的全量数据”，也不是只含随机曝光：它同
 \]
 重复目标位置被屏蔽，但对角线保留。其余物品是批内采样的比较对象，\textbf{并非已知的用户负反馈}，可能包含用户也喜欢的视频。当前没有采样频率修正。
 
+\clearpage
+\section{训练配置、结果与恢复验证}
 \subsection{冻结的公平比较配置}
 \begin{table}[H]\centering\small
 \begin{tabularx}{\linewidth}{lYlY}\toprule
@@ -124,8 +154,7 @@ Dropout / BN & 0 / 关闭 & 输出维度 & 64，L2 归一化\\
 设备 & A100-SXM4-40GB，CUDA AMP & 运行环境 & Python 3.11.15；PyTorch 2.14.1+cu130\\\bottomrule
 \end{tabularx}\caption{两组使用相同数据、预算与优化设置；本次未进行超参数搜索。}\end{table}
 
-\clearpage
-\section{训练结果与恢复验证}
+\subsection{训练诊断}
 \begin{table}[H]\centering\small
 \begin{tabular}{lrrrrr}\toprule
 模型 & 消费样本 & 更新步数 & 验证 loss & Step+wait（秒） & 峰值显存（MiB）\\\midrule
@@ -133,7 +162,7 @@ Basic & 124,255 & 486 & 5.535129 & 7.243 & 83.85\\
 Enhanced & 124,255 & 486 & 5.530827 & 8.636 & 97.61\\\bottomrule
 \end{tabular}\caption{耗时为日志中的读取等待与训练 step 之和，不含完整验证、checkpoint 保存和编排；显存为 PyTorch allocated 峰值。}\end{table}
 \begin{figure}[H]\centering
-\begin{tikzpicture}\begin{axis}[width=.96\linewidth,height=5.5cm,xlabel={Optimizer step},ylabel={In-batch cross entropy},grid=major,grid style={gray!20},legend pos=north east,tick label style={font=\small},label style={font=\small},legend style={font=\small},xmin=1,xmax=485]
+\begin{tikzpicture}\begin{axis}[width=.96\linewidth,height=4.8cm,xlabel={Optimizer step},ylabel={In-batch cross entropy},grid=major,grid style={gray!20},legend pos=north east,tick label style={font=\small},label style={font=\small},legend style={font=\small},xmin=1,xmax=485]
 \addplot[color=accent,thick] coordinates {(1,5.8004608) (2,5.7875061) (3,5.7169495) (4,5.6619415) (5,5.6988068) (6,5.6531525) (7,5.6130524) (8,5.5986023) (9,5.5633240) (10,5.5949554) (11,5.5827026) (12,5.5905304) (13,5.5780640) (14,5.5959015) (15,5.5672760) (16,5.5760803) (17,5.5656281) (18,5.5650482) (19,5.5719147) (20,5.5573730) (25,5.5471802) (30,5.5464478) (35,5.5601349) (40,5.5399170) (45,5.5437775) (50,5.5543671) (55,5.5450134) (60,5.5474854) (65,5.5480957) (70,5.5421753) (75,5.5436249) (80,5.5407562) (85,5.5486603) (90,5.5437317) (95,5.5286102) (100,5.5375366) (105,5.5475311) (110,5.5446167) (115,5.5532379) (120,5.5430756) (125,5.5338898) (130,5.5573578) (135,5.5542755) (140,5.5351562) (145,5.5431213) (150,5.5438232) (155,5.5423737) (160,5.5427551) (165,5.5388336) (170,5.5291138) (175,5.5382538) (180,5.5303345) (185,5.5421753) (190,5.5384827) (195,5.5314789) (200,5.5507507) (205,5.5474854) (210,5.5442963) (215,5.5366058) (220,5.5379181) (225,5.5453644) (230,5.5307159) (235,5.5359039) (240,5.5382385) (245,5.5498047) (250,5.5312805) (255,5.5474396) (260,5.5482635) (265,5.5335083) (270,5.5216980) (275,5.5439301) (280,5.5397797) (285,5.5413208) (290,5.5463257) (295,5.5322113) (300,5.5290833) (305,5.5413055) (310,5.5367126) (315,5.5561218) (320,5.5354614) (325,5.5499725) (330,5.5321655) (335,5.5480499) (340,5.5423584) (345,5.5293121) (350,5.5315247) (355,5.5334930) (360,5.5310059) (365,5.5398254) (370,5.5237732) (375,5.5359039) (380,5.5184784) (385,5.5324402) (390,5.5605621) (395,5.5446625) (400,5.5267181) (405,5.5293427) (410,5.5290833) (415,5.5349426) (420,5.5221405) (425,5.5116272) (430,5.5331573) (435,5.5513992) (440,5.5257492) (445,5.5236282) (450,5.5340881) (455,5.5400848) (460,5.5441132) (465,5.5077209) (470,5.5415497) (475,5.5144424) (480,5.5284729) (485,5.5372925)};\addlegendentry{Basic}
 \addplot[color=orange!85!black,thick] coordinates {(1,6.1000748) (2,5.8072128) (3,5.7100372) (4,5.7269135) (5,5.7256470) (6,5.7185669) (7,5.6869049) (8,5.6656036) (9,5.6456757) (10,5.5991364) (11,5.6070251) (12,5.6041718) (13,5.5910797) (14,5.5993195) (15,5.6147461) (16,5.5803833) (17,5.5897980) (18,5.5856934) (19,5.5966492) (20,5.5821686) (25,5.5704803) (30,5.5646515) (35,5.5424652) (40,5.5628357) (45,5.5469666) (50,5.5523529) (55,5.5462189) (60,5.5452271) (65,5.5641327) (70,5.5634613) (75,5.5497589) (80,5.5487213) (85,5.5511780) (90,5.5484467) (95,5.5408173) (100,5.5444031) (105,5.5437012) (110,5.5393372) (115,5.5440674) (120,5.5454712) (125,5.5453491) (130,5.5509491) (135,5.5484924) (140,5.5309143) (145,5.5445862) (150,5.5477600) (155,5.5429077) (160,5.5511780) (165,5.5416870) (170,5.5388947) (175,5.5418091) (180,5.5372620) (185,5.5443573) (190,5.5414124) (195,5.5355072) (200,5.5444336) (205,5.5408936) (210,5.5434418) (215,5.5286102) (220,5.5425720) (225,5.5521545) (230,5.5359650) (235,5.5332184) (240,5.5290985) (245,5.5472412) (250,5.5358582) (255,5.5395660) (260,5.5355377) (265,5.5369720) (270,5.5412750) (275,5.5439148) (280,5.5531616) (285,5.5565186) (290,5.5498810) (295,5.5316315) (300,5.5312042) (305,5.5368652) (310,5.5358582) (315,5.5399475) (320,5.5479736) (325,5.5453033) (330,5.5445404) (335,5.5363770) (340,5.5424347) (345,5.5398560) (350,5.5442047) (355,5.5400543) (360,5.5366364) (365,5.5383911) (370,5.5239716) (375,5.5289459) (380,5.5347137) (385,5.5229187) (390,5.5449829) (395,5.5256042) (400,5.5425873) (405,5.5412903) (410,5.5241394) (415,5.5414581) (420,5.5351715) (425,5.5202332) (430,5.5365906) (435,5.5343323) (440,5.5328979) (445,5.5327911) (450,5.5272675) (455,5.5539703) (460,5.5477905) (465,5.5261688) (470,5.5267334) (475,5.5241547) (480,5.5435486) (485,5.5485077)};\addlegendentry{Enhanced}
 \end{axis}\end{tikzpicture}\caption{实际训练 loss；前 20 步逐步展示，之后每 5 步取一个日志点。只画完整 batch，避免尾批造成误导。}\end{figure}
