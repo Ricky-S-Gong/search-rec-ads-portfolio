@@ -139,13 +139,42 @@ Pure 不是“更干净的全量数据”，也不是只含随机曝光：它同
 \clearpage
 \begingroup\small
 \subsection{监督信号与损失}
-每个 batch 包含 $B$ 条真实长观看用户--物品对，对角线为正目标。设 $D_i$ 是与第 $i$ 个目标视频重复的非对角位置，则
+\textbf{监督信号的来源：}直接沿用官方二元标签 \texttt{long\_view}，不重新生成标签。视频时长不超过 18 秒时，观看达到视频时长为正反馈；时长超过 18 秒时，观看达到 18 秒为正反馈。正式训练仅保留训练窗口内 \texttt{is\_random=0} 且 \texttt{long\_view=1} 的记录。\texttt{is\_random=0} 表示原推荐系统的常规曝光。
+
+\textbf{一条训练样本：}请求 $q_i$ 包含当时的用户 ID、场景、时间；Enhanced 另使用已可用历史；$v_i$ 对应这条记录中用户实际长观看的视频。监督告诉模型“在这个请求下，这个视频是正目标”。当前不把 \texttt{long\_view=0} 的记录送入损失，也不使用点赞加权或观看时长回归。
+
+\begin{figure}[H]\centering
+\begin{tikzpicture}[cell/.style={draw=accent,rounded corners=2pt,minimum width=2.65cm,minimum height=1.05cm,align=center,font=\small},positive/.style={cell,fill=accent!14,line width=.8pt},other/.style={cell,fill=gray!4},label/.style={font=\small,align=center}]
+\node[label] at (-3.35,1.15) {用户请求（行）};
+\node[label] at (0,1.15) {视频 A $v_1$};
+\node[label] at (3.05,1.15) {视频 B $v_2$};
+\node[label] at (6.1,1.15) {视频 C $v_3$};
+\node[label,text width=3.5cm] at (-3.35,0) {$q_1$：实际长观看 A};
+\node[label,text width=3.5cm] at (-3.35,-1.45) {$q_2$：实际长观看 B};
+\node[label,text width=3.5cm] at (-3.35,-2.9) {$q_3$：实际长观看 C};
+\node[positive] at (0,0) {$S_{11}$\\\textbf{正目标}};
+\node[other] at (3.05,0) {$S_{12}$\\比较对象};
+\node[other] at (6.1,0) {$S_{13}$\\比较对象};
+\node[other] at (0,-1.45) {$S_{21}$\\比较对象};
+\node[positive] at (3.05,-1.45) {$S_{22}$\\\textbf{正目标}};
+\node[other] at (6.1,-1.45) {$S_{23}$\\比较对象};
+\node[other] at (0,-2.9) {$S_{31}$\\比较对象};
+\node[other] at (3.05,-2.9) {$S_{32}$\\比较对象};
+\node[positive] at (6.1,-2.9) {$S_{33}$\\\textbf{正目标}};
+\end{tikzpicture}
+\caption{三个目标视频不同的 batch 示例。矩阵单元是模型分数，蓝色对角线标记正确配对，并不是输入的标签值；同一用户可以产生多条请求。训练提高每行正目标相对于比较对象的分数。}
+\end{figure}
+
+用户塔把请求 $q_i$ 编码为 $u_i$，物品塔编码 batch 中所有目标视频；分数矩阵大小为 $B\times B$，元素为 $S_{ij}=u_i^\top v_j/\tau$，$\tau=0.1$。请求和其实际视频按同一顺序排列，故正确配对恰好位于 $(i,i)$，这就是\textbf{“对角线正目标”}。图中交叉熵的目标列索引为 $[0,1,2]$；这些索引仅指 batch 内位置，不是视频类别，也不是新的二元反馈标签。
+
+若两个请求的目标是同一视频，定义 $D_i=\{j\ne i:\mathrm{item\_id}(v_j)=\mathrm{item\_id}(v_i)\}$，屏蔽这些非对角重复位置，保留对角线。损失为
 \[
 \mathcal L=-\frac1B\sum_{i=1}^{B}
-\log\frac{\exp(s(u_i,i_i)/\tau)}{\sum_{j\notin D_i}\exp(s(u_i,i_j)/\tau)},\qquad \tau=0.1.
+\log\frac{\exp(S_{ii})}{\sum_{j\notin D_i}\exp(S_{ij})}.
 \]
-重复目标位置被屏蔽，但对角线保留。其余物品是批内采样的比较对象，\textbf{并非已知的用户负反馈}，可能包含用户也喜欢的视频。当前没有采样频率修正。
+其余物品是批内采样的比较对象，\textbf{并非已知的用户负反馈}：另一个请求长观看的视频，不代表当前请求不喜欢它。当前没有采样频率修正，仍可能存在假负例。
 
+\clearpage
 \section{训练配置、结果与恢复验证}
 \subsection{冻结的公平比较配置}
 \begin{table}[H]\centering\small
