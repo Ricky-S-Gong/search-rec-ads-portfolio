@@ -41,7 +41,6 @@ Training is manual and requires CUDA by default. No real experiments run as part
 - `recommender/prepare_pure.py`: source hashes, UTC splits, strict-prior history audit; feature fitting uses train-only item IDs.
 - `export_test.py`: held-out requests and causal history audit; does not train.
 - `colab_fetch_pure.py`: authorized Drive download with checksums. It never prints credentials.
-- `colab_share_artifacts.py`: historical runtime's verified handoff copier; expects the old Drive ZIP/runtime paths and does not train. It is not automatically executed by the new notebook.
 
 Pinned publisher snapshot: `9359168f8d55b85f456c0b01d1cbbbfa3b1c37f6` (PR #36). Original files and hashes live in `recommender/vendor/data_pipeline_snapshot/provenance.json`. Retaining this snapshot permits reproducing the published model independently of later data-pipeline changes.
 
@@ -66,3 +65,5 @@ Raw data, checkpoints and vectors stay in Drive. Git contains code, tests and sm
 Single target Recall@100 is hit/miss; NDCG@100 is 1/log2(rank+1) for a hit, otherwise zero; average over requests. The evaluation implementation and candidate eligibility still need Ricky's review. Test must not be used for tuning.
 
 See [docs/pure-test-handoff.md](docs/pure-test-handoff.md) for the complete handoff protocol. [docs/engineering.md](docs/engineering.md) and [docs/pure-handoff.md](docs/pure-handoff.md) describe the original ZIP layout; use the current notebook and commands above for repository setup.
+
+The Week 1 notebook writes directly to the mounted shared Drive. The one-off historical ZIP copier has been removed; its delivered bundle remains intact in the historical release.

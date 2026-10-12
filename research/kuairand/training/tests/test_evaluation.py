@@ -86,3 +86,107 @@ def test_stage_cannot_claim_completion_or_compare_different_protocols(tmp_path):
     assert not report["complete"] and "basic" in report["blockers"]
     with pytest.raises(ValueError, match="Different"):
         stage_report([pop, write("basic", {"requests_sha256": "b"})], tmp_path / "bad")
+
+
+def test_real_model_export_evaluate_pipeline_and_binding_rejection(tmp_path):
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+    import yaml
+
+    from evaluation.evaluate import evaluate
+    from recommender.batch_source import file_sha256
+    from recommender.export import export_items
+    from recommender.item_tower import fit_item_encoding
+    from recommender.training import train
+
+    config = yaml.safe_load((Path(__file__).parents[1] / "configs/pure-basic.yaml").read_text())
+    config["training"].update(device="cpu", mixed_precision=False, batch_size=2)
+    config["wandb"]["mode"] = "disabled"
+    train_table = pa.table(
+        {
+            "request_id": ["a", "b", "c"],
+            "user_id": [1, 2, 1],
+            "item_id": [0, 1, 0],
+            "time_ms": [1000, 1001, 1002],
+            "tab": [1, 1, 1],
+            "category": [0, 0, 0],
+            "duration": [1.0, 1.0, 1.0],
+            "long_view": [1, 1, 1],
+            "is_random": [0, 0, 0],
+            "history_item_ids": pa.array([[], [], [0]], type=pa.list_(pa.int64())),
+        }
+    )
+    validation = pa.table(
+        {
+            "request_id": ["v1", "v2"],
+            "user_id": [1, 999],
+            "item_id": [0, 1],
+            "time_ms": [2000, 2001],
+            "tab": [1, 1],
+            "category": [0, 0],
+            "duration": [1.0, 1.0],
+            "long_view": [1, 1],
+            "is_random": [0, 0],
+            "history_item_ids": pa.array([[], [0]], type=pa.list_(pa.int64())),
+        }
+    )
+    candidates = pa.table(
+        {
+            "item_id": [0, 1],
+            "category": [0, 0],
+            "duration": [0.0, 0.0],
+            "eligible_after_ms": [0, 2002],
+        }
+    )
+    for name, table in [
+        ("train.parquet", train_table),
+        ("validation.parquet", validation),
+        ("candidates.parquet", candidates),
+    ]:
+        pq.write_table(table, tmp_path / name)
+
+    def entry(name):
+        return {
+            "path": name,
+            "sha256": file_sha256(tmp_path / name),
+            "rows": pq.ParquetFile(tmp_path / name).metadata.num_rows,
+        }
+
+    manifest = {
+        "schema_version": 1,
+        "positive_only": True,
+        "label": "long_view",
+        "duration_unit": "seconds",
+        "dataset_version": "SYNTHETIC-PIPELINE-TEST",
+        "feature_version": "id-only",
+        "user_ids": [1, 2],
+        "item_ids": [0, 1],
+        "time_protocol_verified": True,
+        "train_time_ranges_ms": [[1000, 1100]],
+        "validation_time_ranges_ms": [[2000, 2100]],
+        "train_shards": [entry("train.parquet")],
+        "extra_files": [entry("validation.parquet")],
+        "candidates": entry("candidates.parquet"),
+        "history_length": 50,
+        "item_encoding": fit_item_encoding(pa.table({"item_id": [0, 1]}), [0, 1], ("item_id",), ()),
+        "protocol": {"test_used": False, "repeat_items_allowed": True},
+    }
+    path = tmp_path / "manifest.json"
+    path.write_text(json.dumps(manifest))
+    checkpoint = train(config, path, tmp_path / "model")
+    export_items(config, path, checkpoint, tmp_path / "vectors", 0, 2)
+    basic = evaluate(
+        config, path, tmp_path / "basic", checkpoint, tmp_path / "vectors", "basic", request_batch=1
+    )
+    pop = evaluate(config, path, tmp_path / "popularity", request_batch=1)
+    assert basic["protocol"] == pop["protocol"]
+    assert basic["metrics"]["recall_at_100"] == 0.5
+    assert basic["metrics"]["target_coverage"] == 0.5
+    assert basic["metrics"]["unknown_user_rate"] == 0.5
+    assert basic["metrics"]["empty_history_rate"] == 0.5
+    vector_manifest = tmp_path / "vectors/manifest.json"
+    release = json.loads(vector_manifest.read_text())
+    release["checkpoint_sha256"] = "wrong"
+    vector_manifest.write_text(json.dumps(release))
+    with pytest.raises(ValueError, match="binding mismatch"):
+        evaluate(config, path, tmp_path / "bad", checkpoint, tmp_path / "vectors", "basic")

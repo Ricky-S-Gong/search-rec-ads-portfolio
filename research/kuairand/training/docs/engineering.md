@@ -69,8 +69,8 @@ uv sync --locked
 bash cmd/check_env.sh
 uv run --locked python run.py check-config
 uv run --locked python run.py init-wandb
-bash cmd/train.sh --manifest /absolute/manifest.json --output /persistent/runs/yutao/run-001
-bash cmd/train.sh --manifest /absolute/manifest.json --output /persistent/runs/yutao/run-001 --resume-latest
+bash cmd/train.sh --manifest /absolute/manifest.json --output /persistent/runs/week1-pure/run-001
+bash cmd/train.sh --manifest /absolute/manifest.json --output /persistent/runs/week1-pure/run-001 --resume-latest
 uv run --locked python run.py export --manifest /absolute/manifest.json --checkpoint /absolute/model.pt --output /persistent/releases/vectors-001 --start-id 0 --end-id 100
 ```
 
