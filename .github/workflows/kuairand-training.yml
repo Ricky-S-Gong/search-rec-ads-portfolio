@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: research/kuairand
+        working-directory: research/kuairand/training
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6

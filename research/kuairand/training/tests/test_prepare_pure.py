@@ -6,8 +6,8 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 
-from kuairand.batch_source import read_manifest
-from kuairand.prepare_pure import check_data, prepare_pure
+from recommender.batch_source import read_manifest
+from recommender.prepare_pure import check_data, prepare_pure
 from run import load_config
 
 

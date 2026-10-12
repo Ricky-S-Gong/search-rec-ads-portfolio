@@ -5,15 +5,15 @@ from pathlib import Path
 import torch
 import yaml
 
-from kuairand.checkpoint import load_checkpoint, save_checkpoint
-from kuairand.user_tower import UserTower
+from recommender.checkpoint import load_checkpoint, save_checkpoint
+from recommender.user_tower import UserTower
 
 
 def main():
     """Run one bounded CUDA correctness step; never load a real dataset."""
-    ROOT = Path(__file__).resolve().parents[2]
+    ROOT = Path(__file__).resolve().parents[3]
     assert torch.cuda.is_available(), "CUDA unavailable in the locked environment"
-    config = yaml.safe_load((ROOT / "research/kuairand/configs/week1.yaml").read_text())
+    config = yaml.safe_load((ROOT / "research/kuairand/training/configs/week1.yaml").read_text())
     model = UserTower([1, 2, 3], config["model"]).cuda().train()
     features = {
         "user_id": torch.tensor([1, 2, 3, 99], device="cuda"),

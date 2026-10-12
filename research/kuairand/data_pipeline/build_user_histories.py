@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from kuairand_twotower.data import build_histories
+from kuairand_data.data import build_histories
 
 
 def main() -> None:

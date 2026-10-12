@@ -10,7 +10,7 @@ import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from kuairand.batch_source import file_sha256, read_manifest
+from recommender.batch_source import file_sha256, read_manifest
 
 
 def export_test(source, training_manifest, output):

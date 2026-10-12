@@ -23,7 +23,7 @@ shared-drive/kuairand/
 ## Get the official 1K archive
 
 ```bash
-python research/kuairand-twotower/download_data.py \
+python research/kuairand/data_pipeline/download_data.py \
   --destination /content/drive/MyDrive/kuairand/raw/KuaiRand-1K.tar.gz
 ```
 
@@ -38,7 +38,7 @@ and sequential history are reduced. After extracting your downloaded archive,
 run:
 
 ```bash
-uv run python research/kuairand-twotower/prepare_kuairand_data.py \
+uv run python research/kuairand/data_pipeline/prepare_kuairand_data.py \
   --raw-dir /content/drive/MyDrive/kuairand/raw/KuaiRand-Pure/data \
   --output-dir /content/drive/MyDrive/kuairand/datasets/kuairand-pure-v1
 ```
@@ -53,7 +53,7 @@ from seeing a request's own outcome or another request from exactly the same
 timestamp.
 
 ```bash
-PYTHONPATH=research/kuairand-twotower python research/kuairand-twotower/build_user_histories.py \
+PYTHONPATH=research/kuairand/data_pipeline python research/kuairand/data_pipeline/build_user_histories.py \
   --events /content/drive/MyDrive/kuairand/datasets/kuairand-pure-v1/events.parquet \
   --output /content/drive/MyDrive/kuairand/datasets/kuairand-pure-v1/user_histories.parquet
 ```
@@ -65,7 +65,7 @@ statistics file is intentionally excluded because it can include future
 feedback relative to a training request.
 
 ```bash
-PYTHONPATH=research/kuairand-twotower python research/kuairand-twotower/prepare_item_features.py \
+PYTHONPATH=research/kuairand/data_pipeline python research/kuairand/data_pipeline/prepare_item_features.py \
   --basic /content/drive/MyDrive/kuairand/raw/KuaiRand-Pure/data/video_features_basic_pure.csv \
   --events /content/drive/MyDrive/kuairand/datasets/kuairand-pure-v1/events.parquet \
   --output /content/drive/MyDrive/kuairand/datasets/kuairand-pure-v1/item_features.parquet
@@ -86,7 +86,7 @@ from google.colab import drive
 drive.mount('/content/drive')
 !git clone https://github.com/Ricky-S-Gong/search-rec-ads-portfolio.git
 %cd search-rec-ads-portfolio
-!pip install -r research/kuairand-twotower/requirements-colab.txt
+!pip install -r research/kuairand/data_pipeline/requirements-colab.txt
 ```
 
 Do not commit `.env`, API keys, raw CSVs, Parquet files, or checkpoints.

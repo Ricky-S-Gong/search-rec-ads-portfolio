@@ -5,7 +5,7 @@ experiment:
   seed: 42
 model:
   # Replace with Ziqi's actual module:function before real training.
-  item_factory: kuairand.item_tower:build_item_tower
+  item_factory: recommender.item_tower:build_item_tower
   user_embedding_dim: 32
   context_embedding_dim: 8
   num_tabs: 15

@@ -81,7 +81,7 @@ request_id, user_id, history_item_ids
 - 第一版只用 `item_features.parquet` 的静态字段。
 - 类别字段使用 embedding；数值字段（时长、宽、高）标准化后拼接。
 - 输出维度与 User Tower 约定一致，例如 64 维。
-- 代码建议位置：`research/kuairand-twotower/kuairand_twotower/item_tower.py`。
+- 代码建议位置：`research/kuairand/data_pipeline/kuairand_data/item_tower.py`。
 
 ### 2. 训练批次读取器
 
@@ -90,7 +90,7 @@ request_id, user_id, history_item_ids
 - 按上述最小规则过滤正样本。
 - `history_item_ids` 补齐到固定长度 50，并同时返回 mask。
 - 返回目标 `item_id`、目标视频特征、历史视频 ID、历史 mask 与 split。
-- 代码建议位置：`research/kuairand-twotower/kuairand_twotower/dataset.py`。
+- 代码建议位置：`research/kuairand/data_pipeline/kuairand_data/dataset.py`。
 
 ### 3. 与 Yutao 的接口确认
 
@@ -100,7 +100,7 @@ request_id, user_id, history_item_ids
 
 ## 已交付的模型接口
 
-`kuairand_twotower.dataset.build_dataloader` 读取三张 Parquet 表并返回
+`kuairand_data.dataset.build_dataloader` 读取三张 Parquet 表并返回
 `(loader, schema)`。它只接受 `train` 或 `validation` split，并筛选
 `long_view=True`、`is_random=False` 的正样本。
 
@@ -118,16 +118,16 @@ history_mask        [B, 50]  # bool，True 表示真实历史
 `visible_status`、`music_id`、`music_type`、`tag`。4 个数值特征依次为
 时长、宽、高和上传日期。类别 ID 的 `0` 专门保留给 padding/unknown。
 
-`kuairand_twotower.item_tower.ItemTower` 接收 `schema` 的类别基数，输出
+`kuairand_data.item_tower.ItemTower` 接收 `schema` 的类别基数，输出
 L2-normalized 的 64 维向量；目标视频和历史视频使用同一个调用方式：
 
 ```python
 import sys
 
-sys.path.insert(0, "/content/search-rec-ads-portfolio/research/kuairand-twotower")
+sys.path.insert(0, "/content/search-rec-ads-portfolio/research/kuairand/data_pipeline")
 
-from kuairand_twotower.dataset import build_dataloader
-from kuairand_twotower.item_tower import ItemTower
+from kuairand_data.dataset import build_dataloader
+from kuairand_data.item_tower import ItemTower
 
 loader, schema = build_dataloader(
     "/content/drive/MyDrive/kuairand-Two-Tower/datasets/kuairand-pure-v1/events.parquet",
@@ -151,15 +151,15 @@ User Tower，并自行处理负采样、loss、训练和 W&B。
 ## 复现命令
 
 ```bash
-PYTHONPATH=research/kuairand-twotower python research/kuairand-twotower/prepare_kuairand_data.py \
+PYTHONPATH=research/kuairand/data_pipeline python research/kuairand/data_pipeline/prepare_kuairand_data.py \
   --raw-dir /content/drive/MyDrive/kuairand-Two-Tower/raw/KuaiRand-Pure/data \
   --output-dir /content/drive/MyDrive/kuairand-Two-Tower/datasets/kuairand-pure-v1
 
-PYTHONPATH=research/kuairand-twotower python research/kuairand-twotower/build_user_histories.py \
+PYTHONPATH=research/kuairand/data_pipeline python research/kuairand/data_pipeline/build_user_histories.py \
   --events /content/drive/MyDrive/kuairand-Two-Tower/datasets/kuairand-pure-v1/events.parquet \
   --output /content/drive/MyDrive/kuairand-Two-Tower/datasets/kuairand-pure-v1/user_histories.parquet
 
-PYTHONPATH=research/kuairand-twotower python research/kuairand-twotower/prepare_item_features.py \
+PYTHONPATH=research/kuairand/data_pipeline python research/kuairand/data_pipeline/prepare_item_features.py \
   --basic /content/drive/MyDrive/kuairand-Two-Tower/raw/KuaiRand-Pure/data/video_features_basic_pure.csv \
   --events /content/drive/MyDrive/kuairand-Two-Tower/datasets/kuairand-pure-v1/events.parquet \
   --output /content/drive/MyDrive/kuairand-Two-Tower/datasets/kuairand-pure-v1/item_features.parquet

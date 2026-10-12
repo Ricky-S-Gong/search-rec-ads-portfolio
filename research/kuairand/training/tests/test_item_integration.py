@@ -9,11 +9,11 @@ import pyarrow.parquet as pq
 import torch
 import yaml
 
-from kuairand.batch_source import file_sha256, read_manifest
-from kuairand.checkpoint import load_checkpoint
-from kuairand.export import export_items
-from kuairand.item_tower import fit_item_encoding
-from kuairand.training import binding, train
+from recommender.batch_source import file_sha256, read_manifest
+from recommender.checkpoint import load_checkpoint
+from recommender.export import export_items
+from recommender.item_tower import fit_item_encoding
+from recommender.training import binding, train
 
 
 def metadata():

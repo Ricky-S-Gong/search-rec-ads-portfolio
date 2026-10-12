@@ -2,7 +2,7 @@
 
 代码固定到 Ziqi PR #36 的 commit 9359168f8d55b85f456c0b01d1cbbbfa3b1c37f6。
 原始上游 item_tower.py、dataset.py、data.py、DATA_HANDOFF.md 和校验值保存在
-research/kuairand/kuairand/vendor/ziqi/。上游文件未修改。
+research/kuairand/training/recommender/vendor/ziqi/。上游文件未修改。
 
 数据位于共享 Drive：
 kuairand-Two-Tower/datasets/kuairand-pure-v1/。

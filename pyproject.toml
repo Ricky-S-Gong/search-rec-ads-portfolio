@@ -20,7 +20,7 @@ testpaths = [
   "research/spotify-music/tests",
   "research/movielens-cf/tests",
   "research/goodbooks-mf/tests",
-  "research/kuairand-twotower/tests",
+  "research/kuairand/data_pipeline/tests",
 ]
 
 [tool.uv]

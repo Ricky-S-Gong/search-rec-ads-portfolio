@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from kuairand_twotower.data import normalize_events, split_events
+from kuairand_data.data import normalize_events, split_events
 
 
 def prepare(raw_dir: Path, output_dir: Path) -> Path:

@@ -7,7 +7,7 @@ import os
 import platform
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
+ROOT = Path(__file__).resolve().parents[3]
 
 
 def load_config(path: Path) -> tuple[dict, str]:
@@ -142,7 +142,7 @@ def main() -> None:
         ),
     )
     parser.add_argument(
-        "--config", type=Path, default=ROOT / "research/kuairand/configs/week1.yaml"
+        "--config", type=Path, default=ROOT / "research/kuairand/training/configs/week1.yaml"
     )
     recovery = parser.add_mutually_exclusive_group()
     recovery.add_argument("--resume", type=Path)
@@ -160,13 +160,13 @@ def main() -> None:
             return
         config, digest = load_config(args.config)
         if args.command == "prepare-pure":
-            from kuairand.prepare_pure import prepare_pure
+            from recommender.prepare_pure import prepare_pure
 
             if args.source is None or args.output is None:
                 parser.error("prepare-pure requires --source and a new --output directory")
             print(json.dumps(prepare_pure(args.source, args.output, config), indent=2))
         elif args.command in ("check-data", "preflight"):
-            from kuairand.prepare_pure import check_data
+            from recommender.prepare_pure import check_data
 
             if args.manifest is None:
                 parser.error("check-data/preflight requires --manifest")
@@ -178,8 +178,8 @@ def main() -> None:
         elif args.command == "train":
             from dotenv import load_dotenv
 
-            from kuairand.checkpoint import latest_checkpoint
-            from kuairand.training import train
+            from recommender.checkpoint import latest_checkpoint
+            from recommender.training import train
 
             load_dotenv(ROOT / ".env", override=False)
             if args.manifest is None or args.output is None:
@@ -193,7 +193,7 @@ def main() -> None:
             )
             print(train(config, args.manifest, args.output, checkpoint))
         else:
-            from kuairand.export import export_items
+            from recommender.export import export_items
 
             if any(
                 x is None

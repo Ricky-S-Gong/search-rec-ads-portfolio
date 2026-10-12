@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from kuairand_twotower.data import build_histories, normalize_events, split_events
+from kuairand_data.data import build_histories, normalize_events, split_events
 from prepare_item_features import prepare_item_features
 from prepare_kuairand_data import prepare
 

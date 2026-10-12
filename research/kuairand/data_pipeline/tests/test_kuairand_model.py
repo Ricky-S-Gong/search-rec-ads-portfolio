@@ -3,8 +3,8 @@ import pytest
 
 torch = pytest.importorskip("torch", reason="PyTorch is unavailable in this Intel macOS development environment")
 
-from kuairand_twotower.dataset import build_dataloader
-from kuairand_twotower.item_tower import ItemTower
+from kuairand_data.dataset import build_dataloader
+from kuairand_data.item_tower import ItemTower
 
 
 def test_item_tower_returns_normalized_vectors_for_targets_and_histories():

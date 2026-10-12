@@ -8,7 +8,7 @@
 - candidates.parquet：7,583 个按 ID 排序的候选视频及兼容特征。
 - frozen_features.json：从训练数据拟合的用户词表与视频编码，用于检查编码一致性，不是可加载的训练 manifest。
 - evaluation_manifest.json：数量、范围、源文件哈希、产物哈希和协议。
-- export_test.py：本包的可重复生成脚本，在原项目的 research/kuairand 下运行。
+- export_test.py：本包的可重复生成脚本，历史包在原项目的 research/kuairand 下运行；当前源码入口为 research/kuairand/training/export_test.py。
 
 ## 分割和历史协议
 

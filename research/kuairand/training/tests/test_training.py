@@ -9,12 +9,12 @@ import pytest
 import torch
 import yaml
 
-from kuairand.batch_source import ParquetBatches, file_sha256, read_manifest
-from kuairand.checkpoint import latest_checkpoint, load_checkpoint
-from kuairand.export import export_items
-from kuairand.model import batch_loss, build_model
-from kuairand.training import binding, train
-from kuairand.user_tower import UserTower
+from recommender.batch_source import ParquetBatches, file_sha256, read_manifest
+from recommender.checkpoint import latest_checkpoint, load_checkpoint
+from recommender.export import export_items
+from recommender.model import batch_loss, build_model
+from recommender.training import binding, train
+from recommender.user_tower import UserTower
 from run import load_config
 
 
