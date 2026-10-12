@@ -44,7 +44,7 @@ Local datasets remain inside their project's ignored `data/` directory.
 KuaiRand private datasets, checkpoints, vectors and per-request predictions
 remain in shared Drive. Public aggregate evidence is stored in
 `research/kuairand/reports/week1/evidence/`; the editable report is
-`research/kuairand/reports/week1/technical_report_draft.tex`.
+`research/kuairand/reports/week1/week1.tex`.
 
 Archived August handoffs are under `docs/archive/`. GoodBooks plans and team
 instructions are under `research/goodbooks-mf/docs/`; the existing short-video
