@@ -99,6 +99,10 @@ def build(
         )
     if stage["complete"] and runs is None:
         raise ValueError("Final report requires the actual run logs")
+    encoding_path = Path(__file__).parent / "evidence/encoding_audit.json"
+    encoding_audit = read(encoding_path) if encoding_path.is_file() else None
+    if encoding_audit and encoding_audit["manifest_sha256"] != stage["protocol"]["manifest_sha256"]:
+        raise ValueError("Feature encoding audit differs from the report dataset")
     status = "FINAL" if stage["complete"] else "DRAFT -- GPU acceptance pending"
     models = stage["models"]
     splits = audit["splits"]
@@ -651,6 +655,38 @@ Rebuild this report with \texttt{build\_report.py}, providing the audit, matchin
 \end{thebibliography}
 """
     )
+    if encoding_audit:
+        examples = []
+        for entry in encoding_audit["historical_encoding_example"]:
+            raw = "Missing" if entry["raw_value"] is None else escape(entry["raw_value"])
+            encoded = (
+                number(entry["encoded_value"], 6)
+                if entry["representation"] == "training-imputed z-score"
+                else str(entry["encoded_value"])
+            )
+            examples.append(
+                (escape(entry["feature"]), raw, encoded, escape(entry["representation"]))
+            )
+        sections.append(r"\clearpage\section{Actual historical feature transformations}" + "\n")
+        sections.append(
+            "For historical candidate ID "
+            + str(encoding_audit["historical_candidate_id"])
+            + ", these values reproduce the frozen encoder. Numeric values are checked against the stored training median, mean and standard deviation; no held-out fitting is performed.\n"
+        )
+        sections.append(
+            r"\begin{center}\small\begin{tabularx}{\linewidth}{lrrX}\toprule Feature & Raw value & Encoded value & Representation\\\midrule"
+            + "\n"
+            + rows(examples)
+            + r"\bottomrule\end{tabularx}\end{center}"
+            + "\n"
+        )
+        sections.append(
+            "Under the corrected ID-only dictionary, "
+            + percent(encoding_audit["unknown_catalog_item_rate"])
+            + " of catalog items and "
+            + percent(encoding_audit["unknown_validation_item_rate"])
+            + " of validation targets map to the reserved unknown item category. These differ from targets outside the eligible catalog. All valid candidate IDs remain in retrieval.\n"
+        )
     preamble = (
         r"""\documentclass[11pt,a4paper]{article}
 \usepackage[margin=2.2cm]{geometry}

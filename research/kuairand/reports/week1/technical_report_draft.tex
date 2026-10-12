@@ -295,4 +295,24 @@ Rebuild this report with \texttt{build\_report.py}, providing the audit, matchin
 \bibitem{dataset} KuaiRand project. Official dataset definitions and downloads. \url{https://kuairand.com/}.
 \end{thebibliography}
 
+\clearpage\section{Actual historical feature transformations}
+
+For historical candidate ID 0, these values reproduce the frozen encoder. Numeric values are checked against the stored training median, mean and standard deviation; no held-out fitting is performed.
+
+\begin{center}\small\begin{tabularx}{\linewidth}{lrrX}\toprule Feature & Raw value & Encoded value & Representation\\\midrule
+item\_id & 0 & 1 & categorical dictionary index \\
+author\_id & 7349781 & 4199 & categorical dictionary index \\
+video\_type & NORMAL & 2 & categorical dictionary index \\
+upload\_type & LongImport & 5 & categorical dictionary index \\
+visible\_status & 0.0 & 1 & categorical dictionary index \\
+music\_id & 9155697141 & 4461 & categorical dictionary index \\
+music\_type & 9.0 & 5 & categorical dictionary index \\
+tag & 39 & 61 & categorical dictionary index \\
+video\_duration & 87433.0 & -0.193732 & training-imputed z-score \\
+server\_width & 720.0 & -0.557563 & training-imputed z-score \\
+server\_height & 1280.0 & 0.561088 & training-imputed z-score \\
+upload\_day & 1 & 0.284630 & training-imputed z-score \\\bottomrule\end{tabularx}\end{center}
+
+Under the corrected ID-only dictionary, 9.24\% of catalog items and 0.11\% of validation targets map to the reserved unknown item category. These differ from targets outside the eligible catalog. All valid candidate IDs remain in retrieval.
+
 \end{document}
