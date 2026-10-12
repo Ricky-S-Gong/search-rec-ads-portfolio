@@ -1,0 +1,25 @@
+{
+  "scope": "historical diagnostic only; old request-prior histories and snapshot features; not the corrected fair comparison",
+  "run_id": "b2ed5728b9a2",
+  "binding": {
+    "config_sha256": "baccb02d08a339712aa2ed6ac25180aceaf9f559524ee2cbb1bf3d19143711b2",
+    "manifest_sha256": "0e10290ad2eac565ad5386ddf51eaaeeb181426b436ac1ac6c56bb9db27ab0ba",
+    "code_sha256": "11d6716bd85732cc72389aefb6995a9d918642bf1f61d5e638210bcb7075564f",
+    "torch": "2.14.1+cu130",
+    "python": "3.11.16",
+    "device_type": "cuda"
+  },
+  "checkpoint_sha256": "e3ee79a232f322d8099238b85f74a8a6507fb9c8bfac350c282b0837934d62e0",
+  "frozen_source_zip_sha256": "63b63e5a0c451221b6898c7c72a0281964fe3890f56fe0071386d9f12b4e2eec",
+  "validation_sha256": "0e04b0e055d9d4e36e7fef98776485003108d48252c3663ccc98f57c5bc11a0f",
+  "inference_device": "cpu",
+  "metrics": {
+    "requests": 30780,
+    "recall_at_100": 0.023716699155295645,
+    "ndcg_at_100": 0.006615371686265343,
+    "target_coverage": 1.0,
+    "covered_recall_at_100": 0.023716699155295645,
+    "covered_ndcg_at_100": 0.006615371686265343,
+    "insufficient_k_rate": 0.0
+  }
+}

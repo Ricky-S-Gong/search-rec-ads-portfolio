@@ -1,0 +1,92 @@
+{
+  "manifest_sha256": "0c35d9c9f483bca90f909cd8bcf5f7f1c6c64e6c3aeea411ea3617d0cc92b7fc",
+  "unknown_catalog_item_rate": 0.09244362389555585,
+  "unknown_validation_item_rate": 0.0011115106737716173,
+  "historical_candidate_id": 0,
+  "historical_encoding_example": [
+    {
+      "feature": "item_id",
+      "raw_value": 0,
+      "encoded_value": 1,
+      "representation": "categorical dictionary index"
+    },
+    {
+      "feature": "author_id",
+      "raw_value": 7349781,
+      "encoded_value": 4199,
+      "representation": "categorical dictionary index"
+    },
+    {
+      "feature": "video_type",
+      "raw_value": "NORMAL",
+      "encoded_value": 2,
+      "representation": "categorical dictionary index"
+    },
+    {
+      "feature": "upload_type",
+      "raw_value": "LongImport",
+      "encoded_value": 5,
+      "representation": "categorical dictionary index"
+    },
+    {
+      "feature": "visible_status",
+      "raw_value": 0.0,
+      "encoded_value": 1,
+      "representation": "categorical dictionary index"
+    },
+    {
+      "feature": "music_id",
+      "raw_value": 9155697141,
+      "encoded_value": 4461,
+      "representation": "categorical dictionary index"
+    },
+    {
+      "feature": "music_type",
+      "raw_value": 9.0,
+      "encoded_value": 5,
+      "representation": "categorical dictionary index"
+    },
+    {
+      "feature": "tag",
+      "raw_value": "39",
+      "encoded_value": 61,
+      "representation": "categorical dictionary index"
+    },
+    {
+      "feature": "video_duration",
+      "raw_value": 87433.0,
+      "encoded_value": -0.19373221695423126,
+      "training_median": 80800.0,
+      "training_mean": 107671.811101424,
+      "training_std": 104467.96595941801,
+      "representation": "training-imputed z-score"
+    },
+    {
+      "feature": "server_width",
+      "raw_value": 720.0,
+      "encoded_value": -0.5575629472732544,
+      "training_median": 720.0,
+      "training_mean": 849.6001162452775,
+      "training_std": 232.4403207084874,
+      "representation": "training-imputed z-score"
+    },
+    {
+      "feature": "server_height",
+      "raw_value": 1280.0,
+      "encoded_value": 0.5610877871513367,
+      "training_median": 1280.0,
+      "training_mean": 1139.6669572798605,
+      "training_std": 250.10888261467434,
+      "representation": "training-imputed z-score"
+    },
+    {
+      "feature": "upload_day",
+      "raw_value": 1,
+      "encoded_value": 0.28462961316108704,
+      "training_median": 1.0,
+      "training_mean": 0.7959895379250218,
+      "training_std": 0.7167576611312032,
+      "representation": "training-imputed z-score"
+    }
+  ]
+}

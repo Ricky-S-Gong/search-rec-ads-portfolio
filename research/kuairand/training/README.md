@@ -6,7 +6,7 @@ This module publishes the code previously run from a Drive source ZIP. It consum
 
 ## Colab
 
-Open [notebooks/colab.ipynb](notebooks/colab.ipynb) in Colab. This clean notebook contains no outputs, credentials or datasets. It clones **Ricky-S-Gong/search-rec-ads-portfolio**, resolves the selected branch to an exact commit, then installs this module's own locked environment. The default `REF` is `main`; for an unmerged PR set it to that PR branch; for an exact rerun set `COMMIT` to the printed SHA. Never click Run all: preparation, W&B setup and training are separate manual cells.
+Open [notebooks/week1_baseline.ipynb](notebooks/week1_baseline.ipynb) in Colab. This clean notebook contains no outputs, credentials or datasets. It clones **Ricky-S-Gong/search-rec-ads-portfolio**, resolves the selected branch to an exact commit, then installs this module's own locked environment. The default `REF` is `main`; for an unmerged PR set it to that PR branch; for an exact rerun set `COMMIT` to the printed SHA. Never click Run all: preparation, W&B setup and training are separate manual cells.
 
 在 GitHub notebook 页面点击 Open in Colab，先连接 GPU，按顺序准备和检查，`ready_for_training=true` 后手动运行训练单元。Secret 名称为 `WANDB_API_KEY`，每份 notebook 要单独授权。输出保存到个人 Drive，恢复训练使用相同版本与原输出目录。
 
@@ -41,9 +41,8 @@ Training is manual and requires CUDA by default. No real experiments run as part
 - `recommender/prepare_pure.py`: source hashes, UTC splits, strict-prior history audit; feature fitting uses train-only item IDs.
 - `export_test.py`: held-out requests and causal history audit; does not train.
 - `colab_fetch_pure.py`: authorized Drive download with checksums. It never prints credentials.
-- `colab_share_artifacts.py`: historical runtime's verified handoff copier; expects the old Drive ZIP/runtime paths and does not train. It is not automatically executed by the new notebook.
 
-Pinned publisher snapshot: `9359168f8d55b85f456c0b01d1cbbbfa3b1c37f6` (PR #36). Original files and hashes live in `recommender/vendor/ziqi/provenance.json`. Retaining this snapshot permits reproducing the published model independently of later data-pipeline changes.
+Pinned publisher snapshot: `9359168f8d55b85f456c0b01d1cbbbfa3b1c37f6` (PR #36). Original files and hashes live in `recommender/vendor/data_pipeline_snapshot/provenance.json`. Retaining this snapshot permits reproducing the published model independently of later data-pipeline changes.
 
 ## Verified Pure run / 已完成的 Pure 实验
 
@@ -66,3 +65,7 @@ Raw data, checkpoints and vectors stay in Drive. Git contains code, tests and sm
 Single target Recall@100 is hit/miss; NDCG@100 is 1/log2(rank+1) for a hit, otherwise zero; average over requests. The evaluation implementation and candidate eligibility still need Ricky's review. Test must not be used for tuning.
 
 See [docs/pure-test-handoff.md](docs/pure-test-handoff.md) for the complete handoff protocol. [docs/engineering.md](docs/engineering.md) and [docs/pure-handoff.md](docs/pure-handoff.md) describe the original ZIP layout; use the current notebook and commands above for repository setup.
+
+The Week 1 notebook writes directly to the mounted shared Drive. The one-off historical ZIP copier has been removed; its delivered bundle remains intact in the historical release.
+
+New Week 1 sessions use Python 3.11.15, available in uv 0.12.1’s managed downloads. Historical Python 3.11.16 checkpoints retain their original runtime binding; do not rewrite old run metadata to resume them with another patch version.

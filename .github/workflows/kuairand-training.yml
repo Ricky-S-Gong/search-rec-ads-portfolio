@@ -27,5 +27,5 @@ jobs:
           version: '0.12.1'
           python-version: '3.11'
       - run: uv sync --locked
-      - run: uv run --locked ruff check . --exclude vendor
+      - run: uv run --locked ruff check . ../evaluation --exclude vendor --config pyproject.toml
       - run: uv run --locked pytest tests -q

@@ -34,7 +34,7 @@ class TwoTower(nn.Module):
 
     def forward(self, batch):
         history = None
-        if "history_item_ids" in batch:
+        if self.user_tower.history_dim and "history_item_ids" in batch:
             history = self.item_tower.encode_items({"item_id": batch["history_item_ids"]})
         users = self.encode_users(batch, history=history, mask=batch.get("history_mask"))
         return users, self.encode_items(batch)
