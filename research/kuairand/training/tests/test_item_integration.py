@@ -123,3 +123,21 @@ def test_actual_towers_resume_and_export(tmp_path):
     with np.load(tmp_path / "export/items-00000.npz") as z:
         assert z["item_id"].tolist() == [0, 1, 2]
         assert np.allclose(np.linalg.norm(z["vectors"], axis=1), 1, atol=1e-5)
+
+
+def test_id_only_tower_ignores_all_snapshot_metadata():
+    from recommender.item_tower import ItemAdapter
+
+    config = yaml.safe_load((Path(__file__).parents[1] / "configs/pure-basic.yaml").read_text())
+    encoding = fit_item_encoding(metadata(), [0, 1], ("item_id",), ())
+    assert encoding["numeric"] == [[], [], []]
+    model = ItemAdapter(config, {"item_encoding": encoding})
+    vectors = model.encode_items({"item_id": torch.tensor([0, 1, 2])})
+    assert vectors.shape == (3, 64)
+    assert torch.isfinite(vectors).all()
+    torch.testing.assert_close(vectors.norm(dim=1), torch.ones(3))
+    bad = dict(config, model=dict(config["model"], item_categorical_features=["tag"]))
+    import pytest
+
+    with pytest.raises(ValueError, match="features differ"):
+        ItemAdapter(bad, {"item_encoding": encoding})

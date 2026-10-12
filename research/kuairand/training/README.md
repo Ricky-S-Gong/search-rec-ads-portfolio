@@ -6,7 +6,7 @@ This module publishes the code previously run from a Drive source ZIP. It consum
 
 ## Colab
 
-Open [notebooks/colab.ipynb](notebooks/colab.ipynb) in Colab. This clean notebook contains no outputs, credentials or datasets. It clones **Ricky-S-Gong/search-rec-ads-portfolio**, resolves the selected branch to an exact commit, then installs this module's own locked environment. The default `REF` is `main`; for an unmerged PR set it to that PR branch; for an exact rerun set `COMMIT` to the printed SHA. Never click Run all: preparation, W&B setup and training are separate manual cells.
+Open [notebooks/week1_baseline.ipynb](notebooks/week1_baseline.ipynb) in Colab. This clean notebook contains no outputs, credentials or datasets. It clones **Ricky-S-Gong/search-rec-ads-portfolio**, resolves the selected branch to an exact commit, then installs this module's own locked environment. The default `REF` is `main`; for an unmerged PR set it to that PR branch; for an exact rerun set `COMMIT` to the printed SHA. Never click Run all: preparation, W&B setup and training are separate manual cells.
 
 在 GitHub notebook 页面点击 Open in Colab，先连接 GPU，按顺序准备和检查，`ready_for_training=true` 后手动运行训练单元。Secret 名称为 `WANDB_API_KEY`，每份 notebook 要单独授权。输出保存到个人 Drive，恢复训练使用相同版本与原输出目录。
 

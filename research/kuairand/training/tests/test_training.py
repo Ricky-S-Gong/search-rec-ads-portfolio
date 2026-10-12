@@ -8,6 +8,7 @@ import pyarrow.parquet as pq
 import pytest
 import torch
 import yaml
+from run import load_config
 
 from recommender.batch_source import ParquetBatches, file_sha256, read_manifest
 from recommender.checkpoint import latest_checkpoint, load_checkpoint
@@ -15,7 +16,6 @@ from recommender.export import export_items
 from recommender.model import batch_loss, build_model
 from recommender.training import binding, train
 from recommender.user_tower import UserTower
-from run import load_config
 
 
 @pytest.fixture

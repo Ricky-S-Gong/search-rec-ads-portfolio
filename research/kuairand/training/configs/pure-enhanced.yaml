@@ -1,0 +1,70 @@
+experiment:
+  owner: Ricky
+  dataset: KuaiRand-Pure
+  seed: 42
+model:
+  item_factory: recommender.item_tower:build_item_tower
+  user_embedding_dim: 32
+  context_embedding_dim: 8
+  num_tabs: 15
+  timezone_offset_minutes: 0
+  output_dim: 64
+  hidden_dims:
+  - 128
+  - 64
+  dropout: 0.0
+  batch_norm: false
+  history_pooling: mean
+  item_categorical_embedding_dim: 8
+  item_categorical_features:
+  - item_id
+  item_numeric_features: []
+training:
+  device: cuda
+  mixed_precision: true
+  deterministic: true
+  cache_row_groups: 4
+  optimizer: adam
+  learning_rate: 0.001
+  betas:
+  - 0.9
+  - 0.999
+  weight_decay: 0.0
+  batch_size: 256
+  epochs: 1
+  temperature: 0.1
+  log_every_steps: 50
+  checkpoint_every_steps: 500
+wandb:
+  mode: online
+  entity: SAR-Lab
+  project: kuairand-two-tower
+  name: ricky-w1-pure-enhanced
+  group: stage-1
+  tags:
+  - week-1
+  - kuairand-pure
+  - integration
+  - yutao
+export:
+  batch_size: 4096
+data_adapter:
+  max_source_rows: 3000000
+  row_group_size: 32768
+  category_policy: first_tag
+  category_missing: -1
+  duration_ms_per_second: 1000
+  duration_missing_seconds: 0.0
+  integration: true
+  history_length: 50
+  publisher_commit: 9359168f8d55b85f456c0b01d1cbbbfa3b1c37f6
+  split_cutoffs_ms:
+  - 1649980800000
+  - 1651190400000
+  - 1651622400000
+  verified_source_sha256:
+    events.parquet: c69b39c4561ad1d9f596aaedb84aff93a34e0f1842f491b7fcea11a84587c6e6
+    user_histories.parquet: 6d7b37bc816027a4aea4f1877820e39278220ff884e6b449bd2b2c7108550512
+    item_features.parquet: debec7de2e0cf492f04f3228602ebdd484097a0ee0925384466287fe0b7b9ec2
+    manifest.json: 1dd6d9ccba766358297dbd39378237a8683d6accd3dd4e30141906a703d7633d
+  protocol: completion-time-v1

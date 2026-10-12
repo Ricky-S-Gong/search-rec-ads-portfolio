@@ -88,7 +88,7 @@ W&B resume=must 恢复同一 run；train_step 作为曲线横轴，记录恢复�
 
 ## Colab 入口与验收
 
-使用 research/kuairand/training/notebooks/colab.ipynb。手动选择 GPU、挂载 Drive，固定代码版本，安装 uv 0.12.18，再创建 Python 3.11.16 的锁定 venv。Notebook 的挂载代码使用托管 kernel，训练脚本使用 venv Python。先看 check-env 的 cuda_available，再启动实验。所有 Notebook 单元均未执行。
+使用 research/kuairand/training/notebooks/week1_baseline.ipynb。手动选择 GPU、挂载 Drive，固定代码版本，安装 uv 0.12.18，再创建 Python 3.11.16 的锁定 venv。Notebook 的挂载代码使用托管 kernel，训练脚本使用 venv Python。先看 check-env 的 cuda_available，再启动实验。所有 Notebook 单元均未执行。
 
 代码可从固定 Git commit 拉取，或上传交付 ZIP 至 /content/SAR-colab-source.zip。ZIP 不包含凭据、数据、模型或本地环境。2026-10-08 已确认个人 Gmail 获得共享文件夹编辑权限，文件夹仍为空；输出放自己的 MyDrive 私有 run 目录。
 

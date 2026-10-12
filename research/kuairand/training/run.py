@@ -5,9 +5,11 @@ import hashlib
 import json
 import os
 import platform
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 
 def load_config(path: Path) -> tuple[dict, str]:
@@ -139,6 +141,10 @@ def main() -> None:
             "preflight",
             "train",
             "export",
+            "prepare-week1",
+            "evaluate",
+            "stage-report",
+            "verify-resume",
         ),
     )
     parser.add_argument(
@@ -153,13 +159,62 @@ def main() -> None:
     parser.add_argument("--checkpoint", type=Path)
     parser.add_argument("--start-id", type=int)
     parser.add_argument("--end-id", type=int)
+    parser.add_argument("--archive", type=Path)
+    parser.add_argument("--vectors", type=Path)
+    parser.add_argument(
+        "--label", choices=("popularity", "basic", "enhanced"), default="popularity"
+    )
+    parser.add_argument("--results", type=Path, nargs="+")
+    parser.add_argument("--resume-check", type=Path)
     args = parser.parse_args()
     try:
         if args.command == "check-env":
             check_env()
             return
         config, digest = load_config(args.config)
-        if args.command == "prepare-pure":
+        if args.command == "prepare-week1":
+            from evaluation.protocol import prepare_week1
+
+            if any(x is None for x in (args.source, args.archive, args.output)):
+                parser.error("prepare-week1 requires source/archive/new output")
+            print(
+                json.dumps(prepare_week1(args.source, args.archive, args.output, config), indent=2)
+            )
+        elif args.command == "evaluate":
+            from evaluation.evaluate import evaluate
+
+            if args.manifest is None or args.output is None:
+                parser.error("evaluate requires manifest/new output")
+            print(
+                json.dumps(
+                    evaluate(
+                        config,
+                        args.manifest,
+                        args.output,
+                        args.checkpoint,
+                        args.vectors,
+                        args.label,
+                    ),
+                    indent=2,
+                )
+            )
+        elif args.command == "stage-report":
+            from evaluation.evaluate import stage_report
+
+            if not args.results or args.output is None:
+                parser.error("stage-report requires results/new output")
+            print(json.dumps(stage_report(args.results, args.output, args.resume_check), indent=2))
+        elif args.command == "verify-resume":
+            from evaluation.resume import verify_resume
+
+            if any(x is None for x in (args.manifest, args.checkpoint, args.output)):
+                parser.error("verify-resume requires manifest/full reference checkpoint/new output")
+            print(
+                json.dumps(
+                    verify_resume(config, args.manifest, args.checkpoint, args.output), indent=2
+                )
+            )
+        elif args.command == "prepare-pure":
             from recommender.prepare_pure import prepare_pure
 
             if args.source is None or args.output is None:

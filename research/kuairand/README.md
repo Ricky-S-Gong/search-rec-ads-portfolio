@@ -1,11 +1,13 @@
 # KuaiRand recommendation project / KuaiRand 推荐项目
 
-The project has two execution environments with explicit responsibilities:
+The project separates data preparation, model training, evaluation and reports:
 
 | Directory | Responsibility | Entry point |
 | --- | --- | --- |
 | `data_pipeline/` | Official logs, temporal splits, histories and static features | [Data guide](data_pipeline/README.md) |
 | `training/` | Two towers, training, checkpoints, W&B and vector export | [Training guide](training/README.md) |
+| `evaluation/` | Frozen validation protocol, exact retrieval, recovery evidence and stage release | `training/run.py evaluate` |
+| `reports/week1/` | English LaTeX technical report and generated figures | Report generation script |
 | `training/recommender/` | Python implementation of the model and trainer | `training/run.py` |
 | `training/recommender/vendor/ziqi/` | Immutable upstream snapshot and provenance | Read-only; retain original hashes |
 
@@ -23,7 +25,7 @@ uv run --directory research/kuairand/training python run.py check-config
 uv run --directory research/kuairand/training pytest tests -q
 ```
 
-Use [the Colab notebook](training/notebooks/colab.ipynb) for GPU training. For a PR checkout, set its `REF` to the PR branch; after merge use `main`, or pin an exact `COMMIT`.
+Use [the Colab notebook](training/notebooks/week1_baseline.ipynb) for GPU training. For a PR checkout, set its `REF` to the PR branch; after merge use `main`, or pin an exact `COMMIT`.
 
 ## Path migration / 路径迁移
 
@@ -38,4 +40,4 @@ Existing Drive locations, dataset hashes and W&B run IDs remain the historical e
 
 The package/factory name has changed, so new configurations have a different config hash. Resume historical runs using the exact source ZIP, configuration and prepared manifest in the shared model bundle, or their original Git commit. Do not edit old manifests or bypass checkpoint binding checks. New runs use the current layout and new output directories.
 
-旧实验必须用其冻结源码和原配置恢复；新目录下启动新实验。当前重组没有重训练、迁移 Drive 文件或声明召回评估已完成。Evaluation and retrieval are still pending; they are not represented by empty placeholder directories.
+旧实验使用其冻结源码和原配置恢复；新协议启动独立实验。使用 week1_baseline.ipynb 读取挂载 Drive 的已发布数据，运行基础／历史双塔及精确评估。只有 stage_report.json 的 complete=true 才表示第一周验收完成。

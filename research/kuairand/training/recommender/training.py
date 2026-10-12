@@ -226,10 +226,11 @@ def train(config, manifest_path, output, resume=None, stop_after=None):
                     "epoch": epoch,
                     "next_batch": cursor,
                 }
-                with (output / "metrics.jsonl").open("a") as stream:
-                    stream.write(json.dumps(metrics) + "\n")
+                metrics["train/step_seconds"] = seconds
                 if device.type == "cuda":
                     metrics["train/peak_gpu_memory_bytes"] = torch.cuda.max_memory_allocated()
+                with (output / "metrics.jsonl").open("a") as stream:
+                    stream.write(json.dumps(metrics) + "\n")
                 if step % settings["log_every_steps"] == 0 or cursor == source.num_batches:
                     print(json.dumps(metrics), flush=True)
                     if tracking:
