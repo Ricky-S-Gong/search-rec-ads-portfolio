@@ -1,0 +1,10 @@
+{
+  "commit": "9359168f8d55b85f456c0b01d1cbbbfa3b1c37f6",
+  "pr": "https://github.com/Ricky-S-Gong/search-rec-ads-portfolio/pull/36",
+  "sha256": {
+    "kuairand_twotower/item_tower.py": "37e989a20593b02ed6142e8602008b7628a00342634e858a643bbaba69cf4992",
+    "kuairand_twotower/dataset.py": "d2cc1c82417f0a0bd024bcd6ea5330f9708b920b1305cc61b62139c44ff41e19",
+    "kuairand_twotower/data.py": "295211dbb26c6691699fa65cb93281788548c6600073e7fd2270ecf134778f8b",
+    "DATA_HANDOFF.md": "a29acc316a8bdc18028a7d4924a30468513b3610f04de29e30c5263ed2614995"
+  }
+}
