@@ -43,7 +43,7 @@ Training is manual and requires CUDA by default. No real experiments run as part
 - `colab_fetch_pure.py`: authorized Drive download with checksums. It never prints credentials.
 - `colab_share_artifacts.py`: historical runtime's verified handoff copier; expects the old Drive ZIP/runtime paths and does not train. It is not automatically executed by the new notebook.
 
-Pinned publisher snapshot: `9359168f8d55b85f456c0b01d1cbbbfa3b1c37f6` (PR #36). Original files and hashes live in `recommender/vendor/ziqi/provenance.json`. Retaining this snapshot permits reproducing the published model independently of later data-pipeline changes.
+Pinned publisher snapshot: `9359168f8d55b85f456c0b01d1cbbbfa3b1c37f6` (PR #36). Original files and hashes live in `recommender/vendor/data_pipeline_snapshot/provenance.json`. Retaining this snapshot permits reproducing the published model independently of later data-pipeline changes.
 
 ## Verified Pure run / 已完成的 Pure 实验
 

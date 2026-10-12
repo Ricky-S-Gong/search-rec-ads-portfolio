@@ -9,7 +9,7 @@ The project separates data preparation, model training, evaluation and reports:
 | `evaluation/` | Frozen validation protocol, exact retrieval, recovery evidence and stage release | `training/run.py evaluate` |
 | `reports/week1/` | English LaTeX technical report and generated figures | Report generation script |
 | `training/recommender/` | Python implementation of the model and trainer | `training/run.py` |
-| `training/recommender/vendor/ziqi/` | Immutable upstream snapshot and provenance | Read-only; retain original hashes |
+| `training/recommender/vendor/data_pipeline_snapshot/` | Immutable upstream snapshot and provenance | Read-only; retain original hashes |
 
 数据流水线和模型训练分别放在 `data_pipeline/` 与 `training/`。前者使用仓库根目录的研究环境；后者使用自己的 `pyproject.toml` 和 `uv.lock`，由 Colab 手动启动。测试与配置放在所属执行环境旁边。
 

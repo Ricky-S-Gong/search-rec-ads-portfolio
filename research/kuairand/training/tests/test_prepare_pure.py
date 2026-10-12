@@ -5,10 +5,10 @@ import json
 import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
-from run import load_config
 
 from recommender.batch_source import read_manifest
 from recommender.prepare_pure import check_data, prepare_pure
+from run import load_config
 
 
 def source_tables(tmp_path):

@@ -232,11 +232,11 @@ def prepare_pure(source, output, config):
         require(
             (split == expected_split).all(), "Published split differs from reviewed UTC protocol"
         )
-        provenance = json.loads((Path(__file__).parent / "vendor/ziqi/provenance.json").read_text())
+        provenance = json.loads((Path(__file__).parent / "vendor/data_pipeline_snapshot/provenance.json").read_text())
         require(settings["publisher_commit"] == provenance["commit"], "Unreviewed publisher commit")
         require(
             all(
-                file_sha256(Path(__file__).parent / "vendor/ziqi" / Path(name).name) == digest
+                file_sha256(Path(__file__).parent / "vendor/data_pipeline_snapshot" / Path(name).name) == digest
                 for name, digest in provenance["sha256"].items()
             ),
             "Publisher snapshot changed",

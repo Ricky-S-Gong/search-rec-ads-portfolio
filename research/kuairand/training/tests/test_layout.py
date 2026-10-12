@@ -29,7 +29,7 @@ def test_default_cli_config_from_another_directory(tmp_path):
 def test_frozen_upstream_snapshot_preserves_published_checksums():
     import recommender
 
-    vendor = Path(recommender.__file__).parent / "vendor/ziqi"
+    vendor = Path(recommender.__file__).parent / "vendor/data_pipeline_snapshot"
     provenance = json.loads((vendor / "provenance.json").read_text())
     for original, expected in provenance["sha256"].items():
         assert hashlib.sha256((vendor / Path(original).name).read_bytes()).hexdigest() == expected

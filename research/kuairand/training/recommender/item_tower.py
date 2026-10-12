@@ -4,7 +4,7 @@ import numpy as np
 import torch
 from torch import nn
 
-from .vendor.ziqi.item_tower import ItemTower
+from .vendor.data_pipeline_snapshot.item_tower import ItemTower
 
 CATEGORICAL = (
     "item_id",
