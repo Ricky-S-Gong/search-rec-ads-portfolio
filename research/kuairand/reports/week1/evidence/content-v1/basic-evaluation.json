@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "model": "basic",
+  "protocol": {
+    "manifest_sha256": "1f573d11966024fc42b3ee9b78bd71663fde7b65c56743902384a7bd31376bac",
+    "requests_sha256": "c622789c33544e0122abb8d151ff22a50d8bd2db91a99589fddfba6e7db28efd",
+    "validation_sha256": "e695218509a47971a5c26c260a6fc38a4e37a8fc45dc89b03b1318aa94cc70e7",
+    "candidates_sha256": "9b49e12466f88e9cbf0634b0f8e767104d17a7a4145b7bd730d2275d638c636d",
+    "k": 100,
+    "tie_break": "score descending, raw item_id ascending",
+    "calendar_timezone": "UTC",
+    "repeat_items_allowed": true,
+    "eligibility": "day after upload, UTC",
+    "test_used": false,
+    "raw_archive_sha256": "c814bf6f3624c0cfae83c57de3df26b2ed206e5c57bab4c4dcbfabbabe20cbf0"
+  },
+  "artifact": {
+    "checkpoint_sha256": "6844c08bd9022af86780a92f93549c3ed57717bbf7265e700b77c1e768051586",
+    "vector_manifest_sha256": "8c710a1b808570735ff0df2341ab61daa79aec81e876cb5e26c2cc83d443f77d",
+    "binding": {
+      "config_sha256": "d1f92435a2d67a39978ee3ce9672441b51b7fb62d38c6ebdddd192479e04089c",
+      "manifest_sha256": "1f573d11966024fc42b3ee9b78bd71663fde7b65c56743902384a7bd31376bac",
+      "code_sha256": "143327677ec3df4098cb40a4210f8991398c3b41e25e29c646babe63f4bf47ff",
+      "torch": "2.14.1+cu130",
+      "python": "3.11.15",
+      "device_type": "cuda"
+    },
+    "run_id": "087cea6d74ef",
+    "consumed": 124255,
+    "expected_samples": 124255
+  },
+  "metrics": {
+    "requests": 30589,
+    "recall_at_100": 0.025041681650266434,
+    "ndcg_at_100": 0.007094781674809495,
+    "target_coverage": 1.0,
+    "covered_recall_at_100": 0.025041681650266434,
+    "covered_ndcg_at_100": 0.007094781674809495,
+    "insufficient_k_rate": 0.0,
+    "unknown_user_rate": 0.039654777861322696,
+    "empty_history_rate": 0.01490731962470169
+  },
+  "performance": {
+    "device": "cuda",
+    "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
+    "request_batch": 256,
+    "warmup_batches": 1,
+    "encoding_seconds": 0.41051137500085133,
+    "retrieval_seconds": 26.05193796999947,
+    "p50_batch_seconds": 0.20781436749996374,
+    "p95_batch_seconds": 0.287722402750046,
+    "includes": "user feature tensor assembly, user encoding, GPU-to-CPU transfer if used, CPU exact retrieval; excludes initial model/data loading"
+  },
+  "evaluator_sha256": "c221b8000aee188997e430ecbda6de3212d7a87fa3ab61b5b5f83426a78ba581",
+  "training_code_sha256": "143327677ec3df4098cb40a4210f8991398c3b41e25e29c646babe63f4bf47ff",
+  "predictions_sha256": "ce8d899c87ae95022303e82575f0fa3ee0deaf7e60f54fb1fa301a208057a309"
+}
