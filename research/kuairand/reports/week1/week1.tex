@@ -86,50 +86,49 @@ Pure 不是“更干净的全量数据”，也不是只含随机曝光：它同
 \section{模型与损失}
 \subsection{两组架构}
 \begin{figure}[H]\centering
-\begin{tikzpicture}[>=Stealth,box/.style={draw=accent,fill=pale,rounded corners=2pt,align=center,minimum height=6mm,font=\small},layer/.style={box,text width=6.5cm},item/.style={box,text width=5.2cm},raw/.style={box,text width=1.85cm},history/.style={item,dashed,fill=white},arrow/.style={->,draw=accent}]
-\node[font=\bfseries] at (-4,0.65) {用户塔};
-\node[font=\bfseries] at (4,0.65) {物品塔（两组相同）};
+\begin{tikzpicture}[>=Stealth,box/.style={draw=accent,fill=pale,rounded corners=2pt,align=center,minimum height=5.5mm,inner sep=2pt,font=\footnotesize},layer/.style={box,text width=6.5cm},item/.style={box,text width=5.2cm},raw/.style={box,text width=1.85cm},history/.style={item,dashed,fill=white},arrow/.style={->,draw=accent,line width=.45pt}]
 \node[raw] (uid) at (-6.35,0) {user\_id $[B]$};
 \node[raw] (tab) at (-4,0) {tab $[B]$};
 \node[raw] (time) at (-1.65,0) {time\_ms $[B]$};
-\node[raw] (ue) at (-6.35,-.85) {Embedding\\$[B,32]$};
-\node[raw] (te) at (-4,-.85) {Embedding\\$[B,8]$};
-\node[raw] (cyc) at (-1.65,-.85) {周期编码\\$[B,4]$};
+\node[raw,below=3.5mm of uid] (ue) {Embedding\\$[B,32]$};
+\node[raw,below=3.5mm of tab] (te) {Embedding\\$[B,8]$};
+\node[raw,below=3.5mm of time] (cyc) {周期编码\\$[B,4]$};
 \draw[arrow](uid)--(ue);\draw[arrow](tab)--(te);\draw[arrow](time)--(cyc);
-\node[layer] (base) at (-4,-1.8) {拼接用户、场景、时间 $\to[B,44]$};
-\draw[arrow](ue.south)--(-6.35,-1.35)--(base.north);
+\node[layer,below=5mm of te] (base) {拼接用户、场景、时间 $\to[B,44]$};
+\draw[arrow](ue.south)--++(0,-2.5mm)-|(base.north);
 \draw[arrow](te)--(base);
-\draw[arrow](cyc.south)--(-1.65,-1.35)--(base.north);
-\node[layer] (input) at (-4,-2.75) {Basic：$[B,44]$\\Enhanced：拼接历史 $h$ 后 $[B,108]$};
-\draw[arrow](base)--(input);
-\node[layer] (u1) at (-4,-3.65) {Linear：$44/108\to128$，输出 $[B,128]$};
-\node[layer] (ur1) at (-4,-4.4) {ReLU，输出 $[B,128]$};
-\node[layer] (ud1) at (-4,-5.15) {Dropout（$p=0$），输出 $[B,128]$};
-\node[layer] (u2) at (-4,-5.9) {Linear：$128\to64$，输出 $[B,64]$};
-\node[layer] (ur2) at (-4,-6.65) {ReLU，输出 $[B,64]$};
-\node[layer] (ud2) at (-4,-7.4) {Dropout（$p=0$），输出 $[B,64]$};
-\node[layer] (u3) at (-4,-8.15) {Linear：$64\to64$，输出 $[B,64]$};
-\node[layer] (un) at (-4,-8.9) {转 FP32、L2 归一化 $\to u:[B,64]$};
-\foreach \a/\b in {input/u1,u1/ur1,ur1/ud1,ud1/u2,u2/ur2,ur2/ud2,ud2/u3,u3/un}{\draw[arrow](\a)--(\b);}
-\node[item] (iid) at (4,0) {7 个类别字段 + 4 个数值\\原始物品属性};
-\node[item] (dict) at (4,-.85) {冻结词表映射、数值填补与标准化};
-\node[item] (ie) at (4,-1.8) {7 个 Embedding 各 8 维 + 4 个数值\\拼接输出 $[B,60]$};
-\node[item] (i1) at (4,-2.75) {Linear：$60\to64$，输出 $[B,64]$};
-\node[item] (ir) at (4,-3.65) {ReLU，输出 $[B,64]$};
-\node[item] (i2) at (4,-4.4) {Linear：$64\to64$，输出 $[B,64]$};
-\node[item] (inorm) at (4,-5.15) {物品塔内部 L2 归一化，输出 $[B,64]$};
-\node[item] (iout) at (4,-5.9) {目标接口：FP32 + L2 $v:[B,64]$};
+\draw[arrow](cyc.south)--++(0,-2.5mm)-|(base.north);
+\node[layer,below=3.5mm of base] (input) {Basic：$[B,44]$\\Enhanced：拼接历史 $h$ 后 $[B,108]$};
+\node[layer,below=3.5mm of input] (u1) {Linear：$44/108\to128$，输出 $[B,128]$};
+\node[layer,below=3.5mm of u1] (ur1) {ReLU，输出 $[B,128]$};
+\node[layer,below=3.5mm of ur1] (ud1) {Dropout（$p=0$），输出 $[B,128]$};
+\node[layer,below=3.5mm of ud1] (u2) {Linear：$128\to64$，输出 $[B,64]$};
+\node[layer,below=3.5mm of u2] (ur2) {ReLU，输出 $[B,64]$};
+\node[layer,below=3.5mm of ur2] (ud2) {Dropout（$p=0$），输出 $[B,64]$};
+\node[layer,below=3.5mm of ud2] (u3) {Linear：$64\to64$，输出 $[B,64]$};
+\node[layer,below=3.5mm of u3] (un) {转 FP32、L2 归一化 $\to u:[B,64]$};
+\foreach \a/\b in {base/input,input/u1,u1/ur1,ur1/ud1,ud1/u2,u2/ur2,ur2/ud2,ud2/u3,u3/un}{\draw[arrow](\a)--(\b);}
+\node[item,anchor=north] (iid) at (4,0.275) {7 个类别字段 + 4 个数值\\原始物品属性};
+\node[font=\bfseries,above=6mm of uid.north,anchor=south,xshift=2.35cm] {用户塔};
+\node[font=\bfseries,above=6mm of iid.north,anchor=south] {物品塔};
+\node[item,below=3.5mm of iid] (dict) {冻结词表映射、数值填补与标准化};
+\node[item,below=3.5mm of dict] (ie) {7 个 Embedding 各 8 维 + 4 个数值\\拼接输出 $[B,60]$};
+\node[item,below=3.5mm of ie] (i1) {Linear：$60\to64$，输出 $[B,64]$};
+\node[item,below=3.5mm of i1] (ir) {ReLU，输出 $[B,64]$};
+\node[item,below=3.5mm of ir] (i2) {Linear：$64\to64$，输出 $[B,64]$};
+\node[item,below=3.5mm of i2] (inorm) {物品塔内部 L2 归一化，输出 $[B,64]$};
+\node[item,below=3.5mm of inorm] (iout) {目标接口：FP32 + L2 $v:[B,64]$};
 \foreach \a/\b in {iid/dict,dict/ie,ie/i1,i1/ir,ir/i2,i2/inorm,inorm/iout}{\draw[arrow](\a)--(\b);}
-\node[history] (hist) at (4,-6.85) {历史 ID + mask\\$[B,50]$，仅 Enhanced};
-\node[history] (shared) at (4,-7.85) {共享上述物品塔参数 $\to[B,50,64]$};
-\node[history] (pool) at (4,-8.85) {按 mask 求均值 $\to h:[B,64]$};
+\node[history,below=6mm of iout] (hist) {历史 ID + mask\\$[B,50]$，仅 Enhanced};
+\node[history,below=3.5mm of hist] (shared) {共享本模型的物品塔参数 $\to[B,50,64]$};
+\node[history,below=3.5mm of shared] (pool) {按 mask 求均值 $\to h:[B,64]$};
 \draw[arrow,dashed](hist)--(shared);\draw[arrow,dashed](shared)--(pool);
-\draw[arrow,dashed](pool.west)--(.25,-8.85)--(.25,-2.75)--(input.east);
-\node[box,text width=5cm] (score) at (0,-10) {匹配分数：$s(u,i)=u^\top v$};
-\draw[arrow](un.south)--(-4,-10)--(score.west);
-\draw[arrow](iout.east)--(7.15,-5.9)--(7.15,-10)--(score.east);
+\draw[arrow,dashed](pool.west)--(.25,0 |- pool.west)--(.25,0 |- input.east)--(input.east);
+\node[box,text width=5cm,below=6mm of un,xshift=4cm] (score) {匹配分数：$s(u,i)=u^\top v$};
+\draw[arrow](un.south)--(un.south |- score.west)--(score.west);
+\draw[arrow](iout.east)--(7.15,0 |- iout.east)--(7.15,0 |- score.east)--(score.east);
 \end{tikzpicture}
-\caption{按真实执行顺序逐层展开。实线为用户与目标编码；虚线为 Enhanced 历史分支。$B$ 为 batch 大小，历史长度最多 50。}
+\caption{按执行顺序逐层展开。Basic 与 Enhanced 的物品特征及架构一致，但分别训练，权重不共享。虚线仅表示 Enhanced 内部的历史分支与目标物品共用参数；$B$ 为 batch 大小。}
 \end{figure}
 用户塔有两次 ReLU，分别位于两个隐藏 Linear 后；末尾 Linear 后直接归一化，没有额外 ReLU。物品 MLP 则是 Linear、ReLU、Linear，随后归一化。Dropout 模块在代码中保留，但 $p=0$ 不改变输入；BN 关闭。目标物品统一接口的再次归一化是数值保护，不增加可训练层；历史路径直接复用物品塔。
 
@@ -137,6 +136,8 @@ Pure 不是“更干净的全量数据”，也不是只含随机曝光：它同
 
 \textbf{语义边界：}首标签、类型和发布属性提供有限内容线索，ID embedding 学习协同关联。模型尚未读取画面、音频、标题或字幕，音乐 ID 也不是音频语义向量。当前弱效果不能归结为单一原因；后续通过消融检验内容与历史的收益。
 
+\clearpage
+\begingroup\small
 \subsection{监督信号与损失}
 每个 batch 包含 $B$ 条真实长观看用户--物品对，对角线为正目标。设 $D_i$ 是与第 $i$ 个目标视频重复的非对角位置，则
 \[
@@ -145,7 +146,6 @@ Pure 不是“更干净的全量数据”，也不是只含随机曝光：它同
 \]
 重复目标位置被屏蔽，但对角线保留。其余物品是批内采样的比较对象，\textbf{并非已知的用户负反馈}，可能包含用户也喜欢的视频。当前没有采样频率修正。
 
-\clearpage
 \section{训练配置、结果与恢复验证}
 \subsection{冻结的公平比较配置}
 \begin{table}[H]\centering\small
@@ -166,7 +166,7 @@ Basic & 124,255 & 486 & 5.515324 & 8.077 & 85.92\\
 Enhanced & 124,255 & 486 & 5.503570 & 10.086 & 101.53\\\bottomrule
 \end{tabular}\caption{耗时为日志中的读取等待与训练 step 之和，不含完整验证、checkpoint 保存和编排；显存为 PyTorch allocated 峰值。}\end{table}
 \begin{figure}[H]\centering
-\begin{tikzpicture}\begin{axis}[width=.96\linewidth,height=4.8cm,xlabel={Optimizer step},ylabel={In-batch cross entropy},grid=major,grid style={gray!20},legend pos=north east,tick label style={font=\small},label style={font=\small},legend style={font=\small},xmin=1,xmax=485]
+\begin{tikzpicture}\begin{axis}[width=.96\linewidth,height=4.2cm,xlabel={Optimizer step},ylabel={In-batch cross entropy},grid=major,grid style={gray!20},legend pos=north east,tick label style={font=\small},label style={font=\small},legend style={font=\small},xmin=1,xmax=485]
 \addplot[color=accent,thick] coordinates {(1,6.1213684) (2,5.9222107) (3,5.7534637) (4,5.7097321) (5,5.6672668) (6,5.6335754) (7,5.6276855) (8,5.6130219) (9,5.6064148) (10,5.6220093) (11,5.5698395) (12,5.5778503) (13,5.5924530) (14,5.5907440) (15,5.6179047) (16,5.5617523) (17,5.5957184) (18,5.5716248) (19,5.5514679) (20,5.5644989) (25,5.5578613) (30,5.5480347) (35,5.5554657) (40,5.5445709) (45,5.5474701) (50,5.5496063) (55,5.5487823) (60,5.5474548) (65,5.5438080) (70,5.5540161) (75,5.5402069) (80,5.5419006) (85,5.5530548) (90,5.5314636) (95,5.5286560) (100,5.5438385) (105,5.5345612) (110,5.5231934) (115,5.5567780) (120,5.5443878) (125,5.5300446) (130,5.5339203) (135,5.5390625) (140,5.5237579) (145,5.5341644) (150,5.5262604) (155,5.5371704) (160,5.5270233) (165,5.5449982) (170,5.5338287) (175,5.5323639) (180,5.5050354) (185,5.5286102) (190,5.5345001) (195,5.5253296) (200,5.5261536) (205,5.5366364) (210,5.5369186) (215,5.5173569) (220,5.5377197) (225,5.5308685) (230,5.5241089) (235,5.5216980) (240,5.5039368) (245,5.5344772) (250,5.5123749) (255,5.5094757) (260,5.5559235) (265,5.5208206) (270,5.4996414) (275,5.5507812) (280,5.5494232) (285,5.5381088) (290,5.5458069) (295,5.4997253) (300,5.5227432) (305,5.5274811) (310,5.5061111) (315,5.5398331) (320,5.5440063) (325,5.5203857) (330,5.5037918) (335,5.5243607) (340,5.5406799) (345,5.4994354) (350,5.5216980) (355,5.5071030) (360,5.4925385) (365,5.5314560) (370,5.4851532) (375,5.5356598) (380,5.5006027) (385,5.5074844) (390,5.5200195) (395,5.5233917) (400,5.4994278) (405,5.4870605) (410,5.5128403) (415,5.5027466) (420,5.5026321) (425,5.4820633) (430,5.5049133) (435,5.5354919) (440,5.5016022) (445,5.4985809) (450,5.5074997) (455,5.5508194) (460,5.5205002) (465,5.4692993) (470,5.5172653) (475,5.5004120) (480,5.5318069) (485,5.5363846)};\addlegendentry{Basic}
 \addplot[color=orange!85!black,thick] coordinates {(1,6.0289612) (2,5.8281708) (3,5.7149353) (4,5.6744690) (5,5.6763306) (6,5.6500092) (7,5.6149750) (8,5.5806885) (9,5.5789642) (10,5.5907440) (11,5.5863037) (12,5.5844269) (13,5.5669861) (14,5.5794983) (15,5.5541534) (16,5.5818787) (17,5.5766449) (18,5.5628967) (19,5.5356903) (20,5.5597992) (25,5.5517273) (30,5.5520782) (35,5.5398407) (40,5.5486145) (45,5.5468292) (50,5.5335846) (55,5.5401001) (60,5.5409088) (65,5.5507812) (70,5.5418243) (75,5.5437164) (80,5.5360870) (85,5.5379944) (90,5.5329895) (95,5.5317841) (100,5.5431061) (105,5.5360107) (110,5.5294800) (115,5.5497284) (120,5.5383453) (125,5.5383606) (130,5.5360870) (135,5.5444489) (140,5.5305023) (145,5.5325470) (150,5.5319977) (155,5.5292358) (160,5.5377350) (165,5.5306091) (170,5.5446625) (175,5.5432281) (180,5.5207214) (185,5.5292816) (190,5.5146332) (195,5.5098877) (200,5.5279388) (205,5.5318756) (210,5.5171051) (215,5.5000763) (220,5.5244370) (225,5.5256042) (230,5.5058136) (235,5.5091782) (240,5.4876480) (245,5.5238419) (250,5.5100098) (255,5.4948807) (260,5.5578079) (265,5.5096588) (270,5.5148392) (275,5.5352936) (280,5.5442886) (285,5.5232620) (290,5.5366516) (295,5.5016022) (300,5.5127487) (305,5.5116425) (310,5.4663162) (315,5.5336304) (320,5.5527039) (325,5.5340576) (330,5.4907837) (335,5.5214615) (340,5.5449677) (345,5.4946823) (350,5.5227585) (355,5.5007629) (360,5.4863663) (365,5.5189514) (370,5.4903412) (375,5.5376434) (380,5.4948502) (385,5.5010986) (390,5.5404739) (395,5.5123444) (400,5.4912262) (405,5.4962387) (410,5.4921112) (415,5.5089340) (420,5.4809418) (425,5.4648972) (430,5.4791489) (435,5.5287628) (440,5.4929199) (445,5.5079956) (450,5.4996643) (455,5.5206375) (460,5.5249405) (465,5.4824982) (470,5.5224075) (475,5.4759369) (480,5.4991302) (485,5.5152512)};\addlegendentry{Enhanced}
 \end{axis}\end{tikzpicture}\caption{实际训练 loss；前 20 步逐步展示，之后每 5 步取一个日志点。只画完整 batch，避免尾批造成误导。}\end{figure}
@@ -179,7 +179,7 @@ Enhanced & 124,255 & 486 & 5.503570 & 10.086 & 101.53\\\bottomrule
 
 这验证了\textbf{同一环境中的受控保存与恢复}，尚未验证 Colab 断线或重建 runtime 后恢复。checkpoint 文件 hash 不同可以来自运行元信息与序列化差异；验收比较的是训练状态。
 
-\clearpage
+\endgroup
 \section{评估协议与结果}
 \subsection{每条请求如何判断命中？}
 取验证期所有非随机长观看记录。每条记录给出“哪个用户、什么时间、实际长观看了哪个视频”，这个视频就是该条请求的唯一正目标。
@@ -230,10 +230,10 @@ Pure 删除池外观看，历史不完整；反馈完成时间和上传资格均
 
 \subsection{下一周优先任务}
 \begin{enumerate}
-\item 在冻结验证协议下，先增加训练轮数并逐轮评估 Recall/NDCG，判断是否充分学习；保持当前一轮结果作为基线，不同时修改所有参数。
-\item 扩展到 27K，并冻结嵌套用户子集。比较基础、仅历史、仅物品增强、联合增强四组；固定并披露内容属性的时间有效性假设，保持各组候选与请求相同。
-\item 增加用户等权、长尾、冷启动和历史长度切片；补充多 seed 稳定性与新 runtime 恢复检查。
-\item 再分别检验 item embedding 容量、学习率和采样修正，根据吞吐与内存确定扩展预算。封存测试集继续不参与选型。
+\item 完成 KuaiRand-1K 数据的预处理，并将准备好的数据与版本说明放到共享 Drive。
+\item 调整神经网络架构：尝试加深网络、残差连接（residual connection）、attention / LSTM，以及 batch normalization。
+\item 调整超参数，开展更多实验，并完整记录配置、训练过程与评估结果。
+\item 每个 epoch 都进行 evaluation；根据验证集指标选择最佳 checkpoint，用于后续部署（deploy）。
 \end{enumerate}
 
 \subsection{复现入口与依据}
