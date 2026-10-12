@@ -67,3 +67,5 @@ Single target Recall@100 is hit/miss; NDCG@100 is 1/log2(rank+1) for a hit, othe
 See [docs/pure-test-handoff.md](docs/pure-test-handoff.md) for the complete handoff protocol. [docs/engineering.md](docs/engineering.md) and [docs/pure-handoff.md](docs/pure-handoff.md) describe the original ZIP layout; use the current notebook and commands above for repository setup.
 
 The Week 1 notebook writes directly to the mounted shared Drive. The one-off historical ZIP copier has been removed; its delivered bundle remains intact in the historical release.
+
+New Week 1 sessions use Python 3.11.15, available in uv 0.12.1’s managed downloads. Historical Python 3.11.16 checkpoints retain their original runtime binding; do not rewrite old run metadata to resume them with another patch version.
