@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: research/kuairand
+        working-directory: research/kuairand/training
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
@@ -27,5 +27,5 @@ jobs:
           version: '0.12.1'
           python-version: '3.11'
       - run: uv sync --locked
-      - run: uv run --locked ruff check . --exclude vendor
+      - run: uv run --locked ruff check . ../evaluation --exclude vendor --config pyproject.toml
       - run: uv run --locked pytest tests -q

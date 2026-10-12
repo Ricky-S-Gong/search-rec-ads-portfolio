@@ -1,0 +1,39 @@
+# Initial defaults; validate on Colab before a manually started experiment.
+experiment:
+  owner: Yutao
+  dataset: KuaiRand-1K
+  seed: 42
+model:
+  # Replace with Ziqi's actual module:function before real training.
+  item_factory: recommender.item_tower:build_item_tower
+  user_embedding_dim: 32
+  context_embedding_dim: 8
+  num_tabs: 15
+  timezone_offset_minutes: 0
+  output_dim: 64
+  hidden_dims: [128, 64]
+  dropout: 0.0
+  batch_norm: false
+training:
+  device: cuda
+  mixed_precision: true
+  deterministic: true
+  cache_row_groups: 4
+  optimizer: adam
+  learning_rate: 0.001
+  betas: [0.9, 0.999]
+  weight_decay: 0.0
+  batch_size: 256
+  epochs: 1
+  temperature: 0.1
+  log_every_steps: 50
+  checkpoint_every_steps: 500
+wandb:
+  mode: online
+  entity: SAR-Lab
+  project: kuairand-two-tower
+  name: yutao-w1-1k-baseline
+  group: stage-1
+  tags: [week-1, kuairand-1k, yutao]
+export:
+  batch_size: 4096

@@ -1,0 +1,29 @@
+[project]
+name = "sar-kuairand"
+version = "0.1.0"
+description = "SAR-Lab KuaiRand two-tower research"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+  "torch>=2.5,<3",
+  "numpy>=1.26,<3",
+  "pyarrow>=18,<24",
+  "pyyaml>=6,<7",
+  "python-dotenv>=1,<2",
+  "wandb>=0.19,<1",
+]
+
+[dependency-groups]
+dev = ["pytest>=8,<10", "ruff>=0.9,<1"]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["run", "recommender", "evaluation"]

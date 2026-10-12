@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "stage_report_sha256": "5922d4b7a9f49874d6a5b61219f3ae3c54e0e210bf4d0798d124ea6ce6d7c5e2",
+  "evaluation_sha256": {
+    "popularity": "9b46c8a4cf972005070128345db28df00b642e40726ece40f2e7f81c19703641"
+  },
+  "complete": false,
+  "protocol": {
+    "manifest_sha256": "0c35d9c9f483bca90f909cd8bcf5f7f1c6c64e6c3aeea411ea3617d0cc92b7fc",
+    "requests_sha256": "c622789c33544e0122abb8d151ff22a50d8bd2db91a99589fddfba6e7db28efd",
+    "validation_sha256": "e695218509a47971a5c26c260a6fc38a4e37a8fc45dc89b03b1318aa94cc70e7",
+    "candidates_sha256": "9b49e12466f88e9cbf0634b0f8e767104d17a7a4145b7bd730d2275d638c636d",
+    "k": 100,
+    "tie_break": "score descending, raw item_id ascending",
+    "calendar_timezone": "UTC",
+    "repeat_items_allowed": true,
+    "eligibility": "day after upload, UTC",
+    "test_used": false,
+    "raw_archive_sha256": "c814bf6f3624c0cfae83c57de3df26b2ed206e5c57bab4c4dcbfabbabe20cbf0"
+  }
+}

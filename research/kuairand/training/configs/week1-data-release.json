@@ -1,0 +1,26 @@
+{
+  "folder_id": "1MeqQ2aX-T9vN0Co1GeeYVg5oHET6l_UG",
+  "path": "datasets/week1-pure-completion-v1",
+  "files": {
+    "manifest.json": {
+      "bytes": 970794,
+      "sha256": "0c35d9c9f483bca90f909cd8bcf5f7f1c6c64e6c3aeea411ea3617d0cc92b7fc"
+    },
+    "train.parquet": {
+      "bytes": 7477146,
+      "sha256": "544230d9bc4146eef4121200a1ef1ec66d105189a13cdbbb8b4ed3a99414bf42"
+    },
+    "validation.parquet": {
+      "bytes": 1930210,
+      "sha256": "e695218509a47971a5c26c260a6fc38a4e37a8fc45dc89b03b1318aa94cc70e7"
+    },
+    "candidates.parquet": {
+      "bytes": 46089,
+      "sha256": "9b49e12466f88e9cbf0634b0f8e767104d17a7a4145b7bd730d2275d638c636d"
+    },
+    "audit.json": {
+      "bytes": 9943,
+      "sha256": "97032a0dc3013beb37317408c6e43482399739685781f6de8af71a71397cbce1"
+    }
+  }
+}

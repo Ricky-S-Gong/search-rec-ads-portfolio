@@ -1,68 +1,43 @@
-# Yutao: Pure training and Colab / Pure 训练与 Colab
+# KuaiRand recommendation project / KuaiRand 推荐项目
 
-This module publishes the code previously run from a Drive source ZIP. It consumes Ziqi's Pure handoff and pinned Item Tower snapshot; it adds the User Tower, training loop, W&B, checkpoints, validation loss, and export. The existing `../kuairand-twotower/` data project remains the team data pipeline.
+The project separates data preparation, model training, evaluation and reports:
 
-此目录是之前在 Colab 通过源码 ZIP 运行的训练工程。数据处理由 Ziqi 的项目提供，当前训练接入固定版本的 Item Tower，并提供用户塔、训练系统和 Colab 入口。
+| Directory | Responsibility | Entry point |
+| --- | --- | --- |
+| `data_pipeline/` | Official logs, temporal splits, histories and static features | [Data guide](data_pipeline/README.md) |
+| `training/` | Two towers, training, checkpoints, W&B and vector export | [Training guide](training/README.md) |
+| `evaluation/` | Frozen validation protocol, exact retrieval, recovery evidence and stage release | `training/run.py evaluate` |
+| `reports/week1/` | English LaTeX technical report and generated figures | Report generation script |
+| `training/recommender/` | Python implementation of the model and trainer | `training/run.py` |
+| `training/recommender/vendor/data_pipeline_snapshot/` | Immutable upstream snapshot and provenance | Read-only; retain original hashes |
 
-## Colab
+数据流水线和模型训练分别放在 `data_pipeline/` 与 `training/`。前者使用仓库根目录的研究环境；后者使用自己的 `pyproject.toml` 和 `uv.lock`，由 Colab 手动启动。测试与配置放在所属执行环境旁边。
 
-Open [notebooks/colab.ipynb](notebooks/colab.ipynb) in Colab. This clean notebook contains no outputs, credentials or datasets. It clones **Ricky-S-Gong/search-rec-ads-portfolio**, resolves the selected branch to an exact commit, then installs this module's own locked environment. After merge, set `REF = "main"`; for an exact rerun set `COMMIT` to the printed SHA. Never click Run all: preparation, W&B setup and training are separate manual cells.
+Git stores source, tests, configuration and documentation. Drive stores datasets, checkpoints and vectors. W&B stores experiment logs. The website under `src/` consumes only compact public artifacts under `public/artifacts/`.
 
-在 GitHub notebook 页面点击 Open in Colab，先连接 GPU，按顺序准备和检查，`ready_for_training=true` 后手动运行训练单元。Secret 名称为 `WANDB_API_KEY`，每份 notebook 要单独授权。输出保存到个人 Drive，恢复训练使用相同版本与原输出目录。
+## Commands / 运行入口
 
-[Previously executed notebook / 已执行 notebook](https://colab.research.google.com/drive/1oVUgz912A78T0P6AfV7tsQYF3HmqJZCf) used the source ZIP. Moving it into GitHub changes setup instructions, not the model architecture. For loading the historical checkpoint, use the source ZIP and exact manifest in the shared model package; do not bypass checksum bindings with an arbitrary new checkout.
-
-## Local setup / 本地环境
-
-```bash
-cd research/kuairand
-python3 -m pip install uv==0.12.18
-uv sync --locked
-uv run --locked python run.py check-env
-uv run --locked pytest tests -q
-```
-
-This isolated lock avoids altering the parent portfolio environment (uv 0.12.1). Local W&B credentials belong in the repository-root `.env`, or environment variables; keep them outside Git.
+From the repository root:
 
 ```bash
-bash cmd/train.sh --config configs/pure.yaml --manifest /path/to/prepared/manifest.json --output /path/to/new-run
-# Restore with the original output directory, config, source and manifest:
-bash cmd/train.sh --config configs/pure.yaml --manifest /path/to/prepared/manifest.json --output /path/to/original-run --resume-latest
+uv run python research/kuairand/data_pipeline/prepare_kuairand_data.py --help
+uv run --directory research/kuairand/training python run.py check-config
+uv run --directory research/kuairand/training pytest tests -q
 ```
 
-Training is manual and requires CUDA by default. No real experiments run as part of these checks.
+Use [the Colab notebook](training/notebooks/week1_baseline.ipynb) for GPU training. For a PR checkout, set its `REF` to the PR branch; after merge use `main`, or pin an exact `COMMIT`.
 
-## Interfaces / 接口
+## Path migration / 路径迁移
 
-- `kuairand/user_tower.py`: user ID + time/tab + masked mean history, normalized [B,64].
-- `kuairand/item_tower.py`: raw-ID/feature bridge to pinned Ziqi Item Tower; target [B,64], history [B,50,64], padding ID -1.
-- `kuairand/model.py`: normalized dot product / temperature=0.1, diagonal positive CE, duplicate-target negative masking.
-- `kuairand/training.py`: Adam, deterministic batch cursor, train and validation loss; full optimizer/scaler/RNG checkpoint.
-- `kuairand/prepare_pure.py`: source hashes, UTC splits, strict-prior history audit; feature fitting uses train-only item IDs.
-- `export_test.py`: held-out requests and causal history audit; does not train.
-- `colab_fetch_pure.py`: authorized Drive download with checksums. It never prints credentials.
-- `colab_share_artifacts.py`: historical runtime's verified handoff copier; expects the old Drive ZIP/runtime paths and does not train. It is not automatically executed by the new notebook.
+| Previous path | Current path |
+| --- | --- |
+| `research/kuairand-twotower/` | `research/kuairand/data_pipeline/` |
+| `kuairand_twotower` Python package | `kuairand_data` |
+| `research/kuairand/run.py` and training environment | `research/kuairand/training/` |
+| `research/kuairand/kuairand/` Python package | `research/kuairand/training/recommender/` |
 
-Pinned publisher snapshot: `9359168f8d55b85f456c0b01d1cbbbfa3b1c37f6` (PR #36). Original files and hashes live in `kuairand/vendor/ziqi/provenance.json`. Retaining this snapshot permits reproducing the published model independently of later data-pipeline changes.
+Existing Drive locations, dataset hashes and W&B run IDs remain the historical evidence. The frozen vendor snapshot retains original paths in its provenance documentation; those are historical references, not current commands.
 
-## Verified Pure run / 已完成的 Pure 实验
+The package/factory name has changed, so new configurations have a different config hash. Resume historical runs using the exact source ZIP, configuration and prepared manifest in the shared model bundle, or their original Git commit. Do not edit old manifests or bypass checkpoint binding checks. New runs use the current layout and new output directories.
 
-W&B: https://wandb.ai/SAR-Lab/kuairand-two-tower/runs/b2ed5728b9a2
-
-- A100 40GB; 1 epoch; 124,780 train positives; 488 steps.
-- 30,780 validation positives; in-batch validation loss 5.516606385154798.
-- 7,583 normalized 64D item vectors exported.
-- Training loss improved only slightly (~5.54 to ~5.50 on full batches). The final partial batch loss is not directly comparable to full batches.
-- Recall@100/NDCG@100 have not been verified; 1K acceptance is not complete. Weighted like feedback is not implemented.
-
-[Shared model/vector package](https://drive.google.com/file/d/1vEBOxLVamtStwH1yhVRoxrIcEKDOdRWg/view) includes the actual checkpoint, exact prepared manifest/tables, source ZIP, config, vectors and integrity inventory.
-[Test package folder](https://drive.google.com/drive/u/1/folders/1d1QbCe4QBf4qIvEjyxF2r5jXLcj6SWna): `SAR-Pure-test-handoff-v1.zip`.
-Raw data, checkpoints and vectors stay in Drive. Git contains code, tests and small documentation only.
-
-## Test protocol / 测试协议
-
-22,083 nonrandom long-view requests held out by time; test request IDs do not overlap train/validation. Same users/items may appear across splits. Rolling history includes only strictly earlier observed long views, including earlier test events, with no parameter updates. Full 7,583 candidate pool, prior-watched items remain eligible; historical candidate availability is not audited. 884 requests have users unseen in the training vocabulary; report them separately.
-
-Single target Recall@100 is hit/miss; NDCG@100 is 1/log2(rank+1) for a hit, otherwise zero; average over requests. The evaluation implementation and candidate eligibility still need Ricky's review. Test must not be used for tuning.
-
-See [docs/pure-test-handoff.md](docs/pure-test-handoff.md) for the complete handoff protocol. [docs/engineering.md](docs/engineering.md) and [docs/pure-handoff.md](docs/pure-handoff.md) describe the original ZIP layout; use the current notebook and commands above for repository setup.
+旧实验使用其冻结源码和原配置恢复；新协议启动独立实验。使用 week1_baseline.ipynb 读取挂载 Drive 的已发布数据，运行基础／历史双塔及精确评估。只有 stage_report.json 的 complete=true 才表示第一周验收完成。
