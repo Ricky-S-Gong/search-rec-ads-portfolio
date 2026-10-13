@@ -6,7 +6,7 @@ location; other developers can clone the repository anywhere.
 
 The Desktop checkout was on an older `MF-frontend` branch while KuaiRand work
 used isolated Git worktrees. PRs #38 and #39 are now merged into `main`.
-The `codex/workspace-organization` branch integrates that main state, retains
+PR #40 merged the `codex/workspace-organization` branch into main; it retains
 the frontend branch history, and contains the directory changes and updated
 Week 1 report. Switching to an older branch also restores that branch's older
 files; it does not reveal missing work.
@@ -35,7 +35,7 @@ The repository research environment and KuaiRand training environment have
 separate Python requirements and lockfiles. Do not copy virtual environments
 between checkouts: interpreter paths and entry-point shebangs can be absolute.
 The GPU notebook remains
-`research/kuairand/training/notebooks/week1_baseline.ipynb`; moving the local
+`research/kuairand/training/notebooks/week1_content_retraining.ipynb`; moving the local
 checkout does not change Colab's `/content` or mounted Drive paths.
 
 ## Data and reports
