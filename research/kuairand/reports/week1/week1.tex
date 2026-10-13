@@ -276,8 +276,9 @@ Enhanced & 0.607318 & 25.615197 & 0.209800 & 0.259868\\\bottomrule
 Pure 删除池外观看，历史不完整；反馈完成时间和上传资格均依赖代理规则。发布属性没有可验证的历史版本，本次采用固定内容假设；时长已与日志核对，动态状态与未来统计仍被排除。只有一次短预算训练，未测多 seed、用户等权指标或上线效果。批内比较可能包含假负例和采样偏差。\textbf{目前没有证据把弱效果归因于某一个代码错误或单一超参数。}
 
 \subsection{下一周优先任务}
-\begin{enumerate}
+\begin{enumerate}\setlength{\itemsep}{2pt}\setlength{\parsep}{0pt}
 \item 完成 KuaiRand-1K 数据的预处理，并将准备好的数据与版本说明放到共享 Drive。
+\item 设计基线与评估协议：比较常规／随机曝光的长观看次数与长观看率，处理低曝光样本；设计独立时间窗口的随机曝光评估，明确曝光偏差与解释范围。当前热门基线不代表效果上限。
 \item 调整神经网络架构：尝试加深网络、残差连接（residual connection）、attention / LSTM，以及 batch normalization。
 \item 调整超参数，开展更多实验，并完整记录配置、训练过程与评估结果。
 \item 每个 epoch 都进行 evaluation；根据验证集指标选择最佳 checkpoint，用于后续部署（deploy）。
