@@ -3,6 +3,7 @@
 import hashlib
 import heapq
 import json
+import shutil
 import tarfile
 from collections import Counter, deque
 from pathlib import Path
@@ -13,13 +14,18 @@ import pyarrow.compute as pc
 import pyarrow.csv as csv
 import pyarrow.parquet as pq
 
-from recommender.batch_source import file_sha256
+from recommender.batch_source import file_sha256, read_manifest
 from recommender.item_tower import fit_item_encoding
 
 DAY = 86400000
 OFFSET = 0
 CUTOFFS = np.array([1649980800000, 1651190400000, 1651622400000])
 RAW_MD5 = "0820331067a3784d9691136f772b35a7"
+
+# Publication attributes are used under an explicit fixed-content assumption.
+# Current visibility and whole-month behavioral aggregates are deliberately absent.
+CONTENT_CATEGORICAL = ("item_id", "author_id", "video_type", "upload_type", "music_id", "music_type", "tag")
+CONTENT_NUMERIC = ("video_duration", "server_width", "server_height", "upload_day")
 
 
 def completed_histories(users, items, times, available, limit=50):
@@ -315,3 +321,73 @@ def prepare_week1(source, archive, output, config):
     (output / "audit.json").write_text(json.dumps(audit, indent=2, allow_nan=False) + "\n")
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2, allow_nan=False) + "\n")
     return audit
+
+
+def prepare_content(base_manifest, source, output, config):
+    """Add frozen publication attributes without changing any request or candidate."""
+    manifest, root, digest = read_manifest(base_manifest)
+    source, output = Path(source), Path(output)
+    if output.exists():
+        raise ValueError("Use a new immutable content dataset directory")
+    if manifest.get("protocol", {}).get("test_used") is not False:
+        raise ValueError("Require validation-only audited base data")
+    if (
+        config["model"].get("item_categorical_features") != list(CONTENT_CATEGORICAL)
+        or config["model"].get("item_numeric_features") != list(CONTENT_NUMERIC)
+        or config["data_adapter"].get("metadata_policy") != "fixed-publication-attributes-v1"
+    ):
+        raise ValueError("Require the explicit publication-content feature policy")
+    path = source / "item_features.parquet"
+    if (
+        file_sha256(path) != manifest["source_sha256"]["item_features.parquet"]
+        or manifest["source_sha256"] != config["data_adapter"]["verified_source_sha256"]
+    ):
+        raise ValueError("Content snapshot differs from audited source")
+    metadata = pq.read_table(path).sort_by([("item_id", "ascending")])
+    if metadata["item_id"].to_pylist() != manifest["item_ids"]:
+        raise ValueError("Content candidate identity differs")
+    fit_ids = manifest["item_encoding"]["fit_item_ids"]
+    encoding = fit_item_encoding(metadata, fit_ids, CONTENT_CATEGORICAL, CONTENT_NUMERIC)
+    duration = dict(zip(metadata["item_id"].to_pylist(), metadata["video_duration"].to_pylist()))
+    checked, mismatches = 0, 0
+    for entry in manifest["train_shards"] + manifest["extra_files"]:
+        table = pq.read_table(root / entry["path"], columns=["item_id", "duration"])
+        expected = np.array([duration[int(i)] for i in table["item_id"].to_pylist()], dtype=float)
+        observed = table["duration"].to_numpy() * 1000
+        valid = np.isfinite(expected) & np.isfinite(observed)
+        checked += int(valid.sum())
+        mismatches += int((~np.isclose(expected[valid], observed[valid], rtol=0, atol=1e-5)).sum())
+    if not checked or mismatches:
+        raise ValueError("Published duration disagrees with request-time duration")
+    audit = json.loads((root / "audit.json").read_text())
+    policy = {
+        "name": "fixed-publication-attributes-v1",
+        "asof_versions_available": False,
+        "assumption": "Author, type, upload method/date, music, tag, duration and resolution describe fixed published video content; historical mutation is not independently verifiable.",
+        "excluded": ["visible_status", "whole-month video statistics", "unversioned user profile counts/status"],
+        "duration_request_checks": checked,
+        "duration_mismatches": mismatches,
+        "source_sha256": file_sha256(path),
+        "base_manifest_sha256": digest,
+    }
+    audit.update(
+        status="content package prepared; GPU experiments pending",
+        model_categorical_features=list(CONTENT_CATEGORICAL),
+        model_numeric_features=list(CONTENT_NUMERIC),
+        excluded_snapshot_features=["visible_status"],
+        metadata_policy=policy,
+    )
+    audit["limitations"] = [
+        line for line in audit["limitations"] if "content features excluded" not in line
+    ] + [policy["assumption"], "Current visibility, monthly aggregates and unversioned user profile statistics are excluded."]
+    manifest = dict(manifest, feature_version="train-publication-content-v1", item_encoding=encoding, metadata_policy=policy)
+    output.mkdir(parents=True)
+    for entry in manifest["train_shards"] + manifest["extra_files"] + [manifest["candidates"]]:
+        target = output / entry["path"]
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(root / entry["path"], target)
+        if file_sha256(target) != entry["sha256"]:
+            raise ValueError("Content dataset copy checksum mismatch")
+    (output / "manifest.json").write_text(json.dumps(manifest, indent=2, allow_nan=False) + "\n")
+    (output / "audit.json").write_text(json.dumps(audit, indent=2, allow_nan=False) + "\n")
+    return {"manifest_sha256": file_sha256(output / "manifest.json"), "metadata_policy": policy, "item_input_dim": 7 * 8 + 4}

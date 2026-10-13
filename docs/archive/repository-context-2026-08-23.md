@@ -1,3 +1,5 @@
+> Historical snapshot. Preserved for provenance; use the root README and `docs/workspace.md` for current paths and commands.
+
 # Repository Context
 
 Last checked: 2026-08-23 (America/New_York)
@@ -19,7 +21,7 @@ Last checked: 2026-08-23 (America/New_York)
 - Open issue 仅见 #20 `Refine MovieLens evidence flow and evaluation explanation`，但相关 PR #21 已合并，issue 状态可能需要人工关闭或确认。
 - 最新 `main` 工作流 `Check and deploy`（run `32616629348`）已于 2026-08-23 成功完成。这里只确认 Actions 结果，没有在本次会话中人工 smoke-test 线上页面。
 
-`HANDOFF.md` 的仓库快照仍停留在 `7af273a` / MovieLens v3，已经过期；涉及当前状态时优先参考本文件、`origin/main` 和生成产物。
+`docs/archive/portfolio-handoff-2026-08-17.md` 的仓库快照仍停留在 `7af273a` / MovieLens v3，已经过期；涉及当前状态时优先参考本文件、`origin/main` 和生成产物。
 
 ## 产品现状
 
@@ -127,7 +129,7 @@ git diff --check
 如果本地 `pytest` launcher 在 collection 前挂住，可以使用仓库 fallback：
 
 ```bash
-.venv/bin/python research/run_python_tests.py
+.venv/bin/python scripts/run_python_tests.py
 ```
 
 不要声称测试通过，除非在当前会话实际运行过。此次只更新上下文文档，未运行完整 JS/Python/build 测试。

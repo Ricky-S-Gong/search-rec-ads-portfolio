@@ -1,0 +1,296 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[margin=2cm,headheight=15pt]{geometry}
+\usepackage[T1]{fontenc}\usepackage{lmodern}\usepackage{CJKutf8}
+\usepackage{amsmath,amssymb,booktabs,tabularx,array,float}
+\usepackage{tikz,pgfplots}\usetikzlibrary{positioning,arrows.meta}\pgfplotsset{compat=1.18}
+\usepackage{xcolor}\definecolor{accent}{HTML}{174C63}\definecolor{pale}{HTML}{EEF4F7}
+\usepackage[unicode]{hyperref}\hypersetup{colorlinks=true,urlcolor=accent,linkcolor=accent}
+\usepackage{fancyhdr}\pagestyle{fancy}\fancyhf{}\fancyhead[L]{KuaiRand | 第一周技术报告}\fancyhead[R]{2026 年 10 月}\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{.3pt}\renewcommand{\arraystretch}{1.3}
+\setlength{\intextsep}{9pt}
+\setlength{\parindent}{0pt}\setlength{\parskip}{.55em}\setlength{\emergencystretch}{2em}\linespread{1.16}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+\newcommand{\note}[1]{\par\smallskip\noindent\colorbox{pale}{\parbox{\dimexpr\linewidth-2\fboxsep}{\small #1}}\par\smallskip}
+\begin{document}\begin{CJK*}{UTF8}{gbsn}
+\renewcommand{\refname}{参考资料}\renewcommand{\tablename}{表}\renewcommand{\figurename}{图}
+{\color{accent}\LARGE\bfseries KuaiRand 第一周技术报告}\par
+{\large Pure 数据集上的双塔召回基线}\par
+\textcolor{gray}{实验日期：2026 年 10 月 12 日\quad 数据协议：completion-time-v1}
+
+\note{\textbf{核心结论：}本报告只呈现最新的内容属性实验：数据审计、两组训练、向量导出、精确检索和受控 GPU 恢复验证已经跑通。热门基线 Recall@100 为 27.078\%，Basic 为 2.504\%，Enhanced 为 2.262\%。工程产物齐全，但当前双塔尚未体现个性化收益。}
+
+\section{任务与数据范围}
+我们研究的是\textbf{长观看导向的候选召回}：给定某个用户在某个时间点的上下文，从当时符合资格的视频中推荐前 100 个。模型输出排序分数，不输出经过校准的长观看概率。
+
+监督标签直接使用官方 \texttt{long\_view}。视频不超过 18 秒时，观看达到视频时长算正反馈；更长的视频观看达到 18 秒算正反馈。训练只使用 \texttt{is\_random=0} 且 \texttt{long\_view=1} 的记录。\textbf{“随机”描述平台如何选视频，不描述用户如何观看。}非随机曝光（\texttt{is\_random=0}）是平台原推荐系统挑选视频并展示给用户；随机曝光（\texttt{is\_random=1}）是数据采集实验中，平台从规定候选池随机选视频展示给用户。随机曝光不是我们训练时打乱样本，也不是随机划分训练集。
+
+\subsection{Pure 与完整数据集有什么区别？}
+\begin{table}[H]\centering\small
+\begin{tabularx}{\linewidth}{lrrY}\toprule
+官方版本 & 用户数 & 视频规模 & 保留方式\\\midrule
+KuaiRand-27K & 27,285 & 约 3,204 万 & 完整发布版本，保留这些用户在采集期的广泛行为记录。\\
+KuaiRand-1K & 1,000 & 约 437 万 & 从 27K 随机抽取用户，保留这些用户的相关记录。\\
+KuaiRand-Pure & 27,285 & 7,583 & 只保留固定候选池内视频的交互；删除池外视频记录。\\\bottomrule
+\end{tabularx}\caption{官方版本口径，区别于下表中我们切分、去重后的实验规模。}\end{table}
+Pure 不是“更干净的全量数据”，也不是只含随机曝光：它同时含常规曝光与随机曝光。官方常规曝光部分涉及 7,551 个视频，完整候选池为 7,583 个。\textbf{它主要缩减视频范围，而非用户范围；用户行为序列因此不完整。}本阶段用它验证闭环，不能据此判断长序列建模在完整 27K 上的效果。官方建议严格序列研究优先使用 27K 或 1K。\cite{dataset}
+
+\subsection{本次实验实际规模}
+\begin{table}[H]\centering\small
+\begin{tabular}{lrrrr}\toprule
+窗口 & 非随机曝光 & 长观看正反馈 & 正反馈比例 & 用户数\\\midrule
+历史预热 & 886,326 & 297,920 & 33.61\% & 25,185\\
+训练 & 363,643 & 124,255 & 34.17\% & 25,769\\
+验证 & 94,578 & 30,589 & 32.34\% & 20,565\\\bottomrule
+\end{tabular}\caption{精确整行去重后的规模；候选库共 7,583 个视频。测试集未参与本报告。}\end{table}
+\textbf{历史预热：}4 月 15 日正式训练开始前的记录只用于构建用户已有的长观看历史，不作为优化器更新样本，也不计入热门基线。这样第一条训练请求也可以带上用户此前已完成的观看，而非把所有用户都当成空历史。Enhanced 最多使用最近 50 条已可用的正反馈；Basic 不使用这段历史。这是数据历史的准备，不是学习率 warmup。
+
+训练期正反馈集中在热门视频：前 100 个视频占训练正反馈的 26.83\%。这使热门计数成为必须比较的基线。
+
+\clearpage
+\section{数据处理与实际输入}
+\subsection{时间协议与处理}
+以 UTC 时间戳切分：4 月 15 日前预热；4 月 15 日至 29 日前训练；4 月 29 日至 5 月 4 日前验证，测试封存。去除 20,624 条完全相同的原始记录，保留真实重复观看。原始日期与时间戳存在不一致，不用原始日期切分。
+
+历史要求 $t_{\mathrm{request}}+\texttt{play\_time\_ms}<t_{\mathrm{current}}$，同毫秒完成的反馈不可用。这修正了 1,038 条历史；播放结束只是反馈可用时间的代理。词表在训练范围拟合、验证时冻结；未知类别索引为 0。
+
+\subsection{用户塔与物品塔分别接收什么？}
+\begin{table}[H]\centering\small
+\begin{tabularx}{\linewidth}{p{3.2cm}p{3.3cm}Y}\toprule
+输入字段 & 实际原始值示例 & 编码与维度\\\midrule
+\multicolumn{3}{l}{\textbf{用户塔：前三项两组共用，历史两项仅 Enhanced 使用}}\\\midrule
+\mbox{\texttt{user\_id}} & 20853、8286 & 用户词表索引，32 维 embedding；未知用户索引 0。\\
+\mbox{\texttt{tab}} & 0、1、4；范围 0--14 & 场景类别索引，8 维 embedding。\\
+\mbox{\texttt{time\_ms}} & 1649475963278 毫秒 & UTC 日、周周期的正弦与余弦，共 4 维。\\
+\mbox{\texttt{history\_item\_ids}} & 最多 50 次已可用的视频 ID & 经共享物品塔得到 $[B,50,64]$，按 mask 求均值得 $[B,64]$。\\
+\mbox{\texttt{history\_mask}} & 长度 50 的有效位标记 & padding 为 $-1$，不参与均值；空历史为零向量。不作为额外数值拼接。\\\midrule
+\multicolumn{3}{l}{\textbf{物品塔：两组均使用以下 11 个字段}}\\\midrule
+\mbox{\texttt{item\_id}} & 0、1、2 & 冻结词表索引；8 维 embedding。\\
+\mbox{\texttt{author\_id}} & 7349781、2103883 & 作者类别索引；8 维 embedding。\\
+\mbox{\texttt{video\_type}} & NORMAL、AD & 视频类型；8 维 embedding。\\
+\mbox{\texttt{upload\_type}} & LongImport & 上传方式；8 维 embedding。\\
+\mbox{\texttt{music\_id}} & 9155697141 & 音乐类别索引；8 维 embedding。\\
+\mbox{\texttt{music\_type}} & 9、4、8 & 音乐类型；8 维 embedding。\\
+\mbox{\texttt{tag}} & 39、2、1 & 沿用原预处理，只保留首个标签；8 维 embedding。\\
+\mbox{\texttt{video\_duration}} & 87433 毫秒 & 数值缺失用训练物品中位数填补，再标准化；1 维。\\
+\mbox{\texttt{server\_width}} & 720、960 像素 & 同上；1 维。\\
+\mbox{\texttt{server\_height}} & 1280、720 像素 & 同上；1 维。\\
+\mbox{\texttt{upload\_day}} & 上传日期 2022-04-10 $\to1$ 天 & 相对训练物品最早上传日 2022-04-09 的天数，标准化；1 维。\\\bottomrule
+\end{tabularx}\caption{七个类别 embedding 共 56 维，拼接四个数值共 60 维；最终物品向量为 64 维。}\end{table}
+类别缺失作为独立类别，未见类别使用索引 0；数值按训练物品拟合 $z=(x-\mu)/\sigma$，验证与候选库复用冻结参数。例如时长 87433 毫秒编码约为 $-0.194$，宽 720 编码约为 $-0.558$，上传 1 天编码约为 $0.285$。
+
+请求时间示例编码约为 $(0.834,0.552,-0.997,-0.083)$。
+
+\textbf{两组的区别：}Basic 的用户输入为 $32+8+4=44$ 维；Enhanced 再拼接 64 维平均历史，成为 108 维。两组物品输入均为 60 维；Enhanced 的历史也复用包含全部属性的物品塔。
+
+\textbf{时间有效性：}时长与训练、验证的 154,273 条可比较正反馈完全一致；其余发布属性采用固定内容假设，缺少历史版本佐证。当前可见状态、整月行为统计与无时间版本的用户统计排除；标签、随机标记、请求 ID 和 split 不作输入。
+
+\clearpage
+\section{模型与损失}
+\subsection{两组架构}
+\begin{figure}[H]\centering
+\begin{tikzpicture}[>=Stealth,box/.style={draw=accent,fill=pale,rounded corners=2pt,align=center,minimum height=5.5mm,inner sep=2pt,font=\footnotesize},layer/.style={box,text width=6.5cm},item/.style={box,text width=5.2cm},raw/.style={box,text width=1.85cm},history/.style={item,dashed,fill=white},arrow/.style={->,draw=accent,line width=.45pt}]
+\node[raw] (uid) at (-6.35,0) {user\_id $[B]$};
+\node[raw] (tab) at (-4,0) {tab $[B]$};
+\node[raw] (time) at (-1.65,0) {time\_ms $[B]$};
+\node[raw,below=3.5mm of uid] (ue) {Embedding\\$[B,32]$};
+\node[raw,below=3.5mm of tab] (te) {Embedding\\$[B,8]$};
+\node[raw,below=3.5mm of time] (cyc) {周期编码\\$[B,4]$};
+\draw[arrow](uid)--(ue);\draw[arrow](tab)--(te);\draw[arrow](time)--(cyc);
+\node[layer,below=5mm of te] (base) {拼接用户、场景、时间 $\to[B,44]$};
+\draw[arrow](ue.south)--++(0,-2.5mm)-|(base.north);
+\draw[arrow](te)--(base);
+\draw[arrow](cyc.south)--++(0,-2.5mm)-|(base.north);
+\node[layer,below=3.5mm of base] (input) {Basic：$[B,44]$\\Enhanced：拼接历史 $h$ 后 $[B,108]$};
+\node[layer,below=3.5mm of input] (u1) {Linear：$44/108\to128$，输出 $[B,128]$};
+\node[layer,below=3.5mm of u1] (ur1) {ReLU，输出 $[B,128]$};
+\node[layer,below=3.5mm of ur1] (ud1) {Dropout（$p=0$），输出 $[B,128]$};
+\node[layer,below=3.5mm of ud1] (u2) {Linear：$128\to64$，输出 $[B,64]$};
+\node[layer,below=3.5mm of u2] (ur2) {ReLU，输出 $[B,64]$};
+\node[layer,below=3.5mm of ur2] (ud2) {Dropout（$p=0$），输出 $[B,64]$};
+\node[layer,below=3.5mm of ud2] (u3) {Linear：$64\to64$，输出 $[B,64]$};
+\node[layer,below=3.5mm of u3] (un) {转 FP32、L2 归一化 $\to u:[B,64]$};
+\foreach \a/\b in {base/input,input/u1,u1/ur1,ur1/ud1,ud1/u2,u2/ur2,ur2/ud2,ud2/u3,u3/un}{\draw[arrow](\a)--(\b);}
+\node[item,anchor=north] (iid) at (4,0.275) {7 个类别字段 + 4 个数值\\原始物品属性};
+\node[font=\bfseries,above=6mm of uid.north,anchor=south,xshift=2.35cm] {用户塔};
+\node[font=\bfseries,above=6mm of iid.north,anchor=south] {物品塔};
+\node[item,below=3.5mm of iid] (dict) {冻结词表映射、数值填补与标准化};
+\node[item,below=3.5mm of dict] (ie) {7 个 Embedding 各 8 维 + 4 个数值\\拼接输出 $[B,60]$};
+\node[item,below=3.5mm of ie] (i1) {Linear：$60\to64$，输出 $[B,64]$};
+\node[item,below=3.5mm of i1] (ir) {ReLU，输出 $[B,64]$};
+\node[item,below=3.5mm of ir] (i2) {Linear：$64\to64$，输出 $[B,64]$};
+\node[item,below=3.5mm of i2] (inorm) {物品塔内部 L2 归一化，输出 $[B,64]$};
+\node[item,below=3.5mm of inorm] (iout) {目标接口：FP32 + L2 $v:[B,64]$};
+\foreach \a/\b in {iid/dict,dict/ie,ie/i1,i1/ir,ir/i2,i2/inorm,inorm/iout}{\draw[arrow](\a)--(\b);}
+\node[history,below=6mm of iout] (hist) {历史 ID + mask\\$[B,50]$，仅 Enhanced};
+\node[history,below=3.5mm of hist] (shared) {共享本模型的物品塔参数 $\to[B,50,64]$};
+\node[history,below=3.5mm of shared] (pool) {按 mask 求均值 $\to h:[B,64]$};
+\draw[arrow,dashed](hist)--(shared);\draw[arrow,dashed](shared)--(pool);
+\draw[arrow,dashed](pool.west)--(.25,0 |- pool.west)--(.25,0 |- input.east)--(input.east);
+\node[box,text width=5cm,below=6mm of un,xshift=4cm] (score) {匹配分数：$s(u,i)=u^\top v$};
+\draw[arrow](un.south)--(un.south |- score.west)--(score.west);
+\draw[arrow](iout.east)--(7.15,0 |- iout.east)--(7.15,0 |- score.east)--(score.east);
+\end{tikzpicture}
+\caption{按执行顺序逐层展开。Basic 与 Enhanced 的物品特征及架构一致，但分别训练，权重不共享。虚线仅表示 Enhanced 内部的历史分支与目标物品共用参数；$B$ 为 batch 大小。}
+\end{figure}
+用户塔有两次 ReLU，分别位于两个隐藏 Linear 后；末尾 Linear 后直接归一化，没有额外 ReLU。物品 MLP 则是 Linear、ReLU、Linear，随后归一化。Dropout 模块在代码中保留，但 $p=0$ 不改变输入；BN 关闭。目标物品统一接口的再次归一化是数值保护，不增加可训练层；历史路径直接复用物品塔。
+
+\textbf{L2 归一化：}将向量除以其欧氏长度，即 $\hat z=z/\sqrt{\sum_jz_j^2}$。例如 $(3,4)$ 的长度为 5，归一化为 $(0.6,0.8)$。这样保留方向、统一长度；两条单位向量的点积就是余弦相似度，分数取决于方向匹配，而非向量大小。归一化不会增加内容信息。
+
+\textbf{语义边界：}首标签、类型和发布属性提供有限内容线索，ID embedding 学习协同关联。模型尚未读取画面、音频、标题或字幕，音乐 ID 也不是音频语义向量。当前弱效果不能归结为单一原因；后续通过消融检验内容与历史的收益。
+
+\clearpage
+\begingroup\small
+\subsection{监督信号与损失}
+\textbf{监督信号的来源：}直接沿用官方二元标签 \texttt{long\_view}，不重新生成标签。视频时长不超过 18 秒时，观看达到视频时长为正反馈；时长超过 18 秒时，观看达到 18 秒为正反馈。正式训练仅保留训练窗口内 \texttt{is\_random=0} 且 \texttt{long\_view=1} 的记录。\texttt{is\_random=0} 表示原推荐系统的常规曝光。
+
+\textbf{一条训练样本：}请求 $q_i$ 包含当时的用户 ID、场景、时间；Enhanced 另使用已可用历史；$v_i$ 对应这条记录中用户实际长观看的视频。监督告诉模型“在这个请求下，这个视频是正目标”。当前不把 \texttt{long\_view=0} 的记录送入损失，也不使用点赞加权或观看时长回归。
+
+\begin{figure}[H]\centering
+\begin{tikzpicture}[cell/.style={draw=accent,rounded corners=2pt,minimum width=2.65cm,minimum height=1.05cm,align=center,font=\small},positive/.style={cell,fill=accent!14,line width=.8pt},other/.style={cell,fill=gray!4},label/.style={font=\small,align=center}]
+\node[label] at (-3.35,1.15) {用户请求（行）};
+\node[label] at (0,1.15) {视频 A $v_1$};
+\node[label] at (3.05,1.15) {视频 B $v_2$};
+\node[label] at (6.1,1.15) {视频 C $v_3$};
+\node[label,text width=3.5cm] at (-3.35,0) {$q_1$：实际长观看 A};
+\node[label,text width=3.5cm] at (-3.35,-1.45) {$q_2$：实际长观看 B};
+\node[label,text width=3.5cm] at (-3.35,-2.9) {$q_3$：实际长观看 C};
+\node[positive] at (0,0) {$S_{11}$\\\textbf{正目标}};
+\node[other] at (3.05,0) {$S_{12}$\\比较对象};
+\node[other] at (6.1,0) {$S_{13}$\\比较对象};
+\node[other] at (0,-1.45) {$S_{21}$\\比较对象};
+\node[positive] at (3.05,-1.45) {$S_{22}$\\\textbf{正目标}};
+\node[other] at (6.1,-1.45) {$S_{23}$\\比较对象};
+\node[other] at (0,-2.9) {$S_{31}$\\比较对象};
+\node[other] at (3.05,-2.9) {$S_{32}$\\比较对象};
+\node[positive] at (6.1,-2.9) {$S_{33}$\\\textbf{正目标}};
+\end{tikzpicture}
+\caption{三个目标视频不同的 batch 示例。矩阵单元是模型分数，蓝色对角线标记正确配对，并不是输入的标签值；同一用户可以产生多条请求。训练提高每行正目标相对于比较对象的分数。}
+\end{figure}
+
+用户塔把请求 $q_i$ 编码为 $u_i$，物品塔编码 batch 中所有目标视频；分数矩阵大小为 $B\times B$，元素为 $S_{ij}=u_i^\top v_j/\tau$，$\tau=0.1$。请求和其实际视频按同一顺序排列，故正确配对恰好位于 $(i,i)$，这就是\textbf{“对角线正目标”}。图中交叉熵的目标列索引为 $[0,1,2]$；这些索引仅指 batch 内位置，不是视频类别，也不是新的二元反馈标签。
+
+若两个请求的目标是同一视频，定义 $D_i=\{j\ne i:\mathrm{item\_id}(v_j)=\mathrm{item\_id}(v_i)\}$，屏蔽这些非对角重复位置，保留对角线。损失为
+\[
+\mathcal L=-\frac1B\sum_{i=1}^{B}
+\log\frac{\exp(S_{ii})}{\sum_{j\notin D_i}\exp(S_{ij})}.
+\]
+其余物品是批内采样的比较对象，\textbf{并非已知的用户负反馈}：另一个请求长观看的视频，不代表当前请求不喜欢它。当前没有采样频率修正，仍可能存在假负例。
+
+\textbf{矩阵对训练的启发：}模型要学的是“这个请求与其实际长观看视频是否匹配”，因此每一行都以该请求的正目标为监督，而不是让所有请求都给同一热门视频最高分。用户塔与物品塔通过匹配分数共同获得梯度；请求与目标的顺序必须保持配对，否则对角线标签会指向错误视频。
+
+非对角视频只是采样来的竞争对象，可能也是用户喜欢的视频；重复目标屏蔽只能避免同一视频被误当竞争对象，不能消除全部假负例。该损失只优化 batch 内的相对分数，\textbf{loss 下降不保证在全部 7,583 个候选中召回更好}，所以每个 epoch 还需做完整候选检索评估，并据验证指标选择 checkpoint。
+
+
+\clearpage
+\section{训练配置、结果与恢复验证}
+\subsection{冻结的公平比较配置}
+\begin{table}[H]\centering\small
+\begin{tabularx}{\linewidth}{lYlY}\toprule
+项目 & 设置 & 项目 & 设置\\\midrule
+随机种子 & 42，同一打乱顺序 & Batch / Epoch & 256 / 1\\
+优化器 & Adam，$\beta=(0.9,0.999)$ & 学习率 & 0.001\\
+Weight decay & 0 & Temperature & 0.1\\
+Dropout / BN & 0 / 关闭 & 输出维度 & 64，L2 归一化\\
+设备 & A100-SXM4-40GB，CUDA AMP & 运行环境 & Python 3.11.15；PyTorch 2.14.1+cu130\\\bottomrule
+\end{tabularx}\caption{两组使用相同数据、预算与优化设置；本次未进行超参数搜索。}\end{table}
+
+\subsection{训练诊断}
+\begin{table}[H]\centering\small
+\begin{tabular}{lrrrrr}\toprule
+模型 & 消费样本 & 更新步数 & 验证 loss & Step+wait（秒） & 峰值显存（MiB）\\\midrule
+Basic & 124,255 & 486 & 5.515324 & 8.077 & 85.92\\
+Enhanced & 124,255 & 486 & 5.503570 & 10.086 & 101.53\\\bottomrule
+\end{tabular}\caption{耗时为日志中的读取等待与训练 step 之和，不含完整验证、checkpoint 保存和编排；显存为 PyTorch allocated 峰值。}\end{table}
+\begin{figure}[H]\centering
+\begin{tikzpicture}\begin{axis}[width=.96\linewidth,height=4.2cm,xlabel={Optimizer step},ylabel={In-batch cross entropy},grid=major,grid style={gray!20},legend pos=north east,tick label style={font=\small},label style={font=\small},legend style={font=\small},xmin=1,xmax=485]
+\addplot[color=accent,thick] coordinates {(1,6.1213684) (2,5.9222107) (3,5.7534637) (4,5.7097321) (5,5.6672668) (6,5.6335754) (7,5.6276855) (8,5.6130219) (9,5.6064148) (10,5.6220093) (11,5.5698395) (12,5.5778503) (13,5.5924530) (14,5.5907440) (15,5.6179047) (16,5.5617523) (17,5.5957184) (18,5.5716248) (19,5.5514679) (20,5.5644989) (25,5.5578613) (30,5.5480347) (35,5.5554657) (40,5.5445709) (45,5.5474701) (50,5.5496063) (55,5.5487823) (60,5.5474548) (65,5.5438080) (70,5.5540161) (75,5.5402069) (80,5.5419006) (85,5.5530548) (90,5.5314636) (95,5.5286560) (100,5.5438385) (105,5.5345612) (110,5.5231934) (115,5.5567780) (120,5.5443878) (125,5.5300446) (130,5.5339203) (135,5.5390625) (140,5.5237579) (145,5.5341644) (150,5.5262604) (155,5.5371704) (160,5.5270233) (165,5.5449982) (170,5.5338287) (175,5.5323639) (180,5.5050354) (185,5.5286102) (190,5.5345001) (195,5.5253296) (200,5.5261536) (205,5.5366364) (210,5.5369186) (215,5.5173569) (220,5.5377197) (225,5.5308685) (230,5.5241089) (235,5.5216980) (240,5.5039368) (245,5.5344772) (250,5.5123749) (255,5.5094757) (260,5.5559235) (265,5.5208206) (270,5.4996414) (275,5.5507812) (280,5.5494232) (285,5.5381088) (290,5.5458069) (295,5.4997253) (300,5.5227432) (305,5.5274811) (310,5.5061111) (315,5.5398331) (320,5.5440063) (325,5.5203857) (330,5.5037918) (335,5.5243607) (340,5.5406799) (345,5.4994354) (350,5.5216980) (355,5.5071030) (360,5.4925385) (365,5.5314560) (370,5.4851532) (375,5.5356598) (380,5.5006027) (385,5.5074844) (390,5.5200195) (395,5.5233917) (400,5.4994278) (405,5.4870605) (410,5.5128403) (415,5.5027466) (420,5.5026321) (425,5.4820633) (430,5.5049133) (435,5.5354919) (440,5.5016022) (445,5.4985809) (450,5.5074997) (455,5.5508194) (460,5.5205002) (465,5.4692993) (470,5.5172653) (475,5.5004120) (480,5.5318069) (485,5.5363846)};\addlegendentry{Basic}
+\addplot[color=orange!85!black,thick] coordinates {(1,6.0289612) (2,5.8281708) (3,5.7149353) (4,5.6744690) (5,5.6763306) (6,5.6500092) (7,5.6149750) (8,5.5806885) (9,5.5789642) (10,5.5907440) (11,5.5863037) (12,5.5844269) (13,5.5669861) (14,5.5794983) (15,5.5541534) (16,5.5818787) (17,5.5766449) (18,5.5628967) (19,5.5356903) (20,5.5597992) (25,5.5517273) (30,5.5520782) (35,5.5398407) (40,5.5486145) (45,5.5468292) (50,5.5335846) (55,5.5401001) (60,5.5409088) (65,5.5507812) (70,5.5418243) (75,5.5437164) (80,5.5360870) (85,5.5379944) (90,5.5329895) (95,5.5317841) (100,5.5431061) (105,5.5360107) (110,5.5294800) (115,5.5497284) (120,5.5383453) (125,5.5383606) (130,5.5360870) (135,5.5444489) (140,5.5305023) (145,5.5325470) (150,5.5319977) (155,5.5292358) (160,5.5377350) (165,5.5306091) (170,5.5446625) (175,5.5432281) (180,5.5207214) (185,5.5292816) (190,5.5146332) (195,5.5098877) (200,5.5279388) (205,5.5318756) (210,5.5171051) (215,5.5000763) (220,5.5244370) (225,5.5256042) (230,5.5058136) (235,5.5091782) (240,5.4876480) (245,5.5238419) (250,5.5100098) (255,5.4948807) (260,5.5578079) (265,5.5096588) (270,5.5148392) (275,5.5352936) (280,5.5442886) (285,5.5232620) (290,5.5366516) (295,5.5016022) (300,5.5127487) (305,5.5116425) (310,5.4663162) (315,5.5336304) (320,5.5527039) (325,5.5340576) (330,5.4907837) (335,5.5214615) (340,5.5449677) (345,5.4946823) (350,5.5227585) (355,5.5007629) (360,5.4863663) (365,5.5189514) (370,5.4903412) (375,5.5376434) (380,5.4948502) (385,5.5010986) (390,5.5404739) (395,5.5123444) (400,5.4912262) (405,5.4962387) (410,5.4921112) (415,5.5089340) (420,5.4809418) (425,5.4648972) (430,5.4791489) (435,5.5287628) (440,5.4929199) (445,5.5079956) (450,5.4996643) (455,5.5206375) (460,5.5249405) (465,5.4824982) (470,5.5224075) (475,5.4759369) (480,5.4991302) (485,5.5152512)};\addlegendentry{Enhanced}
+\end{axis}\end{tikzpicture}\caption{实际训练 loss；前 20 步逐步展示，之后每 5 步取一个日志点。只画完整 batch，避免尾批造成误导。}\end{figure}
+\textbf{尾批骤降的原因：}前 485 批各 256 条，最后一批为 95 条。均匀打分的参考交叉熵会由 $\ln256=5.545$ 降至 $\ln95=4.554$，并受重复目标屏蔽影响。实际尾批 loss 为 4.509（Basic）和 4.488（Enhanced），不能当作突然学好了。
+
+相同验证批次与重复屏蔽下，均匀打分参考 loss 约为 5.540678。两组验证 loss 分别低于此值约 0.025 与 0.037，与较弱的召回效果一致；批内 loss 稳定不等于全候选检索有效。
+
+\subsection{导出与恢复}
+两组各导出 7,583 个归一化 64 维物品向量，候选 ID、维度、有限值、单位范数和 checkpoint 绑定均通过检查。Enhanced 在第 25 步保存，恢复后最终消费 124,255 条样本、完成 486 步。模型、Adam、AMP、随机状态与游标均与连续训练\textbf{完全一致}。
+
+这验证了\textbf{同一环境中的受控保存与恢复}，尚未验证 Colab 断线或重建 runtime 后恢复。checkpoint 文件 hash 不同可以来自运行元信息与序列化差异；验收比较的是训练状态。
+
+\endgroup
+\begingroup\small
+\section{评估协议与结果}
+\subsection{每条请求如何判断命中？}
+\textbf{一条验证请求的定义：}从原始日志中取一条位于 UTC 4 月 29 日至 5 月 4 日前、\texttt{is\_random=0} 且 \texttt{long\_view=1} 的观看记录，精确整行去重后，把它当成一次离线召回查询。共保留 30,589 条，每条有独立请求 ID；它不是一个用户汇总的观看清单，也不一定对应一次完整的线上页面刷新。
+
+查询输入是这条记录的用户 ID、场景和请求时间；Enhanced 还读取当时已可用的正反馈历史。这条记录实际长观看的视频是\textbf{唯一正目标}，只在生成推荐之后用于检查命中。一个用户的多次观看分别形成多条请求；重复观看同一视频也分别计数，只删除完全相同的原始行。
+
+热门基线按\textbf{训练期内，经平台正常推荐产生的长观看次数}给视频排序，即只统计训练窗口的 \texttt{is\_random=0, long\_view=1} 记录，不统计历史预热、验证期或随机曝光的观看。双塔按该请求用户向量与物品向量的点积排序。两者生成推荐时都不知道当前目标标签，使用相同候选库与资格规则；同分按原始视频 ID 升序。允许推荐历史看过的视频，参数在验证期不更新。
+
+\textbf{热门排序是否因用户而异？}每个请求都会得到一个 Top-100，但热门分数是一份全局物品计数，不读取用户 ID 或历史。同一时刻、候选资格相同的用户会得到相同热门榜；不同时刻可能因视频上传资格变化而不同。本次全部候选在验证期均已合格，热门基线给所有验证请求的是同一份榜单。双塔则按各请求上下文重新计算分数，能够产生不同榜单。
+
+
+\note{\textbf{分子：}实际目标进入该请求 Top-100 的请求数。\quad
+\textbf{分母：}全部 30,589 条验证请求。\quad
+100 是每次推荐的数量，不是分母。同一用户多次观看分别评估，不合并视频去重。}
+令 $r_q$ 为第 $q$ 条请求的目标排名；未进入榜单或不具备候选资格时视为未命中：
+\[
+\mathrm{Recall@100}=\frac{\sum_{q=1}^{Q}\mathbf1[r_q\le100]}{Q},
+\qquad Q=30,589.
+\]
+\[
+\mathrm{NDCG@100}=\frac1Q\sum_{q=1}^{Q}
+\frac{\mathbf1[r_q\le100]}{\log_2(r_q+1)}.
+\]
+\textbf{NDCG 的 ground truth：}每条请求只把该条日志中实际长观看的视频记为相关性 1，其他候选在本次指标中记为 0；这个 0 不表示用户真实不喜欢它们。我们没有获得用户对所有视频的真实偏好排序，也不以热门次数生成 ground truth。
+
+理想排序只需把这个唯一正目标放在第 1 位，其余视频顺序任意，因此 $\mathrm{IDCG@100}=1/\log_2(1+1)=1$。模型把目标放在第 $r_q$ 位时，$\mathrm{NDCG@100}=\mathrm{DCG}/\mathrm{IDCG}=1/\log_2(r_q+1)$；目标不在 Top-100 或无法检索时记为 0。例如目标排第 2 位得 $1/\log_2 3\approx0.631$，不是与一份完整的人工排序逐项比较。
+
+Recall 只看是否进入前 100；NDCG 同时看位置，排第 1 得 1 分，排第 10 约得 0.289 分，排第 100 约得 0.150 分。本指标按请求平均，活跃用户权重更大；尚未计算每个用户等权的平均命中率。
+
+\subsection{三组在同一协议上的比较}
+\begin{table}[H]\centering
+\begin{tabular}{lrrrr}\toprule
+模型 & 命中请求数 & Recall@100 & NDCG@100 & 目标覆盖率\\\midrule
+\textbf{热门基线} & \textbf{8,283} & \textbf{27.078\%} & \textbf{0.069607} & 100\%\\
+Basic 双塔 & 766 & 2.504\% & 0.007095 & 100\%\\
+Enhanced 双塔 & 692 & 2.262\% & 0.006145 & 100\%\\\bottomrule
+\end{tabular}\caption{已从逐请求预测独立复算命中数与 NDCG，并核对冻结请求身份与产物版本。}\end{table}
+三组每次均返回 100 个不重复且符合资格的视频；目标覆盖率为 100\%，因此条件指标与端到端指标相同。热门计数只使用训练期标签，并未使用验证答案，不属于标签泄漏。
+
+\textbf{实验结论：}热门明显领先两组双塔；Enhanced 少命中 74 条请求，没有证明平均历史带来了收益。当前只有 seed 42、1 epoch，不能把两组的小差异解释成稳定优势或劣势。验证来自原推荐策略的曝光，结果也不能直接等同线上收益。
+
+\endgroup
+\clearpage
+\section{成本、限制与下一周安排}
+\subsection{评估成本与覆盖}
+用户编码在 GPU，精确点积与排序在 CPU。分块检索避免常驻完整请求 $\times$ 候选矩阵。下表使用 batch 256、排除 1 个预热 batch；包含特征组装、编码、必要的 GPU 到 CPU 传输与检索，不含初始模型和数据加载。
+\begin{table}[H]\centering\small
+\begin{tabular}{lrrrr}\toprule
+模型 & 用户编码（秒） & 检索（秒） & Batch P50（秒） & Batch P95（秒）\\\midrule
+热门 & 0.002480 & 13.434823 & 0.112512 & 0.114549\\
+Basic & 0.410511 & 26.051938 & 0.207814 & 0.287722\\
+Enhanced & 0.607318 & 25.615197 & 0.209800 & 0.259868\\\bottomrule
+\end{tabular}\caption{Colab 实测批量耗时，不是线上单请求延迟，也不是 GPU 检索性能。}\end{table}
+验证请求中未知用户 1,213 条（3.965\%），空历史 456 条（1.491\%）。训练词表未收录的物品 ID 占候选库的 9.244\%，占验证正目标的 0.111\%；这些 ID 使用未知 embedding，但仍可由其余物品属性编码，并在合法候选库中，不等于目标缺失。
+
+\subsection{解释边界}
+Pure 删除池外观看，历史不完整；反馈完成时间和上传资格均依赖代理规则。发布属性没有可验证的历史版本，本次采用固定内容假设；时长已与日志核对，动态状态与未来统计仍被排除。只有一次短预算训练，未测多 seed、用户等权指标或上线效果。批内比较可能包含假负例和采样偏差。\textbf{目前没有证据把弱效果归因于某一个代码错误或单一超参数。}
+
+\subsection{下一周优先任务}
+\begin{enumerate}\setlength{\itemsep}{2pt}\setlength{\parsep}{0pt}
+\item 完成 KuaiRand-1K 数据的预处理，并将准备好的数据与版本说明放到共享 Drive。
+\item 设计基线与评估协议：比较常规／随机曝光的长观看次数与长观看率，处理低曝光样本；设计独立时间窗口的随机曝光评估，明确曝光偏差与解释范围。当前热门基线不代表效果上限。
+\item 调整神经网络架构：尝试加深网络、残差连接（residual connection）、attention / LSTM，以及 batch normalization。
+\item 调整超参数，开展更多实验，并完整记录配置、训练过程与评估结果。
+\item 每个 epoch 都进行 evaluation；根据验证集指标选择最佳 checkpoint，用于后续部署（deploy）。
+\end{enumerate}
+
+\subsection{复现入口与依据}
+代码位于 \texttt{research/kuairand/}。执行版本为 \texttt{5626823}，Drive release 为 \texttt{week1-pure-content-v1-001}。完整校验值和聚合结果见报告旁的 \texttt{report\_evidence.json} 与 \texttt{evidence/content-v1/}；checkpoint、向量与逐请求数据留在私有 Drive，不在正文堆叠长 hash。
+
+训练 run：Basic \texttt{087cea6d74ef}；Enhanced \texttt{3e2c0f26ec9b}；恢复验收 \texttt{0f6bc7c9effd}。恢复 run 不是第三种模型。数据和模型使用既有流水线，未另建训练系统。
+
+\begin{thebibliography}{9}\small
+\bibitem{dataset} KuaiRand 官方数据版本与字段说明：\url{https://kuairand.com/}。
+\bibitem{paper} Gao 等，KuaiRand，CIKM 2022：\url{https://arxiv.org/abs/2208.08696}。
+\end{thebibliography}
+\clearpage\end{CJK*}\end{document}

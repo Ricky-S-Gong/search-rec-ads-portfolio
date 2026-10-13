@@ -1,5 +1,5 @@
 import { useDeferredValue, useEffect, useMemo, useState } from 'react';
-import { formatCosinePercent, weightedCosine } from '../lib/similarity';
+import { formatCosinePercent, weightedCosine } from '../../lib/similarity';
 import './SpotifyLab.css';
 
 type Lang = 'en' | 'zh';

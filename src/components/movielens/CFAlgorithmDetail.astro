@@ -1,6 +1,6 @@
 ---
-import KatexMath from './KatexMath.astro';
-import { href, type Lang } from '../data/site';
+import KatexMath from '../shared/KatexMath.astro';
+import { href, type Lang } from '../../data/site';
 const { lang, mode } = Astro.props as { lang: Lang; mode: 'user' | 'item' };
 const zh = lang === 'zh';
 const user = mode === 'user';

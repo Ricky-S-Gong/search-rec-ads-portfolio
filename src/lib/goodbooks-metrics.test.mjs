@@ -68,7 +68,7 @@ test('published GoodBooks artifact preserves the canonical six model roles and B
 });
 
 test('GoodBooks teaching copy covers steps, model symbols, bias, and train-only history', async () => {
-  const source = await readFile(new URL('../components/GoodBooksCaseStudy.astro', import.meta.url), 'utf8');
+  const source = await readFile(new URL('../components/goodbooks/GoodBooksCaseStudy.astro', import.meta.url), 'utf8');
   const steps = [...source.matchAll(/<p class="step-label">(Step [1-7])<\/p>/g)].map((match) => match[1]);
 
   assert.deepEqual(steps, ['Step 1', 'Step 2', 'Step 3', 'Step 4', 'Step 5', 'Step 6', 'Step 7']);
@@ -84,7 +84,7 @@ test('GoodBooks teaching copy covers steps, model symbols, bias, and train-only 
 });
 
 test('GoodBooks formulas retain masked NMF and sequential bias-aware ALS semantics', async () => {
-  const source = await readFile(new URL('../components/GoodBooksCaseStudy.astro', import.meta.url), 'utf8');
+  const source = await readFile(new URL('../components/goodbooks/GoodBooksCaseStudy.astro', import.meta.url), 'utf8');
 
   assert.match(source, /\(M\\odot R\)Q/);
   assert.match(source, /train_matrix @ Q/);

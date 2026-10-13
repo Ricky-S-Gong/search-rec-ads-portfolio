@@ -1,6 +1,6 @@
 ---
 import AlgorithmTable from './AlgorithmTable.astro';
-import { domainNames, domains, type Domain, type Lang } from '../data/site';
+import { domainNames, domains, type Domain, type Lang } from '../../data/site';
 const { lang } = Astro.props as { lang: Lang };
 const notes: Record<Domain, Record<Lang, string>> = {
   search: { en: 'Methods for retrieving and ranking documents for a query.', zh: '用于根据查询召回文档并进行相关性排序的方法。' },
@@ -27,7 +27,7 @@ const initialDomain: Domain = 'recommendation';
 </div>
 
 <script>
-  import { parseAlgorithmDomain } from '../lib/domain';
+  import { parseAlgorithmDomain } from '../../lib/domain';
 
   document.querySelectorAll<HTMLElement>('[data-algorithm-tabs]').forEach((tabs) => {
     const buttons = [...tabs.querySelectorAll<HTMLButtonElement>('[role="tab"]')];

@@ -1,6 +1,6 @@
 ---
 import ProjectCard from './ProjectCard.astro';
-import { domainNames, domains, projects, type Domain, type Lang } from '../data/site';
+import { domainNames, domains, projects, type Domain, type Lang } from '../../data/site';
 
 const { lang } = Astro.props as { lang: Lang };
 const descriptions: Record<Domain, Record<Lang, string>> = {

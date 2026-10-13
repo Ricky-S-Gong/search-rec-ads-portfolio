@@ -26,7 +26,7 @@ uv run python research/goodbooks-mf/download_data.py
 uv run python research/goodbooks-mf/prepare_data.py
 uv run python research/goodbooks-mf/verify_data.py
 uv run python research/goodbooks-mf/run_experiment.py
-.venv/bin/python research/run_python_tests.py
+.venv/bin/python scripts/run_python_tests.py
 ```
 
 CI uses `uv run pytest`. In the audited Codex desktop runtime the pytest
@@ -35,6 +35,28 @@ the same existing Python test functions deterministically for local verification
 
 Raw datasets are gitignored. The site reads only compact, versioned artifacts
 from `public/artifacts/`.
+
+## Repository layout
+
+| Path | Purpose |
+| --- | --- |
+| `src/pages/`, `src/layouts/` | Website routes and page layouts |
+| `src/components/shared/` | Navigation, project cards, math and shared UI |
+| `src/components/{cosmos,spotify,movielens,goodbooks}/` | Project-specific UI and styles |
+| `src/lib/`, `src/data/`, `src/styles/` | Shared logic, bilingual content and global styling |
+| `public/` | Published assets and compact experiment artifacts |
+| `research/<project>/` | Project code, configuration, tests, local data and measured results |
+| `research/kuairand/{data_pipeline,training,evaluation,reports}/` | KuaiRand data, GPU training, evaluation and reports |
+| `scripts/` | Repository-wide development commands |
+| `docs/` | Current workspace guide and dated historical documents |
+| `.github/` | CI and contribution templates |
+
+Use [the workspace guide](docs/workspace.md) for canonical local paths and
+environment boundaries. Project plans and team guides live in each project's
+`docs/`; dated repository snapshots in `docs/archive/` are historical evidence.
+Root package manifests, lockfiles, framework configuration and license files
+stay at their standard tool locations. Dependency folders and build caches are
+generated and ignored by Git.
 
 KuaiRand data and GPU training have a dedicated [project guide](research/kuairand/README.md).
 

@@ -142,6 +142,7 @@ def main() -> None:
             "train",
             "export",
             "prepare-week1",
+            "prepare-content",
             "evaluate",
             "stage-report",
             "verify-resume",
@@ -180,6 +181,12 @@ def main() -> None:
             print(
                 json.dumps(prepare_week1(args.source, args.archive, args.output, config), indent=2)
             )
+        elif args.command == "prepare-content":
+            from evaluation.protocol import prepare_content
+
+            if any(x is None for x in (args.manifest, args.source, args.output)):
+                parser.error("prepare-content requires base manifest/source/new output")
+            print(json.dumps(prepare_content(args.manifest, args.source, args.output, config), indent=2))
         elif args.command == "evaluate":
             from evaluation.evaluate import evaluate
 

@@ -9,7 +9,7 @@ baseline.
 uv sync --locked
 uv run python research/movielens-cf/download_data.py
 uv run python research/movielens-cf/run_experiment.py
-.venv/bin/python research/run_python_tests.py
+.venv/bin/python scripts/run_python_tests.py
 ```
 
 For a fast end-to-end check without replacing the published artifacts:

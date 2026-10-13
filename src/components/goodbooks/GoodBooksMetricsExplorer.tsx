@@ -7,7 +7,7 @@ import {
   selectBestPlannedModel,
   type GoodBooksMetricKey,
   type GoodBooksMetricRow,
-} from '../lib/goodbooks-metrics';
+} from '../../lib/goodbooks-metrics';
 
 export interface GoodBooksModelMetric extends GoodBooksMetricRow {
   model_label: string;

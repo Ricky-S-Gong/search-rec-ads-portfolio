@@ -1,25 +1,14 @@
-# Week 1 English technical report
+# 第一周技术报告
 
-`technical_report_draft.tex` and its PDF are a measured **draft**, not a completed Stage 1 certificate. `report_evidence.json` and `evidence/` preserve the aggregate input facts. Corrected basic/enhanced CUDA results and matching interruption/recovery evidence must arrive before finalization.
+`week1.tex` 是当前可编辑的中文报告，`week1.pdf` 为对应 PDF。
+正文保留 Pure 数据范围、时间审计、实际输入、模型与损失、训练与评估结果、主要限制和下一周安排。长校验值、历史实验细节和完整原始特征列表不再重复放入正文。
 
-The standalone LaTeX source includes EDA plot coordinates, actual field examples and both tower diagrams. It can compile without external figures or BibTeX files. The generator writes a final filename only for a complete stage; otherwise `--allow-incomplete` is required and the draft label is visible throughout.
+`report_evidence.json` 与 `evidence/` 保留冻结版本、三组评估和训练曲线的聚合依据。私有 checkpoint、向量和逐请求预测留在共享 Drive。
 
-## Rebuild from a completed private release
+当前正文仅包含 `week1-pure-content-v1-001` 的最新实验，依据位于 `evidence/content-v1/`。执行代码为 `562682341f1b7a9cc49e518fc43b948052ecf871`；两组物品输入均为 7 个类别与 4 个数值，共 60 维，Enhanced 历史复用同一物品塔。此前 ID-only 聚合证据仍保留供追溯，不进入当前正文。
 
-Run from the repository root with Python 3.11 or later and a local `pdflatex` installation. The variables below point to already mounted private artifacts.
+完整新产物：[Drive release](https://drive.google.com/drive/folders/18qFm162pVnjsusK1s0mux6dTWIbtdKZw)。训练与评估入口为 `../../training/notebooks/week1_content_retraining.ipynb`；执行输出保存在原 Drive notebook 的同一链接。发布属性采用固定内容假设，测试集保持封存。
 
-```bash
-python research/kuairand/reports/week1/build_report.py \
-  --audit "$DATA_DIR/audit.json" \
-  --manifest "$DATA_DIR/manifest.json" \
-  --stage "$RELEASE_DIR/stage_report.json" \
-  --runs "$RUN_DIR" \
-  --output research/kuairand/reports/week1 \
-  --compile
-```
+优先在 Codex 内置 LaTeX 编辑器中编译 `week1.tex`。源码使用 CJKutf8、标准 LaTeX 表格和内嵌 PGFPlots，无需额外图片或 BibTeX 文件。导出 PDF 时只更新 `week1.pdf`；本地编译的中间文件应放入临时目录并清除。
 
-Optionally pass `--historical /path/to/unpacked/historical-b2ed5728b9a2` to include the original loss curve. The adjacent `historical-evaluation.json` is used only as a clearly labeled diagnostic. Preserve historical model/config/manifest/frozen source hashes; never rewrite these to match the new package.
-
-`evaluate_historical.py` reproduces diagnostic inference using the original source ZIP's `kuairand` package, with matching PyTorch base version and strict original code/config/data/vector/checkpoint checks. Its CPU inference does not resume or certify original CUDA training.
-
-Compilation uses a temporary directory that is automatically removed, retaining editable `.tex`, PDF and lightweight evidence. Finalization must visually inspect every page and verify tables against aggregate JSON. The sealed final test bundle is not a report input.
+`build_report.py` 是之前英文版本的产物生成器，保留用于历史复现；它不包含本次中文精简和排版编辑，不能用其输出直接覆盖当前报告。当前章节数据应与相邻 evidence JSON 核对。测试集不参与报告。

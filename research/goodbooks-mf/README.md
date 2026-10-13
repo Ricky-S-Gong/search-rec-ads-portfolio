@@ -6,9 +6,9 @@ SVD++ implementation, plus an additional bias-aware residual ALS diagnostic.
 
 Detailed documentation:
 
-- [`ZIQI_IMPLEMENTATION_GUIDE.md`](ZIQI_IMPLEMENTATION_GUIDE.md): complete
+- [`docs/implementation-guide.md`](docs/implementation-guide.md): complete
   implementation walkthrough and interview preparation.
-- [`TEAM_HANDOFF_RICKY_YUTAO.md`](TEAM_HANDOFF_RICKY_YUTAO.md): immutable data
+- [`docs/team-handoff.md`](docs/team-handoff.md): immutable data
   contract and step-by-step continuation instructions for teammates and Codex.
 
 ## Reproduce the environment and data

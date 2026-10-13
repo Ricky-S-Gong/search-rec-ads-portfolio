@@ -1,4 +1,4 @@
-# Yutao: Pure training and Colab / Pure 训练与 Colab
+# KuaiRand-Pure training and Colab / Pure 训练与 Colab
 
 This module publishes the code previously run from a Drive source ZIP. It consumes Ziqi's Pure handoff and pinned Item Tower snapshot; it adds the User Tower, training loop, W&B, checkpoints, validation loss, and export. The existing `../data_pipeline/` data project remains the team data pipeline.
 
@@ -16,8 +16,8 @@ Open [notebooks/week1_baseline.ipynb](notebooks/week1_baseline.ipynb) in Colab. 
 
 ```bash
 cd research/kuairand/training
-python3 -m pip install uv==0.12.18
-uv sync --locked
+python3 -m pip install uv==0.12.1
+uv sync --locked --python 3.11.15
 uv run --locked python run.py check-env
 uv run --locked pytest tests -q
 ```
@@ -69,3 +69,10 @@ See [docs/pure-test-handoff.md](docs/pure-test-handoff.md) for the complete hand
 The Week 1 notebook writes directly to the mounted shared Drive. The one-off historical ZIP copier has been removed; its delivered bundle remains intact in the historical release.
 
 New Week 1 sessions use Python 3.11.15, available in uv 0.12.1’s managed downloads. Historical Python 3.11.16 checkpoints retain their original runtime binding; do not rewrite old run metadata to resume them with another patch version.
+
+## Content feature retraining
+
+Use `notebooks/week1_content_retraining.ipynb` for the publication-content experiment.
+Both item towers consume seven categorical attributes and four numeric attributes (60 input values); the enhanced user history pools these content vectors. Current visibility, monthly aggregates and unversioned user profile statistics are excluded. Published attributes are assumed fixed, with the limitation recorded in the manifest.
+
+`run.py prepare-content --config configs/pure-content-basic.yaml --manifest /path/to/base/manifest.json --source /path/to/source --output /path/to/new-content-dataset` preserves the audited requests and candidate identities while fitting metadata encodings on training items. The notebook reads the prepared shared Drive package, writes separate content runs/releases, and preserves previous ID-only results.

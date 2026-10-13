@@ -40,4 +40,4 @@ Existing Drive locations, dataset hashes and W&B run IDs remain the historical e
 
 The package/factory name has changed, so new configurations have a different config hash. Resume historical runs using the exact source ZIP, configuration and prepared manifest in the shared model bundle, or their original Git commit. Do not edit old manifests or bypass checkpoint binding checks. New runs use the current layout and new output directories.
 
-旧实验使用其冻结源码和原配置恢复；新协议启动独立实验。使用 week1_baseline.ipynb 读取挂载 Drive 的已发布数据，运行基础／历史双塔及精确评估。只有 stage_report.json 的 complete=true 才表示第一周验收完成。
+旧实验使用其冻结源码和原配置恢复；新协议启动独立实验。使用 week1_baseline.ipynb 读取挂载 Drive 的已发布数据，运行基础／历史双塔及精确评估。stage_report.json 的 complete=true 表示三组评估与受控 GPU 恢复验证产物齐全；不代表模型超过热门基线，也不代表 Colab 重建运行时后的恢复已验证。实际结果见 reports/week1/。
