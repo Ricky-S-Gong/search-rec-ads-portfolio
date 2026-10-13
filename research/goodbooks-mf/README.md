@@ -1,254 +1,69 @@
-# Goodreads Poetry matrix factorization
+# Goodreads Poetry：矩阵分解与统一评估
 
-Reproducible Goodreads Book Graph experiment implementing the shared frozen
-data pipeline plus Basic MF, FunkSVD, sparse explicit ALS, masked NMF, and an
-SVD++ implementation, plus an additional bias-aware residual ALS diagnostic.
+使用 UCSD Goodreads Book Graph 的 Poetry 子集，比较 Basic MF、FunkSVD、显式 ALS、Masked NMF 与 SVD++；Bias-aware residual ALS 是额外诊断模型。当前已提交的 `team_model_comparison.json` 为 **complete**，包含全部五个计划模型及诊断模型，前端聚合产物已发布。此前“等待 SVD++ 结果”的说明已过时。
 
-Detailed documentation:
+[项目计划](docs/project-plan.md) · [实现说明](docs/implementation-guide.md) · [数据交接](docs/team-handoff.md) · [当前比较 JSON](results/team_model_comparison.json) · [网站产物](../../public/artifacts/goodbooks/metrics.json)
 
-- [`docs/implementation-guide.md`](docs/implementation-guide.md): complete
-  implementation walkthrough and interview preparation.
-- [`docs/team-handoff.md`](docs/team-handoff.md): immutable data
-  contract and step-by-step continuation instructions for teammates and Codex.
+## Frozen data contract / 数据协议
 
-## Reproduce the environment and data
+`config.json` 与 `canonical_manifest.json` 固定数据版本 `goodreads-poetry-v1`、seed `20260830`、过滤、用户规模、时间切分及文件校验值。所有模型读取同一 bundle，不各自过滤或划分。
 
-From the repository root:
+当前 bundle：5,129 用户、5,551 物品、261,709 交互；train / validation / test 分别 191,436 / 26,044 / 44,229。显式评分测试为 17,168 条，排序评估 4,765 用户。
+
+字段：`user_idx, item_idx, rating, is_read, is_reviewed, event_time, split`。`rating>0` 是显式评分；隐式反馈为 `is_read OR is_reviewed OR rating>0`。按用户时间划分，并使用显式评分边界确保可评估；缺失矩阵位置不是零分。
+
+## Current results / 已冻结测试结果
+
+| 模型 | RMSE | MAE | Recall@10 | NDCG@10 |
+| --- | ---: | ---: | ---: | ---: |
+| Basic MF | 1.149409 | 0.882003 | 0.036178 | 0.023947 |
+| FunkSVD | 0.861341 | 0.668944 | 0.007369 | 0.004920 |
+| ALS | 1.119088 | 0.828761 | 0.005637 | 0.002728 |
+| NMF + L2 | 0.984062 | 0.719640 | 0.001193 | 0.000835 |
+| SVD++ | 0.860568 | 0.666782 | 0.007855 | 0.005447 |
+| Bias-aware ALS | 0.861570 | 0.675045 | 0.007762 | 0.005978 |
+
+表格来自当前汇总 JSON，均使用相同数据人群和候选协议。Basic MF 排序指标最好，SVD++ 的评分误差最低；评分预测与推荐排序不是同一个目标。前端按已观察的 NDCG@10 展示 Basic MF，这属于离线结果展示，不是再用测试集调参。测试结果不用于继续选择超参数。
+
+## Models and evaluation / 实现边界
+
+Basic MF、FunkSVD 与 SVD++ 训练观测评分；ALS、NMF、Bias-aware ALS 使用稀疏显式矩阵。FunkSVD 加全局／用户／物品偏置；SVD++ 隐式历史仅来自 train。SGD 以验证 RMSE early stopping 并恢复最佳 epoch。
+
+统一评分指标在计算时裁剪到 `[1,5]`，排序使用原始分数。每个合格测试用户对完整训练候选库排序，排除其训练已看物品；相关性为 `rating>=4 OR (rating==0 AND is_read)`，同分按 `item_idx` 升序，报告 K=5/10/20 的 Precision、Recall、NDCG。无采样负例。共享实现位于 `goodbooks_mf/evaluation.py`。
+
+## Reproduction / 环境与流程
+
+从仓库根目录使用根 Python 环境：
 
 ```bash
 uv sync --locked
-uv run python research/goodbooks-mf/download_data.py
-uv run python research/goodbooks-mf/prepare_data.py
-uv run python research/goodbooks-mf/verify_data.py
-uv run python research/goodbooks-mf/run_experiment.py
-uv run pytest
+# 取得许可并准备数据后，核验冻结 bundle：
+uv run --locked python research/goodbooks-mf/verify_data.py
+uv run --locked pytest research/goodbooks-mf/tests -q
 ```
 
-`run_experiment.py` is Ziqi's original Basic MF/FunkSVD result reproduction and
-reads the frozen test split. Teammates who are still selecting new model
-configurations must not use that script for tuning.
+阅读已提交结果或运行前端不需要私有 bundle。重现实验才需要原始数据或团队 canonical bundle；原始下载与预处理入口分别为 `download_data.py`、`prepare_data.py`，以 `verify_data.py` 成功为前提。
 
-## Phase-one unified validation runner
+| 阶段 | 命令入口 | 约束 |
+| --- | --- | --- |
+| 验证候选搜索 | `run_all_experiments.py` | 只反序列化 train/validation；候选由 `experiment_config.json` 固定 |
+| 仅搜索 SVD++ | `run_all_experiments.py --models svdpp --output /path/to/new-selection.json` | 同一验证协议，独立输出 |
+| 冻结 ALS / NMF / Bias-aware ALS 测试 | `run_frozen_test.py`, `run_unified_evaluation.py` | 已完成；旧冻结结果不可覆盖，不用于新调参 |
+| SVD++ 最终测试 | `run_svdpp_evaluation.py` | 已完成；恢复最佳验证 checkpoint 后一次性测试 |
+| 汇总 | `build_team_summary.py` | 核对所有模型的版本、seed、协议、人群与状态 |
+| 前端发布 | `publish_frontend_artifacts.py` | bundle 核验 + complete 汇总后写聚合 JSON |
 
-Yutao's phase-one runner trains candidates on the frozen train split and ranks
-them using explicit-rating RMSE or MAE from the frozen validation split only:
+例如，在已核验且冻结结果匹配的环境中重建展示产物：
 
 ```bash
-uv run python research/goodbooks-mf/verify_data.py
-uv run python research/goodbooks-mf/run_all_experiments.py
+uv run --locked python research/goodbooks-mf/build_team_summary.py
+uv run --locked python research/goodbooks-mf/publish_frontend_artifacts.py
 ```
 
-The committed candidate schema is `experiment_config.json`. It fixes dataset
-version `goodreads-poetry-v1`, seed `20260830`, rating clipping to `[1, 5]`, and
-the auditable candidate list for each local model. A candidate cannot override
-the top-level seed.
+`run_experiment.py` 是早期 Basic MF / FunkSVD 的冻结测试复现入口，不是新候选验证入口。冻结测试脚本拒绝覆盖已有配置／结果；不要为了重跑删除冻结证据。若改数据或调新模型，须建立新的版本和输出，保持测试集不参与选型。
 
-The runner:
+## Storage / 存储与许可
 
-1. verifies the bundle against `canonical_manifest.json`;
-2. deserializes only `train.parquet`, `validation.parquet`, and
-   `train_explicit.npz`;
-3. trains every configured candidate on train;
-4. selects within each model using validation only;
-5. writes complete phase-one rows to `results/validation_selection.json`.
+`data/` 中的原始数据、Parquet 和 CSR 不提交。`results/` 保存冻结配置、验证选择和最终聚合结果；`public/artifacts/goodbooks/metrics.json` 保存前端所需计数、字段、协议和模型汇总，不导出用户／物品 ID、交互或逐用户榜单。
 
-Ricky's SVD++ search uses the same runner but writes a separate selection
-artifact so the existing team selection is not replaced:
-
-```bash
-uv run python research/goodbooks-mf/run_all_experiments.py \
-  --models svdpp \
-  --output research/goodbooks-mf/results/ricky_validation_selection.json
-```
-
-The committed SVD++ grid contains the eight combinations of 20/40 factors,
-0.005/0.01 learning rate, and 0.02/0.05 regularization. All candidates use 100
-epochs, patience 10, minimum improvement `1e-4`, and seed `20260830`. Selection
-uses clipped validation RMSE only. Its implicit history is constructed only
-from train interactions satisfying `is_read OR is_reviewed OR rating > 0`.
-
-The test artifact is checksum-verified as part of the bundle, but
-`test.parquet` is not deserialized. Future test access is gated behind a frozen
-configuration with a matching dataset version, seed, and configuration hash.
-The phase-one command intentionally exposes no final-test option.
-
-Current validation-only selected rows are:
-
-| Model | Validation RMSE | Validation MAE |
-|---|---:|---:|
-| Basic MF | 1.022825 | 0.788908 |
-| FunkSVD | 0.844779 | 0.655388 |
-| Sparse explicit ALS | 1.014981 | 0.755570 |
-| Masked NMF with optional L2 regularization | 0.897692 | 0.675072 |
-| Bias-aware residual ALS | 0.843333 | 0.661293 |
-
-These are validation-selection results, not final test metrics. Hyperparameters
-are selected from these validation rows only. Final rating and ranking metrics
-use the shared evaluation implementation described below; no model owns a
-separate Top-K definition.
-
-## Yutao frozen rating test
-
-After the validation configuration review, the selected ALS, masked NMF, and
-bias-aware ALS configurations were frozen under seed `20260830` with config
-hash:
-
-```text
-c9c986bd86acfe24af91b465e773ac9039e16bbb97e51c8e66858aa6fc358cac
-```
-
-The one-time explicit-rating test evaluated 17,168 ratings and produced:
-
-| Model | Test RMSE | Test MAE |
-|---|---:|---:|
-| Sparse explicit ALS | 1.119088 | 0.828761 |
-| Masked NMF with L2 | 0.984062 | 0.719640 |
-| Bias-aware residual ALS | 0.861570 | 0.675045 |
-
-The immutable inputs and aggregate results are recorded in
-`results/yutao_frozen_config.json` and `results/yutao_test_metrics.json`.
-The test-result command refuses to replace an existing frozen configuration or
-result file. These test metrics must not be used for further tuning. The shared
-evaluation runner extends this frozen result with ranking metrics without
-changing the selected hyperparameters.
-
-## Shared final evaluation for Yutao's models
-
-Ricky's shared evaluation is integrated without changing the frozen validation
-selection. Run it once with:
-
-```bash
-uv run python research/goodbooks-mf/run_unified_evaluation.py
-```
-
-It constructs one shared `RankingEvaluationData` object and reuses it for ALS,
-NMF with L2, and bias-aware ALS. The frozen full-data results evaluate 17,168
-explicit ratings from 5,129 users and ranking candidates for 4,765 eligible
-users:
-
-| Model | RMSE | MAE | Precision@10 | Recall@10 | NDCG@10 | Train seconds |
-|---|---:|---:|---:|---:|---:|---:|
-| Sparse explicit ALS | 1.119088 | 0.828761 | 0.001448 | 0.005637 | 0.002728 | 0.814 |
-| Masked NMF + L2 | 0.984062 | 0.719640 | 0.000441 | 0.001193 | 0.000835 | 0.931 |
-| Bias-aware residual ALS | 0.861570 | 0.675045 | 0.002036 | 0.007762 | 0.005978 | 0.812 |
-
-The complete metrics at K = 5, 10, and 20, timing fields, protocol metadata,
-and frozen config hash are stored in
-`results/yutao_unified_test_metrics.json`. The compact table is
-`results/yutao_unified_test_metrics.csv`; the generated comparison figure is
-`results/yutao_unified_test_metrics.png`. These test results are for final
-reporting only and must not be used to revise hyperparameters.
-
-## Current team comparison
-
-Ziqi's committed Basic MF and FunkSVD implementations were reproduced with
-their frozen configuration and Ricky's shared rating/ranking evaluation. The
-rating results exactly reproduce the previously published aggregate values.
-After Ricky's private bundle has passed verification, freeze the selected
-SVD++ configuration and perform its one-time shared test evaluation with:
-
-```bash
-uv run python research/goodbooks-mf/run_svdpp_evaluation.py
-uv run python research/goodbooks-mf/build_team_summary.py
-```
-
-`run_svdpp_evaluation.py` refuses to overwrite either
-`ricky_frozen_config.json` or `ricky_unified_test_metrics.json`. It restores the
-best validation checkpoint before reading test and uses the existing shared
-rating/full-catalog ranking evaluation. The summary builder then requires
-matching dataset version, seed, candidate policy, and evaluated populations
-across all owners. Its five planned rows are Basic MF, FunkSVD, ALS, NMF, and
-SVD++; Bias-aware ALS remains a sixth diagnostic row.
-
-| Model | Owner | RMSE | MAE | Precision@10 | Recall@10 | NDCG@10 | Train seconds |
-|---|---|---:|---:|---:|---:|---:|---:|
-| Basic MF | Ziqi | 1.149409 | 0.882003 | **0.008646** | **0.036178** | **0.023947** | 26.086 |
-| FunkSVD | Ziqi | **0.861341** | **0.668944** | 0.001994 | 0.007369 | 0.004920 | 14.270 |
-| ALS | Yutao | 1.119088 | 0.828761 | 0.001448 | 0.005637 | 0.002728 | 0.814 |
-| NMF + L2 | Yutao | 0.984062 | 0.719640 | 0.000441 | 0.001193 | 0.000835 | 0.931 |
-| Bias-aware ALS | Yutao, diagnostic | 0.861570 | 0.675045 | 0.002036 | 0.007762 | 0.005978 | 0.812 |
-
-All rows use 17,168 explicit test ratings, 5,129 rating users, 4,765 ranking
-users, and the 5,551-item train catalog. Basic MF has the weakest rating error
-but the strongest Top-K result, so rating prediction and ranking quality must
-be discussed separately. `results/team_model_comparison.{json,csv,png}` stores
-the normalized table and chart. The committed table currently remains the
-pre-SVD++ snapshot: the model code and synthetic workflow tests are complete,
-but its official row must not be generated until the private bundle is restored
-and `verify_data.py` succeeds. Bias-aware ALS is explicitly marked as an
-additional diagnostic rather than a substitute for SVD++.
-
-## Publish the portfolio artifact
-
-After all five planned models have completed their frozen evaluation and
-`build_team_summary.py` reports `status: complete`, publish the aggregate-only
-frontend artifact with:
-
-```bash
-uv run python research/goodbooks-mf/publish_frontend_artifacts.py
-```
-
-The command verifies the private bundle against the canonical manifest, rejects
-pending or inconsistent team summaries, and writes
-`public/artifacts/goodbooks/metrics.json`. It exports counts, field ranges,
-matrix statistics, protocol metadata, aggregate model metrics, and the
-NDCG@10-selected offline candidate. It never exports user IDs, book IDs,
-interactions, or per-user recommendation candidates.
-
-The committed `config.json` is the data contract. It fixes the random seed,
-k-core thresholds, maximum user count, and temporal split fractions. Every
-model must consume the generated bundle and must not independently filter or
-split the source.
-
-The processed schema is:
-
-```text
-user_idx, item_idx, rating, is_read, is_reviewed, event_time, split
-```
-
-`rating > 0` is explicit feedback. Implicit feedback is exactly
-`is_read OR is_reviewed OR rating > 0`. The split is chronological per user and
-uses explicit-rating boundaries so train, validation, and test each receive an
-explicit observation before cold validation/test items are removed.
-
-`manifest.json` records the configuration, seed, table counts, and SHA-256 of
-every Parquet and CSR file. The repository's metadata-only
-`canonical_manifest.json` freezes those expected values. Teammates should
-obtain the canonical processed bundle through access-controlled course storage
-and run `verify_data.py` before training. A checksum or canonical-manifest
-mismatch is a hard failure.
-
-## Data policy
-
-Raw and processed Goodreads records live below `research/goodbooks-mf/data/`
-and are gitignored. The UCSD dataset is for academic use only and asks users not
-to redistribute it or use it commercially. Do not commit the dataset or publish
-the shared download location. The public repository contains code,
-configuration, aggregate metrics, and documentation only.
-
-## Model contract
-
-Basic MF and FunkSVD train over observed `(user_idx, item_idx, rating)`
-triplets. ALS, NMF, and bias-aware ALS consume the frozen sparse explicit CSR
-matrix. Missing CSR positions are never interpreted as rating zero. `FunkSVD`
-implements:
-
-```text
-prediction = global_mean + user_bias + item_bias + user_factors @ item_factors
-```
-
-Validation RMSE controls SGD early stopping and restores the best epoch. All
-models expose raw-score prediction and deterministic recommendation methods;
-rating evaluation clips only at metric time. Shared
-rating and ranking metrics live in `goodbooks_mf/evaluation.py` and are called
-for every model. Rating predictions are clipped to `[1, 5]`; ranking always
-uses raw scores.
-
-The ranking protocol evaluates every eligible test user against the complete
-train catalog after removing that user's train interactions. Relevance is
-`rating >= 4 OR (rating == 0 AND is_read)`, exact score ties are broken by
-ascending `item_idx`, and Precision, Recall, and NDCG are reported at 5, 10,
-and 20. There is no negative sampling or row-level candidate artifact. Call
-`prepare_ranking_data(train, test)` once and pass the returned
-`RankingEvaluationData` to `evaluate_ranking` for each model so every model is
-scored on the same protocol.
+UCSD 数据仅供学术使用，不重新分发或商业使用；下载权限和完整流程见交接文档。历史指南若仍描述 pending 状态，以当前汇总 JSON 和本 README 为准。
