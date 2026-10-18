@@ -46,19 +46,6 @@ export interface ProfileMeta {
   email: string;
 }
 
-export interface RoadmapTrack {
-  domain: Domain;
-  introduction: Localized;
-  stages: Array<{
-    title: Localized;
-    topics: Localized;
-    project?: Localized;
-    status: ProjectStatus;
-    compute: string;
-    href?: string;
-  }>;
-}
-
 export interface MetricDefinition {
   key: string;
   label: Localized;
@@ -81,7 +68,7 @@ export const copy = {
   en: {
     siteName: 'SAR Cosmos Lab',
     byline: 'A joint technical portfolio by Ricky Gong, Ziqi Xu & Yutao Rao',
-    nav: { home: 'Home', projects: 'Projects', compare: 'Algorithms', roadmap: 'Roadmap', about: 'About' },
+    nav: { home: 'Home', projects: 'Projects', compare: 'Algorithms', about: 'About' },
     language: '中文',
     heroTitle: 'SAR Cosmos Lab',
     heroBody: 'SAR stands for Search, Advertising, and Recommendation. This technical portfolio shows how the algorithms work, how they are implemented and evaluated, and where they fit in real systems.',
@@ -98,7 +85,7 @@ export const copy = {
   zh: {
     siteName: '搜广推宇宙实验室',
     byline: 'Ricky Gong、Ziqi Xu 与 Yutao Rao 的联合技术作品集',
-    nav: { home: '首页', projects: '项目', compare: '算法对比', roadmap: '路线图', about: '关于我们' },
+    nav: { home: '首页', projects: '项目', compare: '算法对比', about: '关于我们' },
     language: 'English',
     heroTitle: '搜广推宇宙实验室',
     heroBody: '这是一个围绕搜索、广告与推荐算法构建的技术作品集，展示不同算法的原理、代码实现、实验过程与应用场景。',
@@ -115,18 +102,6 @@ export const copy = {
 } as const;
 
 export const projects: ProjectMeta[] = [
-  {
-    slug: 'kuairand-twotower', domain: 'recommendation', status: 'planned', compute: 'GPU required',
-    algorithms: ['Two-Tower retrieval', 'In-batch negatives', 'ANN indexing'],
-    dataset: 'KuaiRand-1K · 11.7M interactions · 1,000 users',
-    authors: ['Ricky Gong', 'Ziqi Xu', 'Yutao Rao'],
-    sourceUrl: 'https://zenodo.org/records/10439422',
-    title: { en: 'KuaiRand two-tower retrieval', zh: 'KuaiRand 双塔召回' },
-    summary: {
-      en: 'An in-progress GPU retrieval system that learns user and video vectors from time-ordered short-video feedback, then retrieves eligible Top-100 candidates.',
-      zh: '进行中的 GPU 召回系统：从带时间顺序的短视频反馈中学习用户与视频向量，再召回合规的 Top-100 候选。',
-    },
-  },
   {
     slug: 'spotify-content-recommender', domain: 'recommendation', status: 'complete', compute: 'CPU',
     algorithms: ['Popularity', 'Euclidean KNN', 'Cosine', 'Weighted cosine', 'K-Means retrieval'],
@@ -159,6 +134,18 @@ export const projects: ProjectMeta[] = [
     summary: {
       en: 'A frozen, temporal Goodreads Poetry benchmark comparing five matrix-factorization models under one full-catalog Top-10 protocol.',
       zh: '在冻结的 Goodreads Poetry 时间切分上，以统一全目录 Top-10 协议比较五种矩阵分解模型。',
+    },
+  },
+  {
+    slug: 'kuairand-twotower', domain: 'recommendation', status: 'in-progress', compute: 'GPU required',
+    algorithms: ['Two-Tower retrieval', 'Attention', 'logQ', 'Exact Top-100'],
+    dataset: 'KuaiRand-1K · full-catalog validation',
+    authors: ['Ricky Gong', 'Ziqi Xu', 'Yutao Rao'],
+    sourceUrl: 'https://zenodo.org/records/10439422',
+    title: { en: 'KuaiRand two-tower retrieval', zh: 'KuaiRand 双塔召回' },
+    summary: {
+      en: 'A GPU two-tower retrieval study with attention and logQ sampling correction, full-catalog validation, and explicit evidence limits.',
+      zh: '进行中的 GPU 双塔召回研究：结合注意力与 logQ 采样修正，在完整视频目录上验证 Top-100，并明确证据边界。',
     },
   },
 ];
@@ -196,103 +183,6 @@ export const profiles: ProfileMeta[] = [
     linkedin: 'https://www.linkedin.com/in/yutao-rao-88527628b/',
     github: 'https://github.com/yutaor2',
     email: 'yutaorao004@gmail.com',
-  },
-];
-
-export const roadmapTracks: RoadmapTrack[] = [
-  {
-    domain: 'search',
-    introduction: {
-      en: 'Build from transparent lexical retrieval to learned and semantic ranking.',
-      zh: '从透明的词法检索出发，逐步进入学习排序与语义搜索。',
-    },
-    stages: [
-      {
-        title: { en: 'Information retrieval foundations', zh: '信息检索基础' },
-        topics: { en: 'Inverted indexes · text processing · query analysis', zh: '倒排索引 · 文本预处理 · 查询分析' },
-        status: 'planned', compute: 'CPU',
-      },
-      {
-        title: { en: 'Lexical retrieval and evaluation', zh: '词法检索与离线评估' },
-        topics: { en: 'TF-IDF · BM25 · relevance metrics', zh: 'TF-IDF · BM25 · 相关性指标' },
-        status: 'planned', compute: 'CPU',
-      },
-      {
-        title: { en: 'Semantic and hybrid retrieval', zh: '语义与混合检索' },
-        topics: { en: 'Dense retrieval · vector search · hybrid fusion', zh: 'Dense Retrieval · 向量检索 · 混合融合' },
-        status: 'planned', compute: 'GPU recommended',
-      },
-      {
-        title: { en: 'Learned ranking and query understanding', zh: '学习排序与查询理解' },
-        topics: { en: 'Learning to Rank · intent · LLM search', zh: 'Learning to Rank · 意图识别 · LLM Search' },
-        status: 'planned', compute: 'GPU recommended',
-      },
-    ],
-  },
-  {
-    domain: 'ads',
-    introduction: {
-      en: 'Connect response prediction to calibrated value and auction decisions.',
-      zh: '把响应预估逐步连接到价值校准、竞价与预算决策。',
-    },
-    stages: [
-      {
-        title: { en: 'Ads systems and objectives', zh: '广告系统与目标' },
-        topics: { en: 'Ecosystem · auctions · CTR/CVR metrics', zh: '广告生态 · 拍卖 · CTR/CVR 指标' },
-        status: 'planned', compute: 'CPU',
-      },
-      {
-        title: { en: 'Response prediction baselines', zh: '响应预估基线' },
-        topics: { en: 'Feature engineering · negative sampling · logistic CTR', zh: '特征工程 · 负采样 · 逻辑回归 CTR' },
-        status: 'planned', compute: 'CPU',
-      },
-      {
-        title: { en: 'Deep prediction and calibration', zh: '深度预估与概率校准' },
-        topics: { en: 'DeepFM · multi-task learning · calibration', zh: 'DeepFM · 多任务学习 · 概率校准' },
-        status: 'planned', compute: 'GPU recommended',
-      },
-      {
-        title: { en: 'Bidding and online optimization', zh: '竞价与在线优化' },
-        topics: { en: 'Bidding · budgets · online learning · experiments', zh: '出价 · 预算控制 · 在线学习 · 实验' },
-        status: 'planned', compute: 'CPU → GPU',
-      },
-    ],
-  },
-  {
-    domain: 'recommendation',
-    introduction: {
-      en: 'Add signals in stages: item attributes, interactions, ranking, then real-time objectives.',
-      zh: '按阶段增加信号：物品属性、用户交互、排序，再到实时多目标。',
-    },
-    stages: [
-      {
-        title: { en: 'Content signals and item cold start', zh: '内容信号与新物品冷启动' },
-        topics: { en: 'Audio features · cosine · KNN · candidate retrieval', zh: '音频特征 · 余弦 · KNN · 候选召回' },
-        project: { en: 'Spotify content recommender', zh: 'Spotify 内容推荐' },
-        status: 'complete', compute: 'CPU', href: '/projects/spotify-content-recommender/',
-      },
-      {
-        title: { en: 'Collaborative signals', zh: '协同信号' },
-        topics: { en: 'Popularity · User-CF · Item-CF · temporal evaluation', zh: '热门基线 · User-CF · Item-CF · 时间切分评估' },
-        project: { en: 'MovieLens collaborative filtering', zh: 'MovieLens 协同过滤' },
-        status: 'complete', compute: 'CPU', href: '/projects/movielens-collaborative-filtering/',
-      },
-      {
-        title: { en: 'Model-based recommendation', zh: '模型化推荐' },
-        topics: { en: 'Matrix factorization · implicit feedback · full-catalog evaluation', zh: '矩阵分解 · 隐式反馈 · 全目录评估' },
-        project: { en: 'Goodreads Poetry matrix factorization', zh: 'Goodreads 诗歌矩阵分解推荐' },
-        status: 'complete', compute: 'CPU', href: '/projects/goodreads-poetry-matrix-factorization/',
-      },
-      {
-        title: { en: 'Retrieval, ranking, and online systems', zh: '召回、排序与在线系统' },
-        topics: {
-          en: 'Research Two-Tower and the business problem first · temporal feedback · vector indexing · offline Recall@100',
-          zh: '先研究双塔模型和业务问题 · 时间反馈 · 向量索引 · 离线 Recall@100',
-        },
-        project: { en: 'KuaiRand two-tower retrieval', zh: 'KuaiRand 双塔召回' },
-        status: 'planned', compute: 'GPU required',
-      },
-    ],
   },
 ];
 

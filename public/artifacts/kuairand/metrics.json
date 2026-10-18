@@ -1,0 +1,673 @@
+{
+  "schema_version": 1,
+  "source": {
+    "report_path": "research/kuairand/reports/1k/2026-10-17-logq-vs-popularity-vs-two-tower.md",
+    "report_sha256": "6e7dd3357e597b589f375db9b39585fa50d8a1a58bd2ae3915cb1a921055b367",
+    "report_url": "https://github.com/Ricky-S-Gong/search-rec-ads-portfolio/blob/5e33772e177c409c8f4ed445264cd0c33ebd40ae/research/kuairand/reports/1k/2026-10-17-logq-vs-popularity-vs-two-tower.md",
+    "date": "2026-10-17",
+    "dataset": "KuaiRand-1K",
+    "manifest_sha256": "16e28ba2598869986c387fc432c412b804ade49898012d696398190a5e353787",
+    "combined_base_feature_manifest_sha256": "03fc0cb41c6dfc6b55f590c453b3954ad229af849219c4e91094f66d33742c20",
+    "source_zip_name": "SAR-KuaiRand-1K-training-logq-v1.zip",
+    "source_zip_sha256": "d06ab5a84b17bc232223edd54c3cb926076cf2a26fda49d2eb9150a48690537b",
+    "source_zip_url": "https://drive.google.com/file/d/1K7Esa-qNEZbo6Mcr58PcEiaDg0LBK4hW/view",
+    "training_code_sha256": "96b0554b3d7963314b025bb1ef791971c9c9fe5ee479fb8780ad5838eb21afe0",
+    "logq_run_id": "c90679f9d390",
+    "epoch_history_source": "Rendered Colab output captured after early stopping; not a fresh rerun or checkpoint-file inspection.",
+    "test_evaluated": false,
+    "model_weights_or_vectors_in_git": false,
+    "training_implementation_note": "This report records the independent 1K Drive source release; the repository training/ module is the earlier Pure implementation. Do not use that Pure entry point to reproduce these 1K results.",
+    "run_url": "https://wandb.ai/SAR-Lab/kuairand-two-tower/runs/c90679f9d390",
+    "colab_url": "https://colab.research.google.com/drive/1B1Tn4fLzZ983m7gssJfoVbFhHaAZUGrr"
+  },
+  "comparison": {
+    "dataset": "KuaiRand-1K",
+    "split": "validation",
+    "date": "2026-10-17",
+    "queries": 555677,
+    "catalog_size": 4371868,
+    "candidate_rule": "upload_next_day",
+    "target_coverage": 0.7573842358060529,
+    "aggregation": "event-micro; one long_view positive per query; uncovered targets remain misses; repeats allowed",
+    "test_evaluated": false,
+    "model_rows": [
+      {
+        "model_id": "popularity-train-long-view",
+        "label": "热门基线 / Popularity",
+        "epochs_completed": 0,
+        "selected_epoch": null,
+        "recall_at_100": 0.001601649879336377,
+        "ndcg_at_100": 0.0003320504074438232,
+        "evidence_status": "independently verified aggregate"
+      },
+      {
+        "model_id": "two-tower-mean-baseline",
+        "label": "基础双塔 / Mean-history two-tower",
+        "epochs_completed": 3,
+        "selected_epoch": null,
+        "recall_at_100": 0.0007918269066382089,
+        "ndcg_at_100": 0.00015827701259809888,
+        "evidence_status": "historical recorded aggregate; no raw baseline ranks recovered"
+      },
+      {
+        "model_id": "attention-residual-bn-no-logq-epoch7",
+        "label": "未加 logQ / Attention + Residual + BN",
+        "epochs_completed": 7,
+        "selected_epoch": 7,
+        "recall_at_100": 0.0012327305251072116,
+        "ndcg_at_100": 0.00026031748881524564,
+        "evidence_status": "Verified epoch-7 checkpoint and full validation ranks; later/final run status not established here"
+      },
+      {
+        "model_id": "attention-residual-bn-logq",
+        "label": "当前 logQ 双塔 / Attention + Residual + BN + logQ",
+        "epochs_completed": 17,
+        "selected_epoch": 14,
+        "recall_at_100": 0.005139676466724374,
+        "ndcg_at_100": 0.0012306225651929504,
+        "evidence_status": "17-epoch Colab log; selected epoch 14; W&B run c90679f9d390"
+      }
+    ],
+    "logq_fold_vs_reference": {
+      "popularity-train-long-view": {
+        "recall_at_100": 3.2089887640449435,
+        "ndcg_at_100": 3.7061317727825673
+      },
+      "two-tower-mean-baseline": {
+        "recall_at_100": 6.49090909090909,
+        "ndcg_at_100": 7.775118730082298
+      },
+      "attention-residual-bn-no-logq-epoch7": {
+        "recall_at_100": 4.16934306569343,
+        "ndcg_at_100": 4.72739104388932
+      }
+    },
+    "interpretation": "Different architectures and training budgets; observed validation comparison, not isolated logQ causal ablation or test performance."
+  },
+  "train_queries": 1335793,
+  "covered_targets": 420861,
+  "epochs": [
+    {
+      "epoch": 1,
+      "train_step": 5218,
+      "validation/improved": true,
+      "validation/epochs_without_improvement": 0,
+      "validation/stopped_early": false,
+      "validation/recall_at_100": 0.0009717875672378019,
+      "validation/ndcg_at_100": 0.00020759926902167708,
+      "validation/target_coverage": 0.7573842358060529,
+      "validation/queries": 555677,
+      "validation/hits": 540,
+      "validation/evaluation_seconds": 174.2598716509999,
+      "validation/catalog_size": 4371868,
+      "validation/ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses"
+    },
+    {
+      "epoch": 2,
+      "train_step": 10436,
+      "validation/improved": true,
+      "validation/epochs_without_improvement": 0,
+      "validation/stopped_early": false,
+      "validation/recall_at_100": 0.002447464984154464,
+      "validation/ndcg_at_100": 0.000572771373771822,
+      "validation/target_coverage": 0.7573842358060529,
+      "validation/queries": 555677,
+      "validation/hits": 1360,
+      "validation/evaluation_seconds": 174.28633411200008,
+      "validation/catalog_size": 4371868,
+      "validation/ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses"
+    },
+    {
+      "epoch": 3,
+      "train_step": 15654,
+      "validation/improved": true,
+      "validation/epochs_without_improvement": 0,
+      "validation/stopped_early": false,
+      "validation/recall_at_100": 0.0035326277675700093,
+      "validation/ndcg_at_100": 0.0008555347109675405,
+      "validation/target_coverage": 0.7573842358060529,
+      "validation/queries": 555677,
+      "validation/hits": 1963,
+      "validation/evaluation_seconds": 174.47493001500015,
+      "validation/catalog_size": 4371868,
+      "validation/ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses"
+    },
+    {
+      "epoch": 4,
+      "train_step": 20872,
+      "validation/improved": true,
+      "validation/epochs_without_improvement": 0,
+      "validation/stopped_early": false,
+      "validation/recall_at_100": 0.004202081425000495,
+      "validation/ndcg_at_100": 0.0010123004639277747,
+      "validation/target_coverage": 0.7573842358060529,
+      "validation/queries": 555677,
+      "validation/hits": 2335,
+      "validation/evaluation_seconds": 174.12329511500002,
+      "validation/catalog_size": 4371868,
+      "validation/ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses"
+    },
+    {
+      "epoch": 5,
+      "train_step": 26090,
+      "validation/improved": true,
+      "validation/epochs_without_improvement": 0,
+      "validation/stopped_early": false,
+      "validation/recall_at_100": 0.0044630243828699045,
+      "validation/ndcg_at_100": 0.0010597903828694368,
+      "validation/target_coverage": 0.7573842358060529,
+      "validation/queries": 555677,
+      "validation/hits": 2480,
+      "validation/evaluation_seconds": 174.53214362900007,
+      "validation/catalog_size": 4371868,
+      "validation/ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses"
+    },
+    {
+      "epoch": 6,
+      "train_step": 31308,
+      "validation/improved": false,
+      "validation/epochs_without_improvement": 1,
+      "validation/stopped_early": false,
+      "validation/recall_at_100": 0.00443423067717397,
+      "validation/ndcg_at_100": 0.0011004491100598131,
+      "validation/target_coverage": 0.7573842358060529,
+      "validation/queries": 555677,
+      "validation/hits": 2464,
+      "validation/evaluation_seconds": 174.356463479,
+      "validation/catalog_size": 4371868,
+      "validation/ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses"
+    },
+    {
+      "epoch": 7,
+      "train_step": 36526,
+      "validation/improved": true,
+      "validation/epochs_without_improvement": 0,
+      "validation/stopped_early": false,
+      "validation/recall_at_100": 0.004813947671039111,
+      "validation/ndcg_at_100": 0.0011549303316214716,
+      "validation/target_coverage": 0.7573842358060529,
+      "validation/queries": 555677,
+      "validation/hits": 2675,
+      "validation/evaluation_seconds": 174.54282340900045,
+      "validation/catalog_size": 4371868,
+      "validation/ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses"
+    },
+    {
+      "epoch": 8,
+      "train_step": 41744,
+      "validation/improved": true,
+      "validation/epochs_without_improvement": 0,
+      "validation/stopped_early": false,
+      "validation/recall_at_100": 0.004819346490857098,
+      "validation/ndcg_at_100": 0.0011313792640067087,
+      "validation/target_coverage": 0.7573842358060529,
+      "validation/queries": 555677,
+      "validation/hits": 2678,
+      "validation/evaluation_seconds": 174.34497566900063,
+      "validation/catalog_size": 4371868,
+      "validation/ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses"
+    },
+    {
+      "epoch": 9,
+      "train_step": 46962,
+      "validation/improved": false,
+      "validation/epochs_without_improvement": 1,
+      "validation/stopped_early": false,
+      "validation/recall_at_100": 0.004758159866253237,
+      "validation/ndcg_at_100": 0.0011742547454398262,
+      "validation/target_coverage": 0.7573842358060529,
+      "validation/queries": 555677,
+      "validation/hits": 2644,
+      "validation/evaluation_seconds": 173.97697786400022,
+      "validation/catalog_size": 4371868,
+      "validation/ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses"
+    },
+    {
+      "epoch": 10,
+      "train_step": 52180,
+      "validation/improved": false,
+      "validation/epochs_without_improvement": 2,
+      "validation/stopped_early": false,
+      "validation/recall_at_100": 0.004786953571949172,
+      "validation/ndcg_at_100": 0.0011155629306487372,
+      "validation/target_coverage": 0.7573842358060529,
+      "validation/queries": 555677,
+      "validation/hits": 2660,
+      "validation/evaluation_seconds": 174.46891009999945,
+      "validation/catalog_size": 4371868,
+      "validation/ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses"
+    },
+    {
+      "epoch": 11,
+      "train_step": 57398,
+      "validation/improved": true,
+      "validation/epochs_without_improvement": 0,
+      "validation/stopped_early": false,
+      "validation/recall_at_100": 0.0049957079382447,
+      "validation/ndcg_at_100": 0.0012236399361786477,
+      "validation/target_coverage": 0.7573842358060529,
+      "validation/queries": 555677,
+      "validation/hits": 2776,
+      "validation/evaluation_seconds": 174.43347182899925,
+      "validation/catalog_size": 4371868,
+      "validation/ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses"
+    },
+    {
+      "epoch": 12,
+      "train_step": 62616,
+      "validation/improved": false,
+      "validation/epochs_without_improvement": 1,
+      "validation/stopped_early": false,
+      "validation/recall_at_100": 0.004777955538919193,
+      "validation/ndcg_at_100": 0.0011610311193707226,
+      "validation/target_coverage": 0.7573842358060529,
+      "validation/queries": 555677,
+      "validation/hits": 2655,
+      "validation/evaluation_seconds": 174.10725390400057,
+      "validation/catalog_size": 4371868,
+      "validation/ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses"
+    },
+    {
+      "epoch": 13,
+      "train_step": 67834,
+      "validation/improved": false,
+      "validation/epochs_without_improvement": 2,
+      "validation/stopped_early": false,
+      "validation/recall_at_100": 0.004768957505889212,
+      "validation/ndcg_at_100": 0.001176592878817976,
+      "validation/target_coverage": 0.7573842358060529,
+      "validation/queries": 555677,
+      "validation/hits": 2650,
+      "validation/evaluation_seconds": 174.2384008879999,
+      "validation/catalog_size": 4371868,
+      "validation/ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses"
+    },
+    {
+      "epoch": 14,
+      "train_step": 73052,
+      "validation/improved": true,
+      "validation/epochs_without_improvement": 0,
+      "validation/stopped_early": false,
+      "validation/recall_at_100": 0.005139676466724374,
+      "validation/ndcg_at_100": 0.0012306225651929504,
+      "validation/target_coverage": 0.7573842358060529,
+      "validation/queries": 555677,
+      "validation/hits": 2856,
+      "validation/evaluation_seconds": 174.17385512300007,
+      "validation/catalog_size": 4371868,
+      "validation/ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses"
+    },
+    {
+      "epoch": 15,
+      "train_step": 78270,
+      "validation/improved": false,
+      "validation/epochs_without_improvement": 1,
+      "validation/stopped_early": false,
+      "validation/recall_at_100": 0.004594395665107607,
+      "validation/ndcg_at_100": 0.0011222338914178643,
+      "validation/target_coverage": 0.7573842358060529,
+      "validation/queries": 555677,
+      "validation/hits": 2553,
+      "validation/evaluation_seconds": 174.09760979800012,
+      "validation/catalog_size": 4371868,
+      "validation/ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses"
+    },
+    {
+      "epoch": 16,
+      "train_step": 83488,
+      "validation/improved": false,
+      "validation/epochs_without_improvement": 2,
+      "validation/stopped_early": false,
+      "validation/recall_at_100": 0.004707770881285351,
+      "validation/ndcg_at_100": 0.0011374941296052466,
+      "validation/target_coverage": 0.7573842358060529,
+      "validation/queries": 555677,
+      "validation/hits": 2616,
+      "validation/evaluation_seconds": 174.05002325700116,
+      "validation/catalog_size": 4371868,
+      "validation/ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses"
+    },
+    {
+      "epoch": 17,
+      "train_step": 88706,
+      "validation/improved": false,
+      "validation/epochs_without_improvement": 3,
+      "validation/stopped_early": true,
+      "validation/recall_at_100": 0.004562002746199681,
+      "validation/ndcg_at_100": 0.0011102385562611439,
+      "validation/target_coverage": 0.7573842358060529,
+      "validation/queries": 555677,
+      "validation/hits": 2535,
+      "validation/evaluation_seconds": 174.49152690700066,
+      "validation/catalog_size": 4371868,
+      "validation/ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses"
+    }
+  ],
+  "early_stopping": {
+    "event": "early_stopping",
+    "epoch": 17,
+    "patience": 3,
+    "best_epoch": 14,
+    "best_recall_at_100": 0.005139676466724374,
+    "best_ndcg_at_100": 0.0012306225651929504
+  },
+  "matched_epoch7": {
+    "epoch": 7,
+    "no_logq_recall": 0.0012327305251072116,
+    "logq_recall": 0.004813947671039111,
+    "recall_fold": 3.905109489051095,
+    "no_logq_ndcg": 0.00026031748881524564,
+    "logq_ndcg": 0.0011549303316214716,
+    "ndcg_fold": 4.436622129683944
+  },
+  "configs": {
+    "two-tower-mean-baseline-config.yaml": {
+      "experiment": {
+        "seed": 42,
+        "dataset": "KuaiRand-1K"
+      },
+      "model": {
+        "item_categorical_features": [
+          "item_id",
+          "author_id",
+          "video_type",
+          "upload_type",
+          "music_id",
+          "music_type",
+          "tag"
+        ],
+        "item_numeric_features": [
+          "video_duration",
+          "server_width",
+          "server_height",
+          "upload_day"
+        ],
+        "category_dim": 8,
+        "user_dim": 32,
+        "tab_dim": 8,
+        "output_dim": 64,
+        "history_length": 50,
+        "history_encoder": "mean",
+        "user_hidden": [
+          128,
+          64
+        ],
+        "item_hidden": [
+          64
+        ],
+        "batch_norm": false,
+        "dropout": 0,
+        "residual_blocks": 0,
+        "attention_heads": 4,
+        "behavior_content_features": true
+      },
+      "training": {
+        "device": "cuda",
+        "deterministic": true,
+        "mixed_precision": true,
+        "batch_size": 256,
+        "epochs": 3,
+        "learning_rate": 0.001,
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "weight_decay": 0,
+        "temperature": 0.1,
+        "log_every": 50,
+        "checkpoint_every": 1000
+      },
+      "evaluation": {
+        "candidate_rule": "upload_next_day",
+        "query_batch_size": 128,
+        "item_batch_size": 16384,
+        "k": 100,
+        "output_dim": 64
+      },
+      "wandb": {
+        "mode": "online",
+        "entity": "SAR-Lab",
+        "project": "kuairand-two-tower",
+        "name": "1k-features-v2-baseline-seed42",
+        "group": "week2-1k-content",
+        "tags": [
+          "1k",
+          "content-15-features",
+          "manual",
+          "baseline",
+          "behavior-content-v2"
+        ]
+      }
+    },
+    "attention-logq-epochs20-es3-config.yaml": {
+      "experiment": {
+        "seed": 42,
+        "dataset": "KuaiRand-1K"
+      },
+      "model": {
+        "item_categorical_features": [
+          "item_id",
+          "author_id",
+          "video_type",
+          "upload_type",
+          "music_id",
+          "music_type",
+          "tag"
+        ],
+        "item_numeric_features": [
+          "video_duration",
+          "server_width",
+          "server_height",
+          "upload_day"
+        ],
+        "category_dim": 8,
+        "user_dim": 32,
+        "tab_dim": 8,
+        "output_dim": 64,
+        "history_length": 50,
+        "history_encoder": "attention",
+        "user_hidden": [
+          256,
+          128,
+          64
+        ],
+        "item_hidden": [
+          128,
+          64
+        ],
+        "batch_norm": true,
+        "dropout": 0.1,
+        "residual_blocks": 1,
+        "attention_heads": 4,
+        "behavior_content_features": true
+      },
+      "training": {
+        "device": "cuda",
+        "deterministic": true,
+        "mixed_precision": true,
+        "batch_size": 256,
+        "epochs": 20,
+        "learning_rate": 0.001,
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "weight_decay": 0,
+        "temperature": 0.1,
+        "log_every": 50,
+        "checkpoint_every": 1000,
+        "early_stopping_patience": 3,
+        "sampling_correction": "logq"
+      },
+      "evaluation": {
+        "candidate_rule": "upload_next_day",
+        "query_batch_size": 128,
+        "item_batch_size": 16384,
+        "k": 100,
+        "output_dim": 64
+      },
+      "wandb": {
+        "mode": "online",
+        "entity": "SAR-Lab",
+        "project": "kuairand-two-tower",
+        "name": "1k-attention-logq-d01-lr0.001-bs256-e20-es3-seed42",
+        "group": "week2-1k-content",
+        "tags": [
+          "1k",
+          "content-15-features",
+          "manual",
+          "deeper",
+          "behavior-content-v2",
+          "attention",
+          "residual",
+          "batchnorm",
+          "combined",
+          "dropout-0.1",
+          "epochs-20",
+          "early-stopping-3",
+          "logq"
+        ]
+      }
+    },
+    "attention-no-logq-epochs10-es3-config.yaml": {
+      "experiment": {
+        "seed": 42,
+        "dataset": "KuaiRand-1K"
+      },
+      "model": {
+        "item_categorical_features": [
+          "item_id",
+          "author_id",
+          "video_type",
+          "upload_type",
+          "music_id",
+          "music_type",
+          "tag"
+        ],
+        "item_numeric_features": [
+          "video_duration",
+          "server_width",
+          "server_height",
+          "upload_day"
+        ],
+        "category_dim": 8,
+        "user_dim": 32,
+        "tab_dim": 8,
+        "output_dim": 64,
+        "history_length": 50,
+        "history_encoder": "attention",
+        "user_hidden": [
+          256,
+          128,
+          64
+        ],
+        "item_hidden": [
+          128,
+          64
+        ],
+        "batch_norm": true,
+        "dropout": 0.1,
+        "residual_blocks": 1,
+        "attention_heads": 4,
+        "behavior_content_features": true
+      },
+      "training": {
+        "device": "cuda",
+        "deterministic": true,
+        "mixed_precision": true,
+        "batch_size": 256,
+        "epochs": 10,
+        "learning_rate": 0.001,
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "weight_decay": 0,
+        "temperature": 0.1,
+        "log_every": 50,
+        "checkpoint_every": 1000,
+        "early_stopping_patience": 3
+      },
+      "evaluation": {
+        "candidate_rule": "upload_next_day",
+        "query_batch_size": 128,
+        "item_batch_size": 16384,
+        "k": 100,
+        "output_dim": 64
+      },
+      "wandb": {
+        "mode": "online",
+        "entity": "SAR-Lab",
+        "project": "kuairand-two-tower",
+        "name": "1k-attention-deeper-residual-bn-d01-lr0.001-bs256-e10-es3-seed42",
+        "group": "week2-1k-content",
+        "tags": [
+          "1k",
+          "content-15-features",
+          "manual",
+          "deeper",
+          "behavior-content-v2",
+          "attention",
+          "residual",
+          "batchnorm",
+          "combined",
+          "dropout-0.1",
+          "epochs-10",
+          "early-stopping-3"
+        ]
+      }
+    }
+  },
+  "pure_history": {
+    "source_path": "research/kuairand/reports/week1/evidence/content-v1/stage_report.json",
+    "protocol": {
+      "manifest_sha256": "1f573d11966024fc42b3ee9b78bd71663fde7b65c56743902384a7bd31376bac",
+      "requests_sha256": "c622789c33544e0122abb8d151ff22a50d8bd2db91a99589fddfba6e7db28efd",
+      "validation_sha256": "e695218509a47971a5c26c260a6fc38a4e37a8fc45dc89b03b1318aa94cc70e7",
+      "candidates_sha256": "9b49e12466f88e9cbf0634b0f8e767104d17a7a4145b7bd730d2275d638c636d",
+      "k": 100,
+      "tie_break": "score descending, raw item_id ascending",
+      "calendar_timezone": "UTC",
+      "repeat_items_allowed": true,
+      "eligibility": "day after upload, UTC",
+      "test_used": false,
+      "raw_archive_sha256": "c814bf6f3624c0cfae83c57de3df26b2ed206e5c57bab4c4dcbfabbabe20cbf0"
+    },
+    "models": {
+      "popularity": {
+        "requests": 30589,
+        "recall_at_100": 0.270783615025009,
+        "ndcg_at_100": 0.06960693883670191,
+        "target_coverage": 1,
+        "covered_recall_at_100": 0.270783615025009,
+        "covered_ndcg_at_100": 0.06960693883670191,
+        "insufficient_k_rate": 0,
+        "unknown_user_rate": 0.039654777861322696,
+        "empty_history_rate": 0.01490731962470169
+      },
+      "basic": {
+        "requests": 30589,
+        "recall_at_100": 0.025041681650266434,
+        "ndcg_at_100": 0.007094781674809495,
+        "target_coverage": 1,
+        "covered_recall_at_100": 0.025041681650266434,
+        "covered_ndcg_at_100": 0.007094781674809495,
+        "insufficient_k_rate": 0,
+        "unknown_user_rate": 0.039654777861322696,
+        "empty_history_rate": 0.01490731962470169
+      },
+      "enhanced": {
+        "requests": 30589,
+        "recall_at_100": 0.022622511360292915,
+        "ndcg_at_100": 0.006144820476977004,
+        "target_coverage": 1,
+        "covered_recall_at_100": 0.022622511360292915,
+        "covered_ndcg_at_100": 0.006144820476977004,
+        "insufficient_k_rate": 0,
+        "unknown_user_rate": 0.039654777861322696,
+        "empty_history_rate": 0.01490731962470169
+      }
+    },
+    "resume_passed": true
+  }
+}

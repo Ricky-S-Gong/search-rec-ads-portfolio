@@ -40,19 +40,19 @@ const t = copy[lang];
 <style>
   .about { max-width: 1120px; }
   h1 { font-size: clamp(2.5rem, 7vw, 5rem); }
-  .crew { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1rem, 2vw, 2rem); }
+  .crew { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1rem, 2vw, 2rem); }
   .crew article { display:grid;justify-items:center;padding-top:clamp(1.4rem,3vw,2rem);overflow:hidden;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(145deg,rgba(16,36,61,.92),rgba(7,17,31,.96)); }
   .portrait { width:clamp(150px,16vw,180px);aspect-ratio:1;overflow:hidden;border:1px solid var(--line);border-radius:50%;background:var(--deep);box-shadow:0 0 38px rgba(167,139,250,.12); }
   .portrait img { width:100%;height:100%;object-fit:cover; }
   .crew article:first-child .portrait img{object-position:50% 58%}.crew article:nth-child(2) .portrait img{object-position:62% 44%}.crew article:nth-child(3) .portrait img{object-position:50% 36%}
-  .profile-copy { display: grid; gap: .55rem; padding: clamp(1.2rem, 3vw, 1.7rem); }
+  .profile-copy { min-width:0;width:100%;display: grid; gap: .55rem; padding: clamp(1.2rem, 3vw, 1.7rem); }
   .profile-copy h2 { font-size: clamp(1.55rem, 3vw, 2.2rem); }
   .profile-details{display:grid;gap:.5rem;margin:.35rem 0 0;padding-left:1.1rem;color:var(--muted);font-size:.92rem}
-  .contacts { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .65rem; padding-top: 1rem; border-top: 1px solid var(--line); }
-  .contacts a { display: inline-flex; align-items: center; justify-content: center; gap:.4rem;min-height:42px;padding:.58rem .85rem;border:1px solid var(--line);border-radius:999px;color:var(--starlight);background:rgba(7,17,31,.62);font:.72rem/1.2 'IBM Plex Mono',monospace;text-decoration:none}.contacts svg{width:16px;height:16px;fill:currentColor;flex:none}
+  .contacts { display: flex; flex-wrap: nowrap; gap: .35rem; margin-top: .65rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+  .contacts a { display: inline-flex; align-items: center; justify-content: center; gap:.25rem;min-height:44px;padding:.58rem .45rem;white-space:nowrap;border:1px solid var(--line);border-radius:999px;color:var(--starlight);background:rgba(7,17,31,.62);font:.72rem/1.2 'IBM Plex Mono',monospace;text-decoration:none}.contacts svg{width:16px;height:16px;fill:currentColor;flex:none}
   .contacts a:hover, .contacts a:focus-visible { border-color: var(--search); color: var(--search); background: rgba(53,208,226,.07); }
   .license { margin-top: 2.5rem; color: var(--muted); font: .76rem/1.6 'IBM Plex Mono', monospace; }
-  @media (max-width: 720px) {
+  @media (max-width: 1000px) {
     .crew { grid-template-columns: 1fr; }
     .portrait { width:clamp(132px,38vw,150px); }
   }

@@ -11,7 +11,7 @@ A bilingual recommendation portfolio with reproducible experiments, measured res
 | Spotify 内容推荐 | 音频属性相似度、Euclidean KNN、精确／聚类 cosine；已发布内容一致性与检索成本指标 | [Spotify](research/spotify-music/README.md) |
 | MovieLens 协同过滤 | Bayesian popularity、bias-aware User-CF / Item-CF；已发布 v4 评估和置信区间 | [MovieLens](research/movielens-cf/README.md) |
 | Goodreads Poetry 矩阵分解 | Basic MF、FunkSVD、ALS、NMF、SVD++，另含 Bias-aware ALS；统一比较与前端产物已完成 | [GoodBooks](research/goodbooks-mf/README.md) |
-| KuaiRand 双塔召回 | Pure 内容属性基线已完成训练、向量导出、精确评估和受控 GPU 恢复检查；1K 扩展与基线协议设计待完成 | [KuaiRand](research/kuairand/README.md) |
+| KuaiRand 双塔召回 | 已发布 1K 注意力 + logQ 验证结果、同轮次对照与候选覆盖审计；Pure 作为历史阶段保留 | [KuaiRand](research/kuairand/README.md) |
 
 这些项目的指标定义和评估人群不同，不能直接横向比较数值。已提交实验是离线结果，不代表线上收益或推荐服务已经部署。
 
@@ -73,7 +73,9 @@ uv run --locked --directory research/kuairand/training ruff check . ../evaluatio
 | `research/kuairand/{data_pipeline,training,evaluation,reports}/` | 数据准备、GPU 训练、精确召回评估和 LaTeX 报告 |
 | `scripts/`, `docs/`, `.github/` | 通用命令、工作区说明、CI 与协作模板 |
 
-当前 KuaiRand 中文报告：[PDF](research/kuairand/reports/week1/week1.pdf) · [LaTeX 源文件](research/kuairand/reports/week1/week1.tex)。详细特征、监督信号和评估定义以报告及对应 JSON 为依据。
+最新 1K 报告：[验证结果与聚合证据](research/kuairand/reports/1k/2026-10-17-logq-vs-popularity-vs-two-tower.md)。页面产物通过 `npm run artifacts:kuairand` 从报告生成，`node scripts/build-kuairand-artifacts.mjs --check` 检查是否过期。
+
+历史 Pure 中文报告：[PDF](research/kuairand/reports/week1/week1.pdf) · [LaTeX 源文件](research/kuairand/reports/week1/week1.tex)。详细特征、监督信号和评估定义以报告及对应 JSON 为依据。
 
 ## Data, artifacts and collaboration / 数据与协作
 
