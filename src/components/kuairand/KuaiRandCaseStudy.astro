@@ -1,0 +1,232 @@
+---
+import type { Lang } from '../../data/site';
+import { href } from '../../data/site';
+import KatexMath from '../shared/KatexMath.astro';
+import metrics from '../../../public/artifacts/kuairand/metrics.json';
+import { coverageBreakdown, formatKuaiRandMetric } from '../../lib/kuairand-metrics';
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const L = (en: string, zh: string) => lang === 'zh' ? zh : en;
+const num = (value: number) => value.toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-US');
+const percent = (value: number, digits = 2) => `${(value * 100).toFixed(digits)}%`;
+const fmt = (value: number | null | undefined, metric = 'recall_at_100') => formatKuaiRandMetric(value, metric, lang);
+const c = metrics.comparison;
+const best = metrics.epochs.find((e) => e.epoch === metrics.early_stopping.best_epoch)!;
+const baseline = c.model_rows[0];
+const current = c.model_rows[3];
+const matched = metrics.matched_epoch7;
+const breakdown = coverageBreakdown(c.queries, metrics.covered_targets, best['validation/hits']);
+const losses = [
+  { label: L('Target outside eligible candidates', '目标不具备候选资格'), color: 'var(--danger)', ...breakdown[0] },
+  { label: L('Eligible target, missed by Top-100', '目标可召回但未命中 Top-100'), color: 'var(--muted)', ...breakdown[1] },
+  { label: L('Retrieved target', '成功召回目标'), color: 'var(--rec)', ...breakdown[2] },
+];
+const labels = [L('Popularity', '热门基线'), L('Mean-history two-tower', '平均历史双塔'), L('Attention · without logQ', '注意力双塔 · 无 logQ'), L('Attention · with logQ', '注意力双塔 · 有 logQ')];
+const evidence = [
+  L('Independently verified counts and ranks', '计数与排名经过独立核验'),
+  L('Historical aggregate; original ranks and checkpoint unavailable', '历史汇总；原始排名与 checkpoint 未找回'),
+  L('Verified epoch-7 snapshot; final run result unknown', '第 7 轮已核验快照；最终成绩未知'),
+  L('17-epoch Colab log; checkpoint and ranks not recomputed for this report', '17 轮 Colab 日志；本报告未重算 checkpoint 与排名'),
+];
+const sameEpochRows = [
+  { label: labels[2], recall_at_100: matched.no_logq_recall, ndcg_at_100: matched.no_logq_ndcg, epochs: matched.epoch, selected: matched.epoch, evidence: evidence[2] },
+  { label: labels[3], recall_at_100: matched.logq_recall, ndcg_at_100: matched.logq_ndcg, epochs: matched.epoch, selected: matched.epoch, evidence: L('Epoch-7 Colab aggregate, seed 42', '第 7 轮 Colab 汇总，seed 42') },
+];
+const comparisons = [
+  { key: 'all', title: L('Recorded validation results', '已记录的验证结果'), rows: c.model_rows.map((row, i) => ({ ...row, label: labels[i], epochs: row.epochs_completed, selected: row.selected_epoch, evidence: evidence[i] })) },
+  { key: 'matched', title: L('Matched epoch 7', '同为第 7 轮'), rows: sameEpochRows },
+];
+const config = metrics.configs['attention-logq-epochs20-es3-config.yaml'];
+const x = (epoch: number) => 70 + (epoch - 1) / (metrics.epochs.length - 1) * 720;
+const ceiling = Math.ceil(Math.max(...metrics.epochs.map(e => e['validation/recall_at_100'])) * 1000) / 1000;
+const y = (recall: number) => 270 - recall / ceiling * 220;
+const ticks = [0, 1, 2, 3].map(tick => ceiling * tick / 3);
+const points = metrics.epochs.map(e => `${x(e.epoch)},${y(e['validation/recall_at_100'])}`).join(' ');
+const reportUrl = metrics.source.report_url;
+const sections = [['business', L('Business & goals', '业务背景与目标')], ['data', L('Data', '数据')], ['model', L('Model & retrieval', '模型与推荐算法')], ['evaluation', L('Evaluation', '评估')]];
+---
+<article class="kuairand">
+  <header class="container kr-hero">
+    <h1>{L('KuaiRand two-tower retrieval', 'KuaiRand 双塔召回')}</h1>
+    <p class="lede">{L('A study of personalized Top-100 candidate retrieval for short-video feeds.', '面向短视频信息流的个性化 Top-100 候选召回研究。')}</p>
+
+  </header>
+
+  <div class="container kr-body">
+    <nav class="section-nav" aria-label={L('Case study sections', '案例章节')}>
+      {sections.map(([id, label], i) => <a href={`#${id}`}><span>0{i + 1}</span>{label}</a>)}
+    </nav>
+
+    <section id="business" class="chapter">
+      <h2><span>01</span> {L('Business background & goals', '业务背景与目标')}</h2>
+      <p>{L('A short-video feed cannot deeply score every video at each request. Candidate retrieval narrows the catalog to a manageable Top-100 using the user’s context and available history. A later ranker would decide what to show; this project evaluates the retrieval step.', '短视频信息流无法在每次请求时对全部视频做复杂打分。候选召回利用用户上下文和当时可用的历史，把目录缩小为 Top-100，再交给后续排序。本项目评估的是候选召回环节。')}</p>
+      <div class="two-columns">
+        <div class="note"><h3>{L('Product decision', '业务决策')}</h3><p>{L('Should personalized retrieval become a candidate source alongside popularity? Compare its ability to retrieve observed long-view targets under the same candidate and evaluation rules.', '个性化召回是否值得成为热门召回之外的候选来源？先在相同候选规则和评估协议下，比较找回实际长观看目标的能力。')}</p></div>
+        <div class="note"><h3>{L('Success criteria', '成功标准')}</h3><p>{L('Improve Recall@100 and NDCG@100, explain the remaining misses, and preserve request-time information boundaries. CTR, watch time and retention would require separate online experiments.', '改善 Recall@100 与 NDCG@100，解释剩余漏召回，并守住请求时的信息边界。点击率、观看时长和留存收益仍需独立线上实验验证。')}</p></div>
+      </div>
+
+    </section>
+
+    <section id="data" class="chapter">
+      <h2><span>02</span> {L('Data', '数据')}</h2>
+      <p>{L('KuaiRand-1K is the source dataset. The figures below describe the frozen kuairand-1k-content-v1 experiment, not the raw dataset’s total interaction count. Only non-random long-view events become positive train and validation queries.', '数据来源为 KuaiRand-1K。下方规模对应冻结的 kuairand-1k-content-v1 实验，不是原始数据的全部交互数。训练与验证的正目标均来自常规曝光中的长观看事件。')}</p>
+    <div class="fact-grid">
+      <div><span>{L('Training positives', '训练正样本')}</span><strong>{num(metrics.train_queries)}</strong><small>long_view = 1 · is_random = 0</small></div>
+      <div><span>{L('Validation requests', '验证请求')}</span><strong>{num(c.queries)}</strong><small>{L('One positive target per event', '每条事件一个正目标')}</small></div>
+      <div><span>{L('Full metadata catalog', '完整元数据目录')}</span><strong>{num(c.catalog_size)}</strong><small>{L('Query-time eligibility applies', '按请求时间检查候选资格')}</small></div>
+    </div>
+      <p><a href="https://zenodo.org/records/10439422" target="_blank" rel="noreferrer">{L('Dataset source and original terms', '数据来源与原始使用条款')} ↗</a></p>
+      <div class="table-scroll" tabindex="0" role="region" aria-label={L('Scrollable data table', '可横向滚动的数据表格')}><table>
+        <caption>{L('Signals used by the 1K experiment', '1K 实验使用的信号')}</caption>
+        <thead><tr><th>{L('Signal', '信号')}</th><th>{L('Role', '作用')}</th><th>{L('Boundary', '使用边界')}</th></tr></thead>
+        <tbody>
+          <tr><th>{L('User and request context', '用户与请求上下文')}</th><td>{L('User identity, scene and time, behavior statistics and preferences', '用户标识、场景与时间、行为统计及偏好')}</td><td>{L('Use request-available information; 131-dimensional user input', '使用请求时可用信息；用户输入共 131 维')}</td></tr>
+          <tr><th>{L('History', '历史反馈')}</th><td>{L('Up to 50 strict history items with behavior feedback; context-query attention', '最多 50 条严格历史，结合行为反馈与上下文查询注意力')}</td><td>{L('The 1K report does not publish the full temporal split or feature reconstruction details; consult the frozen source release', '1K 报告未完整披露时间切分与特征重建细节，需结合冻结源码复核')}</td></tr>
+          <tr><th>{L('Video categories', '视频类别')}</th><td>item_id, author_id, video_type, upload_type, music_id, music_type, tag</td><td>{L('Categorical embedding dimension 8', '类别嵌入维度为 8')}</td></tr>
+          <tr><th>{L('Video numerics', '视频数值')}</th><td>video_duration, server_width, server_height, upload_day</td><td>{L('Video input is 64-dimensional in the 1K release; Pure uses a different input contract', '1K 物品输入共 64 维，与 Pure 的输入协议不同')}</td></tr>
+          <tr><th>{L('Positive label', '正反馈标签')}</th><td><code>long_view=1, is_random=0</code></td><td>{L('Observed under the existing exposure policy; other candidates are not confirmed dislikes', '来自旧策略选择的曝光；其他候选并非已确认的不喜欢')}</td></tr>
+        </tbody>
+      </table></div>
+      <div class="note"><h3>{L('Eligibility is part of the problem', '候选资格也是问题的一部分')}</h3><p>{L(`The full metadata catalog contains ${num(c.catalog_size)} videos. At each query, upload_next_day determines eligibility from the day after upload; seen videos may be recommended again. Only ${num(metrics.covered_targets)} of ${num(c.queries)} positive targets are eligible and covered. Uncovered targets remain in the denominator as misses.`, `完整元数据目录包含 ${num(c.catalog_size)} 个视频；每次请求按 upload_next_day 规则，从上传次日起检查候选资格，允许重复推荐已看视频。${num(c.queries)} 个正目标中有 ${num(metrics.covered_targets)} 个满足候选覆盖条件；未覆盖目标仍留在分母并记为未命中。`)}</p></div>
+      <p>{L('Target coverage measures whether the observed target is retrievable under the protocol. It does not measure how widely recommendations spread across the catalog. Regular exposure reflects the previous recommender’s selection, so this validation is not an unbiased estimate of all user preferences.', '目标覆盖率衡量实际目标在协议下是否具备被召回的条件，不衡量推荐结果覆盖了多少视频。常规曝光受旧推荐策略选择影响，因此本次验证不是对全部用户偏好的无偏估计。')}</p>
+    </section>
+
+    <section id="model" class="chapter">
+      <h2><span>03</span> {L('Model & recommendation algorithm', '模型与推荐算法')}</h2>
+      <p>{L('Two towers encode users and videos independently into one vector space. Video vectors could be precomputed in a serving system; request-time user vectors then retrieve nearby videos. This release uses exact ranking for evaluation. ANN indexing, serving deployment and 1K vector export have not been established by this report.', '双塔分别编码用户与视频，将二者映射到同一向量空间。在服务系统中，视频向量可以预计算，请求时只需编码用户再查找相近视频。本次采用精确排序评估；报告尚未证明 ANN 索引、线上服务部署或 1K 向量导出已经完成。')}</p>
+      <div class="architecture" aria-label={L('Current 1K two-tower architecture', '当前 1K 双塔结构')}>
+        <div class="tower user"><span class="eyebrow">{L('User tower', '用户塔')}</span><h3>{L('User + scene + time', '用户 + 场景 + 时间')}</h3><p>{L('Behavior statistics & preferences', '行为统计与偏好')}</p><div class="flow-node">{L('≤ 50 history items → 4-head attention', '≤ 50 条历史 → 4 头注意力')}</div><div class="flow-arrow" aria-hidden="true">↓</div><code>131 → 256 → 128 → 64 → 64</code><p>Residual · BatchNorm · Dropout {config.model.dropout}</p><strong>{L('L2-normalized user vector · 64D', 'L2 归一化用户向量 · 64 维')}</strong></div>
+        <div class="tower item"><span class="eyebrow">{L('Item tower', '物品塔')}</span><h3>{L('Video + content attributes', '视频 + 内容属性')}</h3><p>{L('Categorical & numeric inputs', '类别与数值输入')}</p><div class="flow-node">{L('Independent video encoding', '独立编码视频')}</div><div class="flow-arrow" aria-hidden="true">↓</div><code>64 → 128 → 64 → 64</code><p>Residual · BatchNorm · Dropout {config.model.dropout}</p><strong>{L('L2-normalized video vector · 64D', 'L2 归一化视频向量 · 64 维')}</strong></div>
+        <div class="retrieval"><strong>{L('Cosine similarity → eligible candidates → exact Top-100', '余弦相似度 → 合规候选 → 精确 Top-100')}</strong><p>{L('FP32 exhaustive ranking · raw video ID ascending for ties · repeats allowed', 'FP32 穷举排序 · 同分按原始视频 ID 升序 · 允许重复推荐')}</p></div>
+      </div>
+      <h3>{L('Why correct the sampled training scores?', '为什么修正训练时的采样分数？')}</h3>
+      <p>{L('In-batch training compares each user’s target with videos from other examples. Frequent targets appear more often in this comparison pool. logQ uses the training target frequency Q(v) to correct the logits consumed by cross-entropy. Non-diagonal duplicates of the same target are masked.', '批内训练将每个用户的目标与其他样本的视频比较；高频目标在比较池中出现得更多。logQ 使用训练正目标频率 Q(v) 修正送入交叉熵的分数，并屏蔽同目标视频的非对角重复位置。')}</p>
+      <KatexMath display latex={'\\ell_{uv}=\\frac{\\langle \\hat{u},\\hat{v}\\rangle}{\\tau}-\\log Q(v)'} label={L('Training logit equals cosine similarity divided by temperature minus log training target frequency', '训练分数等于余弦相似度除以温度，再减去训练目标频率的对数')} />
+      <p>{L(`Here û and v̂ are unit vectors, τ = ${config.training.temperature}, and Q is fitted from training positives only. Validation and inference rank by raw cosine; logQ is not an inference-time popularity penalty.`, `其中 û 与 v̂ 为单位向量，温度 τ = ${config.training.temperature}，Q 仅从训练正目标拟合。验证和推理使用原始余弦排序，logQ 不是推理阶段的热门惩罚。`)}</p>
+      <div class="table-scroll" tabindex="0" role="region" aria-label={L('Scrollable data table', '可横向滚动的数据表格')}><table><caption>{L('What changes between models?', '模型之间改变了什么？')}</caption><thead><tr><th>{L('Model', '模型')}</th><th>{L('History & architecture', '历史与架构')}</th><th>{L('Training budget', '训练预算')}</th></tr></thead><tbody>
+        <tr><th>{labels[0]}</th><td>{L('Count training long-view events; shared list per eligibility state', '统计训练期长观看事件；同一资格状态使用共享榜单')}</td><td>{L('No parameter updates', '无参数训练')}</td></tr>
+        <tr><th>{labels[1]}</th><td>{L('Masked mean history + behavior; user 131→128→64→64, item 64→64→64; no residual or BN', '掩码平均历史 + 行为；用户 131→128→64→64，物品 64→64→64；无残差与 BN')}</td><td>{L('3 epochs; selected epoch unavailable', '3 轮；最佳轮次未提供')}</td></tr>
+        <tr><th>{labels[2]}</th><td>{L('Deeper towers + attention + residual + BN; dropout 0.1', '加深双塔 + 注意力 + 残差 + BN；dropout 0.1')}</td><td>{L('Verified through epoch 7; configured maximum 10', '核验至第 7 轮；配置上限 10 轮')}</td></tr>
+        <tr><th>{labels[3]}</th><td>{L('Same enhanced architecture + training-only logQ', '相同增强架构 + 仅训练阶段的 logQ')}</td><td>{L('Maximum 20; completed 17; best 14; patience 3', '上限 20 轮；完成 17 轮；最佳 14；早停耐心 3')}</td></tr>
+      </tbody></table></div>
+      <p class="provenance">Adam · lr {config.training.learning_rate} · batch {config.training.batch_size} · seed {config.experiment.seed} · CUDA AMP</p>
+    </section>
+
+    <section id="evaluation" class="chapter">
+      <h2><span>04</span> {L('Evaluation', '评估')}</h2>
+      <div class="note progress-note"><h3>{L('Current milestone · research in progress', '当前进展 · 研究进行中')}</h3>
+    <p class="provenance">{metrics.source.date} · {L('Validation only · Test set sealed · No online experiment', '仅验证集 · 测试集封存 · 尚无线上实验')}</p>
+    <p class="result-summary">{L(`On KuaiRand-1K validation, attention + logQ reaches ${fmt(current.recall_at_100)} Recall@100, ${(current.recall_at_100 / baseline.recall_at_100).toFixed(2)}× popularity. The absolute hit rate remains low; this is a research result with substantial room to improve.`, `在 KuaiRand-1K 验证集上，注意力 + logQ 的 Recall@100 为 ${fmt(current.recall_at_100)}，约为热门的 ${(current.recall_at_100 / baseline.recall_at_100).toFixed(2)} 倍。绝对命中率仍低，当前结果说明改进方向，同时也暴露出很大的提升空间。`)}</p>
+      </div>
+      <p>{L('Every validation event has one positive target. Recall@100 is the fraction of events whose target appears in the Top-100, so it equals Hit Rate here. NDCG@100 also rewards placing that target earlier: a hit at rank r scores 1/log₂(r+1), otherwise zero. Both average over events, not equally over users.', '每条验证事件只有一个正目标。Recall@100 是目标出现在 Top-100 中的事件比例，因此在这里等于命中率。NDCG@100 还奖励更靠前的位置：命中排名 r 时得 1/log₂(r+1)，否则为零。两项指标均按事件平均，不按用户等权平均。')}</p>
+      <KatexMath display latex={'\\mathrm{Recall@100}=\\frac{1}{N}\\sum_{q=1}^{N}\\mathbf{1}[r_q\\le100],\\qquad\\mathrm{NDCG@100}=\\frac{1}{N}\\sum_{q=1}^{N}\\frac{\\mathbf{1}[r_q\\le100]}{\\log_2(r_q+1)}'} label={L('Recall and single-target NDCG averaged over validation events; missing targets score zero', '验证事件平均的召回率与单目标 NDCG；未命中目标记零')} />
+      <p class="provenance">{L(`N = ${num(c.queries)} validation events; r is the target’s 1-based rank. Higher is better. Other candidates are treated as non-relevant by the metric, not as confirmed negative feedback.`, `N = ${num(c.queries)} 条验证事件，r 为目标从 1 开始的排名；指标越高越好。指标把其他候选按不相关处理，不代表这些候选是已确认的负反馈。`)}</p>
+
+      <div class="dashboard" data-kr-comparison data-lang={lang}>
+        <div class="dashboard-heading"><span class="chart-number">A</span><div><h3>{L('How much does the model improve?', '模型究竟改善了多少？')}</h3><p>{L('Full-catalog validation · two complementary comparisons', '全目录验证 · 两种互补的比较口径')}</p></div></div>
+        <div class="controls" hidden data-kr-controls>
+          <label>{L('Comparison', '比较口径')}<select data-kr-view aria-label={L('Comparison', '比较口径')}><option value="all">{L('Recorded results', '已记录结果')}</option><option value="matched">{L('Matched epoch 7', '同为第 7 轮')}</option></select></label>
+          <label>{L('Metric', '指标')}<select data-kr-metric aria-label={L('Metric', '指标')}><option value="recall_at_100">Recall@100 (%)</option><option value="ndcg_at_100">NDCG@100</option></select></label>
+        </div>
+        <p class="provenance">{L('Recall is shown as a percentage; NDCG is a unitless score. Each chart starts at zero. Exact values and evidence are in the tables below.', 'Recall 以百分比展示，NDCG 为无量纲分数；图形均从零起始。下表提供精确数值和证据说明。')}</p>
+        <div aria-live="polite" aria-atomic="true" class="comparison-summary" data-kr-summary>{L(`Best logQ vs popularity: ${(current.recall_at_100 / baseline.recall_at_100).toFixed(2)}× Recall, +${((current.recall_at_100 - baseline.recall_at_100) * 100).toFixed(6)} percentage points.`, `最佳 logQ 对热门：Recall ${(current.recall_at_100 / baseline.recall_at_100).toFixed(2)} 倍，增加 ${((current.recall_at_100 - baseline.recall_at_100) * 100).toFixed(6)} 个百分点。`)}</div>
+        {comparisons.map(group => <div data-kr-group={group.key}>
+          <h4>{group.title}</h4>
+          <div class="bar-chart" aria-label={`${group.title} Recall@100`} data-kr-bars>
+            {group.rows.map(row => <div class="bar-row" data-recall={row.recall_at_100} data-ndcg={row.ndcg_at_100}><span>{row.label}</span><div class="bar-track"><div class="bar-fill" style={`width:${row.recall_at_100 / Math.max(...group.rows.map(r => r.recall_at_100)) * 100}%`}></div></div><strong data-kr-value>{fmt(row.recall_at_100)}</strong></div>)}
+          </div>
+          <div class="table-scroll" tabindex="0" role="region" aria-label={L('Scrollable data table', '可横向滚动的数据表格')}><table><caption>{group.title} · {L('exact values & evidence', '精确数值与证据')}</caption><thead><tr><th>{L('Model', '模型')}</th><th>Recall@100 (%)</th><th>NDCG@100</th><th>{L('Recorded / selected epoch', '已记录 / 选定轮次')}</th><th>{L('Evidence', '证据')}</th></tr></thead><tbody>
+            {group.rows.map(row => <tr><th>{row.label}</th><td>{fmt(row.recall_at_100)}</td><td>{fmt(row.ndcg_at_100, 'ndcg_at_100')}</td><td>{row.epochs} / {row.selected ?? L('Not provided', '未提供')}</td><td>{row.evidence}</td></tr>)}
+          </tbody></table></div>
+        </div>)}
+        <p class="insight">{L(`At epoch 7, logQ improves Recall by ${(matched.logq_recall / matched.no_logq_recall).toFixed(2)}× and NDCG by ${(matched.logq_ndcg / matched.no_logq_ndcg).toFixed(2)}× over the otherwise matching attention model. This supports sampling correction for this seed; it does not establish multi-seed significance or test-set gains. The best-epoch comparison also changes the training and selection budget.`, `同为第 7 轮时，logQ 相对相同注意力架构的 Recall 为 ${(matched.logq_recall / matched.no_logq_recall).toFixed(2)} 倍、NDCG 为 ${(matched.logq_ndcg / matched.no_logq_ndcg).toFixed(2)} 倍。这支持采样修正在该 seed 下有效，尚不代表多 seed 统计结论或测试集收益。最佳轮次对照还改变了训练与选择预算。`)}</p>
+        <a class="evidence-link" href={reportUrl} target="_blank" rel="noreferrer">{L('Source: model aggregates and matched-epoch evidence', '来源：模型聚合结果与同轮次对照证据')} ↗</a>
+      </div>
+
+      <div class="dashboard">
+        <div class="dashboard-heading"><span class="chart-number">B</span><div><h3>{L('Where are targets lost?', '目标在哪一步丢失？')}</h3><p>{L('Best logQ checkpoint · all validation events', 'logQ 最佳 checkpoint · 全部验证事件')}</p></div></div>
+        <div class="loss-stack" role="img" aria-label={losses.map(row => `${row.label}: ${num(row.count)} (${percent(row.share)})`).join('; ')}>{losses.map(row => <span style={`--segment-color:${row.color};width:${row.share * 100}%`}></span>)}</div>
+        <div class="table-scroll" tabindex="0" role="region" aria-label={L('Scrollable data table', '可横向滚动的数据表格')}><table><caption>{L('Target availability and retrieval decomposition', '目标可用性与召回分解')}</caption><thead><tr><th>{L('Outcome', '结果')}</th><th>{L('Requests', '请求数')}</th><th>{L('Share of all requests', '占全部请求')}</th></tr></thead><tbody>{losses.map(row => <tr><th><span class="legend-dot" style={`background:${row.color}`}></span>{row.label}</th><td>{num(row.count)}</td><td>{percent(row.share, 6)}</td></tr>)}</tbody></table></div>
+        <p class="insight">{L(`${percent(breakdown[0].share)} of targets cannot be retrieved under this candidate protocol; audit catalog coverage and eligibility metadata before changing the model. Yet ${percent(breakdown[1].share)} of all requests have eligible targets that the model still misses. Fixing availability alone would leave most misses unresolved. Preserve request-time rules when investigating either gap.`, `${percent(breakdown[0].share)} 的目标在当前候选协议下无法召回，应核查目录覆盖与资格元数据。同时，${percent(breakdown[1].share)} 的全部请求中，目标具备资格但模型仍未命中。仅修复可用性也无法解决大部分漏召回；排查时应继续遵守请求时的信息边界。`)}</p>
+        <a class="evidence-link" href={reportUrl} target="_blank" rel="noreferrer">{L('Source: popularity coverage audit and epoch-14 hit count', '来源：热门覆盖审计与第 14 轮命中数')} ↗</a>
+      </div>
+
+      <div class="dashboard">
+        <div class="dashboard-heading"><span class="chart-number">C</span><div><h3>{L('When does more training stop helping?', '继续训练何时不再带来改善？')}</h3><p>{L('logQ validation Recall@100 · 17 completed epochs', 'logQ 验证 Recall@100 · 已完成 17 轮')}</p></div></div>
+        <div class="chart-scroll" tabindex="0" role="region" aria-label={L('Scrollable training curve', '可横向滚动的训练曲线')}><svg class="epoch-chart" viewBox="0 0 850 330" role="img" aria-labelledby={`epoch-title-${lang} epoch-desc-${lang}`}>
+          <title id={`epoch-title-${lang}`}>{L('Recall@100 over training epochs', '逐轮 Recall@100')}</title>
+          <desc id={`epoch-desc-${lang}`}>{L(`Best epoch ${best.epoch}: ${fmt(best['validation/recall_at_100'])}. Stopped at epoch 17. Exact values follow in the table.`, `最佳第 ${best.epoch} 轮：${fmt(best['validation/recall_at_100'])}，第 17 轮早停。精确数值见后方表格。`)}</desc>
+          {ticks.map(value => <g><line x1="70" y1={y(value)} x2="790" y2={y(value)} class="grid-line"/><text x="58" y={y(value) + 5} text-anchor="end">{percent(value, 1)}</text></g>)}
+          <text x="70" y="22">Recall@100 (%)</text>
+          <polyline points={points} fill="none" stroke="var(--rec)" stroke-width="3" />
+          {metrics.epochs.map(epoch => <circle cx={x(epoch.epoch)} cy={y(epoch['validation/recall_at_100'])} r={epoch.epoch === best.epoch ? 6 : 3} fill={epoch.epoch === best.epoch ? 'var(--ads)' : 'var(--rec)'} />)}
+          {[1, 7, 14, 17].map(epoch => <text x={x(epoch)} y="294" text-anchor="middle">{epoch}</text>)}
+          <text x="430" y="322" text-anchor="middle">{L('Completed epoch', '已完成轮次')}</text>
+          <text x={x(7)} y="42" text-anchor="middle">{L('7 · matched', '7 · 同轮对照')}</text>
+          <line x1={x(7)} x2={x(7)} y1="50" y2="270" class="marker-line" />
+          <text x={x(14)} y="42" text-anchor="middle" class="best-label">{L('14 · best', '14 · 最佳')}</text>
+          <text x={x(17)} y="42" text-anchor="end">{L('17 · stop', '17 · 早停')}</text>
+        </svg></div>
+        <p class="insight">{L(`Epoch ${best.epoch} is selected by validation Recall, with NDCG breaking ties. Three subsequent epochs do not improve Recall, triggering early stopping at ${metrics.early_stopping.epoch}. This avoids selecting the last checkpoint by default; repeated validation selection still requires a sealed test and multiple seeds for a stronger conclusion.`, `按验证 Recall 优先、NDCG 打破并列，选定第 ${best.epoch} 轮。后续连续三轮 Recall 未提升，在第 ${metrics.early_stopping.epoch} 轮触发早停，因此最终采用最佳 checkpoint。反复使用验证集选择模型后，仍需封存测试集与多 seed 实验增强结论。`)}</p>
+        <details><summary>{L('Inspect all 17 epochs', '查看全部 17 轮数值')}</summary><div class="table-scroll" tabindex="0" role="region" aria-label={L('Scrollable data table', '可横向滚动的数据表格')}><table><caption>{L('Recorded Colab validation history', 'Colab 已记录验证历史')}</caption><thead><tr><th>Epoch</th><th>Recall@100 (%)</th><th>NDCG@100</th><th>{L('Hits', '命中数')}</th><th>{L('New best', '刷新最佳')}</th></tr></thead><tbody>{metrics.epochs.map(e => <tr><th>{e.epoch}{e.epoch === best.epoch ? ' ★' : ''}</th><td>{fmt(e['validation/recall_at_100'])}</td><td>{fmt(e['validation/ndcg_at_100'], 'ndcg_at_100')}</td><td>{num(e['validation/hits'])}</td><td>{e['validation/improved'] ? L('Yes', '是') : L('No', '否')}</td></tr>)}</tbody></table></div></details>
+        <a class="evidence-link" href={metrics.source.colab_url} target="_blank" rel="noreferrer">{L('Source: executed Colab aggregate log', '来源：已执行 Colab 聚合日志')} ↗</a>
+      </div>
+
+      <h3>{L('What this evidence supports', '这些证据支持什么结论')}</h3>
+      <p>{L('The enhanced logQ model is a promising offline candidate source, with a clear gain over popularity in this 1K validation protocol. The absolute hit rate remains below 1%. Architecture, sampling correction, training budget and model selection all matter; the four-row table cannot isolate their individual contributions.', '增强后的 logQ 模型是值得继续研究的离线候选来源，在本次 1K 验证协议下明显超过热门，但绝对命中率仍低于 1%。架构、采样修正、训练预算和模型选择都可能影响结果，四组结果表无法单独识别每一项的贡献。')}</p>
+      <p>{L('Next: audit uncovered targets, repeat controlled comparisons across seeds and matched budgets, then freeze the decision before evaluating the sealed test. Any production proposal also needs catalog coverage and head/tail slices, ANN recall/cost checks and online user outcomes. These measurements are not available in the published report.', '下一步应先审计未覆盖目标，在匹配训练预算下开展多 seed 对照，再冻结方案并评估封存测试集。进入生产评估还需补充目录覆盖、头尾部切片、ANN 召回与成本，以及线上用户结果；当前报告尚未提供这些测量。')}</p>
+
+      <details class="history"><summary>{L('Earlier milestone: Pure Week 1', '历史阶段：Pure Week 1')}</summary>
+        <p>{L('Pure established training, exact evaluation and controlled same-runtime CUDA recovery. Its dataset and protocol differ from 1K; these results are historical context, not a comparable progress curve.', 'Pure 完成了训练、精确评估和同一 runtime 内的受控 CUDA 恢复验证。它与 1K 的数据及协议不同，下列结果仅作历史背景，不构成可直接比较的进步曲线。')}</p>
+        <div class="table-scroll" tabindex="0" role="region" aria-label={L('Scrollable data table', '可横向滚动的数据表格')}><table><caption>Pure · {L('separate validation protocol', '独立验证协议')}</caption><thead><tr><th>{L('Model', '模型')}</th><th>Recall@100 (%)</th><th>NDCG@100</th></tr></thead><tbody>{Object.entries(metrics.pure_history.models).map(([name, row]) => <tr><th>{name}</th><td>{fmt(row.recall_at_100)}</td><td>{fmt(row.ndcg_at_100, 'ndcg_at_100')}</td></tr>)}</tbody></table></div>
+        <p><a href="https://github.com/Ricky-S-Gong/search-rec-ads-portfolio/tree/main/research/kuairand/reports/week1" target="_blank" rel="noreferrer">{L('Pure report & evidence', 'Pure 报告与证据')} ↗</a></p>
+      </details>
+      <div class="note provenance-note"><h3>{L('Evidence & reproduction', '证据与复核')}</h3>    <div class="resource-links">
+      <a href={reportUrl} target="_blank" rel="noreferrer">{L('Latest report', '最新报告')} ↗</a>
+      <a href={metrics.source.run_url} target="_blank" rel="noreferrer">W&amp;B ↗</a>
+      <a href={metrics.source.colab_url} target="_blank" rel="noreferrer">Colab ↗</a>
+      <a href={metrics.source.source_zip_url} target="_blank" rel="noreferrer">{L('Frozen 1K source', '1K 冻结源码')} ↗</a>
+    </div>
+<p>{L('This page is generated from the checked-in 1K report and Pure aggregates. The actual 1K training code is a separate frozen Drive release; the repository’s Pure training CLI does not reproduce it. Raw data, per-request predictions, weights and vectors remain outside Git.', '本页由仓库内的 1K 报告和 Pure 聚合证据生成。实际 1K 训练代码是独立冻结的 Drive release，仓库中的 Pure 训练 CLI 不能复现该实验。原始数据、逐请求预测、权重和向量保存在 Git 之外。')}</p><code>npm run artifacts:kuairand</code><p><a href={href('/artifacts/kuairand/metrics.json')}>{L('Download page evidence (JSON)', '下载页面证据（JSON）')}</a> · <a href={reportUrl} target="_blank" rel="noreferrer">{L('Read source report', '阅读来源报告')} ↗</a></p><p class="hash">Source ZIP SHA256: {metrics.source.source_zip_sha256}</p><p class="hash">Report SHA256: {metrics.source.report_sha256}</p></div>
+    </section>
+  </div>
+</article>
+<script>
+  import { formatKuaiRandMetric } from '../../lib/kuairand-metrics';
+  document.querySelectorAll<HTMLElement>('[data-kr-comparison]').forEach(dashboard => {
+    const controls = dashboard.querySelector<HTMLElement>('[data-kr-controls]')!;
+    const view = dashboard.querySelector<HTMLSelectElement>('[data-kr-view]')!;
+    const metric = dashboard.querySelector<HTMLSelectElement>('[data-kr-metric]')!;
+    const groups = [...dashboard.querySelectorAll<HTMLElement>('[data-kr-group]')];
+    const summary = dashboard.querySelector<HTMLElement>('[data-kr-summary]')!;
+    const lang = dashboard.dataset.lang === 'zh' ? 'zh' : 'en';
+    const update = () => {
+      groups.forEach(group => {
+        group.hidden = group.dataset.krGroup !== view.value;
+        const rows = [...group.querySelectorAll<HTMLElement>('[data-recall]')];
+        const values = rows.map(row => Number(metric.value === 'recall_at_100' ? row.dataset.recall : row.dataset.ndcg));
+        rows.forEach((row, i) => {
+          row.querySelector<HTMLElement>('.bar-fill')!.style.width = `${values[i] / Math.max(...values) * 100}%`;
+          row.querySelector<HTMLElement>('[data-kr-value]')!.textContent = formatKuaiRandMetric(values[i], metric.value, lang);
+        });
+        group.querySelector('[data-kr-bars]')!.setAttribute('aria-label', `${group.querySelector('h4')!.textContent} ${metric.value === 'recall_at_100' ? 'Recall@100 (%)' : 'NDCG@100'}`);
+        if (!group.hidden) {
+          const reference = values[0];
+          const candidate = values[values.length - 1];
+          const fold = (candidate / reference).toFixed(2);
+          const delta = metric.value === 'recall_at_100' ? ((candidate - reference) * 100).toFixed(6) : (candidate - reference).toFixed(9);
+          const comparison = view.value === 'matched' ? (lang === 'zh' ? '同为第 7 轮，有 logQ 对无 logQ' : 'Matched epoch 7, with vs without logQ') : (lang === 'zh' ? '最佳 logQ 对热门' : 'Best logQ vs popularity');
+          summary.textContent = `${comparison}: ${fold}× · +${delta}${metric.value === 'recall_at_100' ? (lang === 'zh' ? ' 个百分点' : ' percentage points') : ' NDCG'}`;
+        }
+      });
+    };
+    controls.hidden = false;
+    view.addEventListener('change', update);
+    metric.addEventListener('change', update);
+    update();
+  });
+</script>
+<style>
+  .kuairand{--reading:1088px}.kr-hero{display:grid;gap:1rem;padding-block:clamp(2.5rem,5vw,4rem);max-width:var(--reading)}h1{font-size:clamp(1.25rem,4.5vw,3.65rem);max-width:none;white-space:nowrap;letter-spacing:-.035em}.lede{font-size:clamp(1rem,1.8vw,1.2rem);max-width:none;color:var(--muted)}.result-summary{max-width:78ch}.resource-links{display:flex;flex-wrap:wrap;gap:.55rem}.resource-links a{display:inline-flex;align-items:center;min-height:44px;padding:.5rem .8rem;border:1px solid var(--line);border-radius:999px;text-decoration:none;font-size:.85rem}.resource-links a:hover{border-color:var(--rec)}.provenance{color:var(--muted);font-size:.83rem;line-height:1.7}.fact-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-block:1px solid var(--line);margin-top:.7rem}.fact-grid>div{display:grid;gap:.5rem;padding:1.4rem 1rem;border-right:1px solid var(--line)}.fact-grid>div:last-child{border:0}.fact-grid span,.fact-grid small{color:var(--muted);font-size:.82rem}.fact-grid strong{font:500 clamp(1.45rem,2.8vw,2.2rem) 'IBM Plex Mono',monospace}.kr-body{max-width:var(--reading);padding-bottom:5rem}.section-nav{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--line)}.section-nav a{display:flex;align-items:baseline;gap:.5rem;padding:.5rem 0;text-decoration:none;font-size:.86rem}.section-nav span{color:var(--rec);font-family:'IBM Plex Mono',monospace}.chapter{display:grid;gap:1.35rem;margin-top:1.5rem;padding:clamp(1rem,3vw,2rem);border:1px solid var(--line);border-radius:var(--radius);background:rgba(12,27,48,.55);scroll-margin-top:90px;min-width:0}.chapter>*{min-width:0}.chapter h2{display:flex;align-items:baseline;gap:.8rem;font-size:clamp(1.5rem,3vw,2.25rem);max-width:none;padding-bottom:1.1rem;border-bottom:1px solid var(--line)}.chapter h2>span{flex:none;color:var(--rec);font:400 .85rem 'IBM Plex Mono',monospace;letter-spacing:.08em}.chapter h3{font-size:1.25rem}.chapter>p{max-width:86ch}.two-columns,.architecture{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}.note{display:grid;gap:.75rem;padding:1.25rem;border-left:3px solid var(--rec);background:var(--deep)}.note p{color:var(--muted)}.table-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}.kuairand table{width:100%;border-collapse:collapse;font-size:.85rem;text-align:left}.kuairand caption{text-align:left;color:var(--muted);font-size:.8rem;margin-bottom:.75rem}.kuairand th,.kuairand td{padding:.85rem .75rem;border-bottom:1px solid var(--line);vertical-align:top}.kuairand thead th{color:var(--muted);font-weight:500}.kuairand td{font-variant-numeric:tabular-nums}.tower{display:grid;gap:.75rem;align-content:start;padding:1.5rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel)}.tower p{color:var(--muted);font-size:.85rem}.tower code{font-size:clamp(.8rem,1.4vw,1rem);white-space:normal}.tower strong{font-size:.95rem;color:var(--rec)}.tower.item strong,.tower.item .eyebrow{color:var(--search)}.flow-node{padding:.65rem;background:var(--deep);border-radius:8px;font-size:.9rem}.flow-arrow{color:var(--muted);text-align:center}.retrieval{grid-column:1/-1;text-align:center;padding:1.3rem;border:1px solid var(--rec);border-radius:var(--radius)}.retrieval p{color:var(--muted);font-size:.85rem;margin-top:.5rem}.dashboard{min-width:0;display:grid;gap:1.25rem;padding:clamp(1rem,3vw,1.8rem);margin-top:1rem;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(145deg,var(--panel),var(--void))}.dashboard-heading{display:flex;gap:1rem;align-items:flex-start}.dashboard-heading p{color:var(--muted);font-size:.85rem;margin-top:.45rem}.chart-number{display:grid;place-items:center;flex-shrink:0;width:2rem;height:2rem;border:1px solid var(--rec);border-radius:50%;font:.85rem 'IBM Plex Mono',monospace;color:var(--rec)}.controls{display:flex;flex-wrap:wrap;gap:1rem}.controls[hidden]{display:none}.controls label{display:grid;gap:.4rem;color:var(--muted);font-size:.8rem}.controls select{max-width:100%;min-height:44px;padding:.5rem 1.8rem .5rem .7rem;background:var(--deep);color:var(--starlight);border:1px solid var(--line);border-radius:8px;font:inherit}.comparison-summary{padding:.8rem;border-left:3px solid var(--ads);font-size:.95rem}.dashboard h4{font-size:.95rem;margin-block:.5rem 1rem}.bar-chart{display:grid;gap:1rem;margin-bottom:1.4rem}.bar-row{display:grid;grid-template-columns:minmax(150px,1fr) minmax(70px,1.6fr) 120px;gap:.8rem;align-items:center;font-size:.8rem}.bar-row strong{text-align:right;font-family:'IBM Plex Mono',monospace;font-size:.78rem;white-space:nowrap}.bar-track{height:13px;background:var(--deep);border-radius:3px;overflow:hidden}.bar-fill{height:100%;background:var(--rec);border-radius:3px}.bar-row:last-child .bar-fill{background:var(--search)}.insight{color:var(--starlight);font-size:.94rem;line-height:1.85}.evidence-link{font-size:.8rem;color:var(--muted)}.loss-stack{display:flex;height:32px;overflow:hidden;border-radius:6px;outline:1px solid var(--line)}.loss-stack span{background:var(--segment-color);flex-shrink:0}.legend-dot{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;margin-right:.5rem}.chart-scroll{max-width:100%;overflow-x:auto}.epoch-chart{display:block;width:100%;height:auto;overflow:visible}.epoch-chart text{fill:var(--muted);font:13px 'IBM Plex Sans',sans-serif}.epoch-chart .best-label{fill:var(--ads)}.grid-line{stroke:var(--line);stroke-width:1}.marker-line{stroke:var(--line);stroke-width:1;stroke-dasharray:4 4}.kuairand details summary{cursor:pointer;min-height:44px;padding-block:.6rem;color:var(--rec);font-weight:500}.kuairand details p{margin-block:1rem}.history{padding:1rem;border:1px solid var(--line);border-radius:12px}.hash{overflow-wrap:anywhere;font:.75rem/1.7 'IBM Plex Mono',monospace}.provenance-note code{overflow-wrap:anywhere}.kuairand :global(.katex-math-block){display:block;min-width:0;max-width:100%;overflow-x:auto;padding-block:.75rem;text-align:center}.dashboard>*{min-width:0}.kuairand a:focus-visible,.kuairand select:focus-visible,.kuairand summary:focus-visible{outline:2px solid var(--search);outline-offset:4px}
+  @media(max-width:700px){.fact-grid{grid-template-columns:1fr}.fact-grid>div{border-right:0;border-bottom:1px solid var(--line);padding-inline:0}.section-nav{grid-template-columns:repeat(2,minmax(0,1fr))}.two-columns,.architecture{grid-template-columns:1fr}.chapter{padding:1rem;gap:1.1rem}.chapter h2{font-size:1.4rem;gap:.6rem}.bar-row{grid-template-columns:minmax(0,1fr) 110px;gap:.4rem}.bar-row>span{grid-column:1/-1}.bar-track{grid-column:1}.kuairand th,.kuairand td{min-width:110px}.kuairand th:last-child,.kuairand td:last-child{min-width:150px}.epoch-chart{min-width:680px}.controls label{flex:1;min-width:0}.dashboard-heading h3{font-size:1.1rem}}
+</style>

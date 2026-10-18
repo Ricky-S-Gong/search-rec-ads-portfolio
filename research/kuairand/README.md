@@ -1,6 +1,6 @@
 # KuaiRand：双塔候选召回
 
-给定用户在请求时的上下文，从符合时间资格的视频中召回 Top-100。当前完成的是 **KuaiRand-Pure Week 1 内容属性实验**；模型尚未超过热门基线，1K 预处理和新的基线／评估协议属于下一周任务。
+给定用户在请求时的上下文，从符合时间资格的视频中召回 Top-100。最新进展为 **KuaiRand-1K 注意力 + logQ 验证实验**；Pure Week 1 内容属性实验保留为历史阶段。封存测试集尚未评估，当前没有线上收益结论。
 
 ## Navigation / 模块职责
 
@@ -14,6 +14,12 @@
 `training/recommender/vendor/data_pipeline_snapshot/` 是固定版本的上游物品塔，不直接修改其文件或 provenance hash。统一执行入口为 `training/run.py`，没有第二套训练系统。
 
 ## Latest measured experiment / 最新实测
+
+2026-10-17 的 [1K 报告](reports/1k/2026-10-17-logq-vs-popularity-vs-two-tower.md) 发布了全目录验证结果、17 轮日志、同为第 7 轮的有／无 logQ 对照与候选覆盖审计。数值及证据强度以该报告内 JSON 为准；网站用 `npm run artifacts:kuairand` 生成轻量产物。
+
+1K 训练使用独立冻结的 Drive 源码 release，**不是下方 Pure `training/run.py` 的执行结果**。热门经过独立核验，无 logQ 是第 7 轮已核验快照，logQ 来源为已执行 Colab 聚合日志；历史基础双塔只有汇总记录。Pure 与 1K 的数据、输入维度和评估协议不同，不直接比较指标。
+
+## Historical Pure experiment / 历史 Pure 实测
 
 Release：`week1-pure-content-v1-001`；执行源码：`562682341f1b7a9cc49e518fc43b948052ecf871`。两组各消费 124,255 条训练正反馈、486 次更新，使用同一份 30,589 条验证请求和 7,583 个候选。
 
@@ -29,7 +35,7 @@ Release：`week1-pure-content-v1-001`；执行源码：`562682341f1b7a9cc49e518f
 
 结果来自常规曝光验证，受旧推荐策略的选择偏差影响，不能解释为无偏偏好评价或线上效果上限。下一阶段需设计随机曝光下的计数／长观看率基线及独立时间窗口评估。发布属性采用固定内容假设，只有时长与请求日志独立核对；可见状态、整月统计和无历史版本的用户统计被排除。
 
-## Run / 运行入口
+## Run Pure / Pure 运行入口
 
 在仓库根目录：
 

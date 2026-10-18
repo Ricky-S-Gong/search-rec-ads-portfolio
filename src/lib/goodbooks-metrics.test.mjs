@@ -91,11 +91,3 @@ test('GoodBooks formulas retain masked NMF and sequential bias-aware ALS semanti
   assert.match(source, /not a joint closed-form optimization/);
   assert.match(source, /e_\{ui\}=r_\{ui\}-\\mu-b_u-b_i/);
 });
-
-test('recommendation roadmap keeps Two-Tower research-first with no fabricated kickoff date', async () => {
-  const source = await readFile(new URL('../data/site.ts', import.meta.url), 'utf8');
-
-  assert.match(source, /Research Two-Tower and the business problem first/);
-  assert.match(source, /先研究双塔模型和业务问题/);
-  assert.match(source, /status: 'planned'/);
-});

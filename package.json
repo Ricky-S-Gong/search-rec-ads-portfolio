@@ -8,7 +8,8 @@
     "build": "ASTRO_TELEMETRY_DISABLED=1 astro check && ASTRO_TELEMETRY_DISABLED=1 astro build",
     "preview": "ASTRO_TELEMETRY_DISABLED=1 astro preview",
     "check": "ASTRO_TELEMETRY_DISABLED=1 astro check",
-    "test": "node --experimental-strip-types --test src/lib/*.test.mjs"
+    "test": "node --experimental-strip-types --test src/lib/*.test.mjs",
+    "artifacts:kuairand": "node scripts/build-kuairand-artifacts.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.0.0",
