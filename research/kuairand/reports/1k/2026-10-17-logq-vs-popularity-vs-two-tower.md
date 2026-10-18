@@ -1,4 +1,4 @@
-# KuaiRand-1K：logQ vs 热门基线 vs 基础双塔 / Experiment results
+# KuaiRand-1K：有/无 logQ、热门基线与基础双塔 / With and without logQ vs baselines
 
 2026-10-17 · Validation only / 仅验证集 · run `c90679f9d390`
 
@@ -8,6 +8,7 @@ logQ 实验已完成：最多 20 epochs，在第 17 轮因连续 3 轮未提升�
 | --- | ---: | ---: | ---: | ---: |
 | 热门基线 / Popularity | 0 | 未取得 / unavailable | 0.160165% | 0.000332050 |
 | 基础双塔 / Mean-history two-tower | 3 | 未取得 / unavailable | 0.079183% | 0.000158277 |
+| 未加 logQ / Attention + Residual + BN | 已核验至 7 / verified through 7 | 7（快照 / snapshot） | 0.123273% | 0.000260317 |
 | 当前 logQ 双塔 / Attention + Residual + BN + logQ | 17 | 14 | 0.513968% | 0.001230623 |
 
 当前 logQ 相对热门基线 Recall/NDCG 分别约 **3.21× / 3.71×**，相对已记录基础双塔约 **6.49× / 7.78×**。架构、训练与模型选择预算不同，不能把全部差距归因于 logQ。These are observed validation comparisons, not an isolated causal ablation or held-out test result.
@@ -28,6 +29,18 @@ logQ 实验已完成：最多 20 epochs，在第 17 轮因连续 3 轮未提升�
 **当前 / Current logQ:** Deeper + 4-head context-query Attention + Residual + BatchNorm + Dropout=0.1。用户 MLP `131→256→128→64→64`，物品 `64→128→64→64`；每个隐藏层后一个 residual block。最多 50 条严格历史，输入同为用户 131 / 物品 64 维，输出 normalized 64 维。Adam lr=0.001、batch=256、temperature=0.1、seed=42、CUDA AMP。每轮完整验证，以 Recall 优先、NDCG 打破并列选择 checkpoint。
 
 **logQ:** `training_logit = cosine / temperature - log(Q(video))`。Q 仅由训练正目标频率拟合，批内重复目标的非对角位置屏蔽；验证和推理使用原始 cosine。Training-only correction; no logQ adjustment to evaluation scoring.
+
+## 未加 logQ 的对照 / Without-logQ reference
+
+已补充 run `181951c41957` 的**第 7 轮已核验快照**：Recall@100 **0.123273%**，NDCG@100 **0.000260317**，命中 **685/555,677**。其 best.pt、配置/数据/源码绑定已核对；完整验证排名文件按 event identity、唯一记录数、候选资格与指标做过独立 SQL/NumPy 核验。这里不推断该 run 后续轮次或最终成绩。
+
+The without-logQ run has a verified epoch-7 snapshot, not an established final-run result. Its full validation rank file and checkpoint/data/config/code bindings were checked. The table distinguishes it from the simple mean-history baseline.
+
+它与当前模型都使用 Deeper + Attention + Residual + BatchNorm + dropout=0.1、lr=0.001、batch=256、temperature=0.1、seed=42、相同 1K 特征和评估口径。旧配置上限 10 轮，新 logQ 上限 20 轮；第 14 轮对第 7 轮的比较训练预算不同。
+
+**同为第 7 轮 / Matched epoch 7：** 未加 logQ 的 Recall **0.123273%** → 加 logQ **0.481395%**（**3.91×**）；NDCG **0.000260317** → **0.001154930**（**4.44×**）。该单 seed 对照支持采样修正有效，尚不代表多随机种子统计结论或测试集收益。
+
+[未加 logQ 的 W&B run](https://wandb.ai/SAR-Lab/kuairand-two-tower/runs/181951c41957)；完整聚合指标、checkpoint/rank hash 和配置在文末 JSON 中。
 
 ## 证据完整性 / Evidence limits
 
@@ -72,7 +85,7 @@ The historical mean-history baseline aggregate has weaker provenance than the cu
 ## 可复核的聚合证据与配置 / Aggregate evidence and configs
 
 <details>
-<summary>展开完整 JSON：三组结果、来源、17 轮日志、配置与版本 / Full JSON</summary>
+<summary>展开完整 JSON：四组结果、来源、17 轮日志、配置与版本 / Full JSON</summary>
 
 ```json
 {
@@ -108,6 +121,16 @@ The historical mean-history baseline aggregate has weaker provenance than the cu
         "recall_percent": 0.07918269066382089
       },
       {
+        "model_id": "attention-residual-bn-no-logq-epoch7",
+        "label": "未加 logQ / Attention + Residual + BN",
+        "epochs_completed": 7,
+        "selected_epoch": 7,
+        "recall_at_100": 0.0012327305251072116,
+        "ndcg_at_100": 0.00026031748881524564,
+        "recall_percent": 0.12327305251072117,
+        "evidence_status": "Verified epoch-7 checkpoint and full validation ranks; later/final run status not established here"
+      },
+      {
         "model_id": "attention-residual-bn-logq",
         "label": "当前 logQ 双塔 / Attention + Residual + BN + logQ",
         "epochs_completed": 17,
@@ -126,6 +149,10 @@ The historical mean-history baseline aggregate has weaker provenance than the cu
       "two-tower-mean-baseline": {
         "recall_at_100": 6.49090909090909,
         "ndcg_at_100": 7.775118730082298
+      },
+      "attention-residual-bn-no-logq-epoch7": {
+        "recall_at_100": 4.16934306569343,
+        "ndcg_at_100": 4.72739104388932
       }
     },
     "interpretation": "Different architectures and training budgets; observed validation comparison, not isolated logQ causal ablation or test performance."
@@ -477,6 +504,39 @@ The historical mean-history baseline aggregate has weaker provenance than the cu
       "all_top100_lists_match": true,
       "brute_force_random_query_checks": 5000,
       "test_evaluated": false
+    },
+    "attention-no-logq-epoch007-verified-metrics.json": {
+      "run_id": "181951c41957",
+      "run_url": "https://wandb.ai/SAR-Lab/kuairand-two-tower/runs/181951c41957",
+      "record_type": "epoch-7 verified snapshot; not a claim that this was the final result of the full run",
+      "queries": 555677,
+      "catalog_size": 4371868,
+      "hits": 685,
+      "recall_at_100": 0.0012327305251072116,
+      "ndcg_at_100": 0.00026031748881524564,
+      "rank_sha256": "ac1507e698639b8cc9f93b47a5ec4f37d5b0258806baacd3156d780ebf17cc69",
+      "checkpoint": {
+        "sha256": "964ed542e3eb534a3eff374aa57616bd0cdab46e7730283574e2394f960ed456",
+        "epoch": 7,
+        "step": 36526,
+        "run_id": "181951c41957",
+        "binding": {
+          "config_sha256": "0f4715debd6ec6449e77a4b61c6bf4f1c8407e5680d4bd7425028955146c22ba",
+          "manifest_sha256": "03fc0cb41c6dfc6b55f590c453b3954ad229af849219c4e91094f66d33742c20",
+          "code_sha256": "be1cf13f46eec21fba683359902355e968c33ab56975ff2ca0df67ca7f8ebda1",
+          "torch": "2.14.1+cu130",
+          "python": "3.11.16",
+          "device_type": "cuda"
+        },
+        "file_unchanged_verified_after_diagnostics": true
+      },
+      "checks": {
+        "full_validation_event_identity_and_unique_count": true,
+        "candidate_coverage_matches_frozen_upload_next_day": true,
+        "overall_metrics_match_recorded_epoch7": true,
+        "independent_sql_numpy_agree": true,
+        "test_evaluated": false
+      }
     }
   },
   "configs": {
@@ -647,7 +707,104 @@ The historical mean-history baseline aggregate has weaker provenance than the cu
           "logq"
         ]
       }
+    },
+    "attention-no-logq-epochs10-es3-config.yaml": {
+      "experiment": {
+        "seed": 42,
+        "dataset": "KuaiRand-1K"
+      },
+      "model": {
+        "item_categorical_features": [
+          "item_id",
+          "author_id",
+          "video_type",
+          "upload_type",
+          "music_id",
+          "music_type",
+          "tag"
+        ],
+        "item_numeric_features": [
+          "video_duration",
+          "server_width",
+          "server_height",
+          "upload_day"
+        ],
+        "category_dim": 8,
+        "user_dim": 32,
+        "tab_dim": 8,
+        "output_dim": 64,
+        "history_length": 50,
+        "history_encoder": "attention",
+        "user_hidden": [
+          256,
+          128,
+          64
+        ],
+        "item_hidden": [
+          128,
+          64
+        ],
+        "batch_norm": true,
+        "dropout": 0.1,
+        "residual_blocks": 1,
+        "attention_heads": 4,
+        "behavior_content_features": true
+      },
+      "training": {
+        "device": "cuda",
+        "deterministic": true,
+        "mixed_precision": true,
+        "batch_size": 256,
+        "epochs": 10,
+        "learning_rate": 0.001,
+        "betas": [
+          0.9,
+          0.999
+        ],
+        "weight_decay": 0.0,
+        "temperature": 0.1,
+        "log_every": 50,
+        "checkpoint_every": 1000,
+        "early_stopping_patience": 3
+      },
+      "evaluation": {
+        "candidate_rule": "upload_next_day",
+        "query_batch_size": 128,
+        "item_batch_size": 16384,
+        "k": 100,
+        "output_dim": 64
+      },
+      "wandb": {
+        "mode": "online",
+        "entity": "SAR-Lab",
+        "project": "kuairand-two-tower",
+        "name": "1k-attention-deeper-residual-bn-d01-lr0.001-bs256-e10-es3-seed42",
+        "group": "week2-1k-content",
+        "tags": [
+          "1k",
+          "content-15-features",
+          "manual",
+          "deeper",
+          "behavior-content-v2",
+          "attention",
+          "residual",
+          "batchnorm",
+          "combined",
+          "dropout-0.1",
+          "epochs-10",
+          "early-stopping-3"
+        ]
+      }
     }
+  },
+  "matched_epoch7_logq_comparison": {
+    "epoch": 7,
+    "no_logq_recall": 0.0012327305251072116,
+    "logq_recall": 0.004813947671039111,
+    "recall_fold": 3.905109489051095,
+    "no_logq_ndcg": 0.00026031748881524564,
+    "logq_ndcg": 0.0011549303316214716,
+    "ndcg_fold": 4.436622129683944
   }
 }
 ```
