@@ -19,6 +19,8 @@ dev = ["pytest>=8,<10", "ruff>=0.9,<1"]
 package = false
 
 [tool.ruff]
+# Frozen Colab experiment source retains its recorded checksums.
+extend-exclude = ["architecture_v1"]
 target-version = "py311"
 line-length = 100
 
