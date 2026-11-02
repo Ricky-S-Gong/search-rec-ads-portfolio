@@ -1,0 +1,6 @@
+{
+  "checkpoint": "epoch-001.pt",
+  "sha256": "9be3a7bfb0120f54ad34fc48cea581827d8154de7e42645565b858ee9c447567",
+  "artifact": "SAR-Lab/kuairand-two-tower/ddcece18c201-epoch-001:v0",
+  "status": "synced"
+}

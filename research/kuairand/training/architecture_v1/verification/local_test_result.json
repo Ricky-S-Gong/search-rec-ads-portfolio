@@ -1,0 +1,16 @@
+{
+  "python": "3.12.2",
+  "torch": "2.2.2",
+  "numpy": "1.26.4",
+  "pyarrow": "15.0.2",
+  "device": "CPU",
+  "local_scaler_shim": true,
+  "tests": 24,
+  "skipped": 2,
+  "failures": 0,
+  "errors": 0,
+  "successful": true,
+  "cuda_verified": false,
+  "online_wandb_verified": false,
+  "full_1k_training_run": false
+}

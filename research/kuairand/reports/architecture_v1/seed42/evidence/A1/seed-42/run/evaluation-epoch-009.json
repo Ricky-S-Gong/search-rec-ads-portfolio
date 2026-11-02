@@ -1,0 +1,16 @@
+{
+  "recall_at_100": 0.0011589466542613785,
+  "ndcg_at_100": 0.0002518948083586859,
+  "target_coverage": 0.7573842358060529,
+  "queries": 555677,
+  "hits": 644,
+  "evaluation_seconds": 214.21571159200175,
+  "catalog_size": 4371868,
+  "ranking": "exhaustive FP32; raw ID ascending tie break; repeats allowed; uncovered targets count as misses",
+  "loss": 7.041560316822854,
+  "validation_loss_seconds": 69.12158123799964,
+  "loss_protocol": "stored-order all validation events; batch=256; no correction; FP32",
+  "train_loss": 3.437046754728529,
+  "train_seconds": 653.4979891242183,
+  "learning_rate": 0.001
+}

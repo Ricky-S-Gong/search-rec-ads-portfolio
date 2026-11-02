@@ -1,0 +1,65 @@
+experiment:
+  seed: 42
+  dataset: KuaiRand-1K
+model:
+  item_categorical_features:
+  - item_id
+  - author_id
+  - video_type
+  - upload_type
+  - music_id
+  - music_type
+  - tag
+  item_numeric_features:
+  - video_duration
+  - server_width
+  - server_height
+  - upload_day
+  category_dim: 8
+  user_dim: 32
+  tab_dim: 8
+  output_dim: 64
+  history_length: 50
+  history_encoder: mean
+  user_hidden:
+  - 128
+  - 64
+  item_hidden:
+  - 64
+  batch_norm: true
+  dropout: 0.0
+  residual_blocks: 0
+  attention_heads: 4
+  behavior_content_features: true
+training:
+  device: cuda
+  deterministic: true
+  mixed_precision: true
+  batch_size: 256
+  epochs: 3
+  learning_rate: 0.001
+  betas:
+  - 0.9
+  - 0.999
+  weight_decay: 0.0
+  temperature: 0.1
+  log_every: 50
+  checkpoint_every: 1000
+evaluation:
+  candidate_rule: upload_next_day
+  query_batch_size: 128
+  item_batch_size: 16384
+  k: 100
+  output_dim: 64
+wandb:
+  mode: online
+  entity: SAR-Lab
+  project: kuairand-two-tower
+  name: 1k-features-v2-batchnorm-seed42
+  group: week2-1k-content
+  tags:
+  - 1k
+  - content-15-features
+  - manual
+  - batchnorm
+  - behavior-content-v2
