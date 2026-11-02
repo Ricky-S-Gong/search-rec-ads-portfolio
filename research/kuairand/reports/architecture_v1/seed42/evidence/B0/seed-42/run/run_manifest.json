@@ -1,0 +1,29 @@
+{
+  "binding": {
+    "config_sha256": "edfebc5b0d606c9b329544cfc80c14804006727337e049afa18cef7769584e21",
+    "manifest_sha256": "03fc0cb41c6dfc6b55f590c453b3954ad229af849219c4e91094f66d33742c20",
+    "code_sha256": "0ce8af4998a2c679beaa5ae253d8c47cf996bdecdf726dff99bf65802c54c864",
+    "torch": "2.14.1+cu130",
+    "python": "3.11.18",
+    "device_type": "cuda"
+  },
+  "run_id": "ddcece18c201",
+  "epochs_completed": 13,
+  "next_batch": 0,
+  "global_step": 67834,
+  "consumed": 17365309,
+  "target_samples": 26715860,
+  "complete": true,
+  "stop_reason": "early_stopping",
+  "stopped_early": true,
+  "early_stopping_patience": 3,
+  "epochs_without_improvement": 3,
+  "best_epoch": 10,
+  "best_recall_at_100": 0.0010329741918416635,
+  "best_ndcg_at_100": 0.0002119553344002475,
+  "latest_checkpoint": "/content/drive/MyDrive/KuaiRank/architecture-v1/runs/B0/seed-42/run/latest.pt",
+  "best_checkpoint": "/content/drive/MyDrive/KuaiRank/architecture-v1/runs/B0/seed-42/run/best.pt",
+  "candidate_rule": "upload_next_day",
+  "trainable_parameters": 34045126,
+  "run_url": "https://wandb.ai/SAR-Lab/kuairand-two-tower/runs/ddcece18c201"
+}

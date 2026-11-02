@@ -1,0 +1,999 @@
+{
+  "status": "PASS",
+  "purpose": "SYNTHETIC SMOKE ONLY; NOT EXPERIMENT RESULTS",
+  "device": "cpu",
+  "gpu": null,
+  "torch": "2.2.2",
+  "controls_exact_resume": [
+    "B0",
+    "R0"
+  ],
+  "all_six_preflight_passed": true,
+  "online_artifact_verified": false,
+  "reports": {
+    "B0": {
+      "parameter_updates": 0,
+      "item_features": {
+        "item_id": {
+          "output_change": 0.18731646239757538,
+          "gradient_norm": 0.08401373028755188
+        },
+        "author_id": {
+          "output_change": 0.18102511763572693,
+          "gradient_norm": 0.07470416277647018
+        },
+        "video_type": {
+          "output_change": 0.14460529386997223,
+          "gradient_norm": 0.0794433057308197
+        },
+        "upload_type": {
+          "output_change": 0.17099350690841675,
+          "gradient_norm": 0.0749114453792572
+        },
+        "music_id": {
+          "output_change": 0.14896051585674286,
+          "gradient_norm": 0.07495275139808655
+        },
+        "music_type": {
+          "output_change": 0.1286291480064392,
+          "gradient_norm": 0.06833434849977493
+        },
+        "tag": {
+          "output_change": 0.11123377084732056,
+          "gradient_norm": 0.05334397032856941
+        },
+        "video_duration": {
+          "output_change": 0.05141131579875946,
+          "gradient_norm": 0.017459647729992867
+        },
+        "server_width": {
+          "output_change": 0.06327895820140839,
+          "gradient_norm": 0.013442864641547203
+        },
+        "server_height": {
+          "output_change": 0.051705993711948395,
+          "gradient_norm": 0.014042462222278118
+        },
+        "upload_day": {
+          "output_change": 0.04910701513290405,
+          "gradient_norm": 0.014954358339309692
+        },
+        "log_duration": {
+          "output_change": 0.05467317998409271,
+          "gradient_norm": 0.016207821667194366
+        },
+        "aspect_ratio": {
+          "output_change": 0.045472145080566406,
+          "gradient_norm": 0.017877602949738503
+        },
+        "portrait": {
+          "output_change": 0.04786856099963188,
+          "gradient_norm": 0.016199711710214615
+        },
+        "tag_count": {
+          "output_change": 0.05378524959087372,
+          "gradient_norm": 0.01216171681880951
+        }
+      },
+      "user_features": {
+        "count1": {
+          "output_change": 0.03037482500076294,
+          "gradient_norm": 0.009129708632826805
+        },
+        "count7": {
+          "output_change": 0.02697661519050598,
+          "gradient_norm": 0.007996260188519955
+        },
+        "play": {
+          "output_change": 0.010592162609100342,
+          "gradient_norm": 0.001530938665382564
+        },
+        "completion": {
+          "output_change": 0.003748558461666107,
+          "gradient_norm": 0.0010514480527490377
+        },
+        "likes": {
+          "output_change": 0.036315783858299255,
+          "gradient_norm": 0.009893576614558697
+        },
+        "known": {
+          "output_change": 0.020060360431671143,
+          "gradient_norm": 0.0029400282073765993
+        },
+        "age": {
+          "output_change": 0.018313780426979065,
+          "gradient_norm": 0.0021098351571708918
+        },
+        "like": {
+          "output_change": 0.008113354444503784,
+          "gradient_norm": 0.0010802441975101829
+        },
+        "user_id": {
+          "output_change": 0.19847920536994934,
+          "gradient_norm": 0.07138880342245102
+        },
+        "tab": {
+          "output_change": 0.12009390443563461,
+          "gradient_norm": 0.040679581463336945
+        },
+        "time_ms": {
+          "output_change": 0.008164063096046448
+        },
+        "history_mask": {
+          "output_change": 0.0985068827867508
+        },
+        "history_item_ids": {
+          "output_change": 0.1317785531282425
+        },
+        "author_preference": {
+          "output_change": 0.07890383899211884,
+          "gradient_norm": 0.032982777804136276
+        },
+        "tag_preference": {
+          "output_change": 0.08599935472011566,
+          "gradient_norm": 0.035410523414611816
+        },
+        "duration_preference": {
+          "output_change": 0.03355100750923157,
+          "gradient_norm": 0.012659874744713306
+        }
+      },
+      "item_mlp_input": 64,
+      "user_mlp_input": 131,
+      "user_shape": [
+        32,
+        64
+      ],
+      "item_shape": [
+        32,
+        64
+      ],
+      "history_encoder": "mean",
+      "feature_version": "fixture-features-v2",
+      "passed": true,
+      "sampling_correction": {
+        "mode": "none",
+        "alpha": 0.0,
+        "smoothing": 0.0
+      },
+      "trainable_parameters": 43598,
+      "model_structure": "TwoTower(\n  (item): ItemTower(\n    (embeddings): ModuleList(\n      (0-6): 7 x Embedding(17, 8, padding_idx=0)\n    )\n    (net): Sequential(\n      (0): Linear(in_features=64, out_features=64, bias=True)\n      (1): Identity()\n      (2): ReLU()\n      (3): Dropout(p=0.0, inplace=False)\n      (4): Linear(in_features=64, out_features=64, bias=True)\n    )\n  )\n  (user): UserTower(\n    (user_embedding): Embedding(5, 32)\n    (tab_embedding): Embedding(16, 8, padding_idx=0)\n    (feedback_projection): Linear(in_features=5, out_features=8, bias=True)\n    (feedback_gate): Linear(in_features=5, out_features=1, bias=True)\n    (history_projection): Linear(in_features=72, out_features=64, bias=True)\n    (net): Sequential(\n      (0): Linear(in_features=131, out_features=128, bias=True)\n      (1): Identity()\n      (2): ReLU()\n      (3): Dropout(p=0.0, inplace=False)\n      (4): Linear(in_features=128, out_features=64, bias=True)\n      (5): Identity()\n      (6): ReLU()\n      (7): Dropout(p=0.0, inplace=False)\n      (8): Linear(in_features=64, out_features=64, bias=True)\n    )\n  )\n)",
+      "device": "cpu",
+      "cuda_device": null,
+      "train_queries": 32,
+      "validation_queries": 16,
+      "candidate_rule": "upload_next_day",
+      "validation_target_coverage": 1.0,
+      "gpu_feature_acceptance": false,
+      "training_started": false,
+      "code_sha256": "0ce8af4998a2c679beaa5ae253d8c47cf996bdecdf726dff99bf65802c54c864",
+      "manifest_sha256": "672006c60267c40682df13da8372eabf095aa287edea9bfcdfd8e227b487cd26",
+      "config_sha256": "17e2d6029f4167aca1b6bada3af35052f49636459a7861a0fcb3e4fc30fe6d65",
+      "limitations": [
+        "Uncovered targets remain in the Recall/NDCG denominator.",
+        "first_observed_exposure, when selected, has coverage by construction and is not verified catalog registration.",
+        "Unversioned publication attributes use the fixed-content assumption."
+      ]
+    },
+    "R0": {
+      "parameter_updates": 0,
+      "item_features": {
+        "item_id": {
+          "output_change": 0.09637196362018585,
+          "gradient_norm": 0.04242394119501114
+        },
+        "author_id": {
+          "output_change": 0.10268863290548325,
+          "gradient_norm": 0.04135798290371895
+        },
+        "video_type": {
+          "output_change": 0.11914912611246109,
+          "gradient_norm": 0.04279273748397827
+        },
+        "upload_type": {
+          "output_change": 0.1252053827047348,
+          "gradient_norm": 0.04817890003323555
+        },
+        "music_id": {
+          "output_change": 0.10240890085697174,
+          "gradient_norm": 0.04077708721160889
+        },
+        "music_type": {
+          "output_change": 0.13486260175704956,
+          "gradient_norm": 0.03972439467906952
+        },
+        "tag": {
+          "output_change": 0.08507473766803741,
+          "gradient_norm": 0.029433296993374825
+        },
+        "video_duration": {
+          "output_change": 0.0387476310133934,
+          "gradient_norm": 0.006595340557396412
+        },
+        "server_width": {
+          "output_change": 0.04303804039955139,
+          "gradient_norm": 0.016387563198804855
+        },
+        "server_height": {
+          "output_change": 0.041929081082344055,
+          "gradient_norm": 0.009729010052978992
+        },
+        "upload_day": {
+          "output_change": 0.04629002884030342,
+          "gradient_norm": 0.008412985131144524
+        },
+        "log_duration": {
+          "output_change": 0.03937748819589615,
+          "gradient_norm": 0.009650538675487041
+        },
+        "aspect_ratio": {
+          "output_change": 0.0413924865424633,
+          "gradient_norm": 0.007255704142153263
+        },
+        "portrait": {
+          "output_change": 0.046748511493206024,
+          "gradient_norm": 0.010234382003545761
+        },
+        "tag_count": {
+          "output_change": 0.04085059463977814,
+          "gradient_norm": 0.013989776372909546
+        }
+      },
+      "user_features": {
+        "count1": {
+          "output_change": 0.02198140323162079,
+          "gradient_norm": 0.005078787449747324
+        },
+        "count7": {
+          "output_change": 0.017887763679027557,
+          "gradient_norm": 0.004163822159171104
+        },
+        "play": {
+          "output_change": 0.0015848949551582336,
+          "gradient_norm": 0.0002435472997603938
+        },
+        "completion": {
+          "output_change": 0.0032062754034996033,
+          "gradient_norm": 0.0004747568164020777
+        },
+        "likes": {
+          "output_change": 0.0217537023127079,
+          "gradient_norm": 0.004693503025919199
+        },
+        "known": {
+          "output_change": 0.0022058263421058655,
+          "gradient_norm": 0.0003701609675772488
+        },
+        "age": {
+          "output_change": 0.002382887527346611,
+          "gradient_norm": 0.0003160550259053707
+        },
+        "like": {
+          "output_change": 0.0029368773102760315,
+          "gradient_norm": 0.0004476764879655093
+        },
+        "user_id": {
+          "output_change": 0.13929089903831482,
+          "gradient_norm": 0.023992327973246574
+        },
+        "tab": {
+          "output_change": 0.07316885888576508,
+          "gradient_norm": 0.014758964069187641
+        },
+        "time_ms": {
+          "output_change": 0.005450733006000519
+        },
+        "history_mask": {
+          "output_change": 0.07160017639398575
+        },
+        "history_item_ids": {
+          "output_change": 0.08409591764211655
+        },
+        "author_preference": {
+          "output_change": 0.049620285630226135,
+          "gradient_norm": 0.016275694593787193
+        },
+        "tag_preference": {
+          "output_change": 0.057421743869781494,
+          "gradient_norm": 0.01392634678632021
+        },
+        "duration_preference": {
+          "output_change": 0.0152321457862854,
+          "gradient_norm": 0.005918636918067932
+        }
+      },
+      "item_mlp_input": 64,
+      "user_mlp_input": 131,
+      "user_shape": [
+        32,
+        64
+      ],
+      "item_shape": [
+        32,
+        64
+      ],
+      "history_encoder": "attention",
+      "feature_version": "fixture-features-v2",
+      "passed": true,
+      "sampling_correction": {
+        "mode": "none",
+        "alpha": 0.0,
+        "smoothing": 0.0
+      },
+      "trainable_parameters": 128910,
+      "model_structure": "TwoTower(\n  (item): ItemTower(\n    (embeddings): ModuleList(\n      (0-6): 7 x Embedding(17, 8, padding_idx=0)\n    )\n    (net): Sequential(\n      (0): Linear(in_features=64, out_features=128, bias=True)\n      (1): Identity()\n      (2): ReLU()\n      (3): Dropout(p=0.0, inplace=False)\n      (4): Linear(in_features=128, out_features=64, bias=True)\n      (5): Identity()\n      (6): ReLU()\n      (7): Dropout(p=0.0, inplace=False)\n      (8): Linear(in_features=64, out_features=64, bias=True)\n    )\n  )\n  (user): UserTower(\n    (user_embedding): Embedding(5, 32)\n    (tab_embedding): Embedding(16, 8, padding_idx=0)\n    (feedback_projection): Linear(in_features=5, out_features=8, bias=True)\n    (feedback_gate): Linear(in_features=5, out_features=1, bias=True)\n    (history_projection): Linear(in_features=72, out_features=64, bias=True)\n    (query): Linear(in_features=50, out_features=64, bias=True)\n    (position): Embedding(50, 64)\n    (attention): MultiheadAttention(\n      (out_proj): NonDynamicallyQuantizableLinear(in_features=64, out_features=64, bias=True)\n    )\n    (net): Sequential(\n      (0): Linear(in_features=131, out_features=256, bias=True)\n      (1): Identity()\n      (2): ReLU()\n      (3): Dropout(p=0.0, inplace=False)\n      (4): Linear(in_features=256, out_features=128, bias=True)\n      (5): Identity()\n      (6): ReLU()\n      (7): Dropout(p=0.0, inplace=False)\n      (8): Linear(in_features=128, out_features=64, bias=True)\n      (9): Identity()\n      (10): ReLU()\n      (11): Dropout(p=0.0, inplace=False)\n      (12): Linear(in_features=64, out_features=64, bias=True)\n    )\n  )\n)",
+      "device": "cpu",
+      "cuda_device": null,
+      "train_queries": 32,
+      "validation_queries": 16,
+      "candidate_rule": "upload_next_day",
+      "validation_target_coverage": 1.0,
+      "gpu_feature_acceptance": false,
+      "training_started": false,
+      "code_sha256": "0ce8af4998a2c679beaa5ae253d8c47cf996bdecdf726dff99bf65802c54c864",
+      "manifest_sha256": "672006c60267c40682df13da8372eabf095aa287edea9bfcdfd8e227b487cd26",
+      "config_sha256": "99ca0a9bf71b6a5374dfa791f1961e57a356a8faf37ff4e87efcfca4074f4189",
+      "limitations": [
+        "Uncovered targets remain in the Recall/NDCG denominator.",
+        "first_observed_exposure, when selected, has coverage by construction and is not verified catalog registration.",
+        "Unversioned publication attributes use the fixed-content assumption."
+      ]
+    },
+    "A1": {
+      "parameter_updates": 0,
+      "item_features": {
+        "item_id": {
+          "output_change": 0.09637196362018585,
+          "gradient_norm": 0.04811711609363556
+        },
+        "author_id": {
+          "output_change": 0.10268863290548325,
+          "gradient_norm": 0.04629348963499069
+        },
+        "video_type": {
+          "output_change": 0.11914912611246109,
+          "gradient_norm": 0.053694333881139755
+        },
+        "upload_type": {
+          "output_change": 0.1252053827047348,
+          "gradient_norm": 0.04912206158041954
+        },
+        "music_id": {
+          "output_change": 0.10240890085697174,
+          "gradient_norm": 0.050435084849596024
+        },
+        "music_type": {
+          "output_change": 0.13486260175704956,
+          "gradient_norm": 0.05683811753988266
+        },
+        "tag": {
+          "output_change": 0.08507473766803741,
+          "gradient_norm": 0.04098609834909439
+        },
+        "video_duration": {
+          "output_change": 0.0387476310133934,
+          "gradient_norm": 0.009160716086626053
+        },
+        "server_width": {
+          "output_change": 0.04303804039955139,
+          "gradient_norm": 0.012372222729027271
+        },
+        "server_height": {
+          "output_change": 0.041929081082344055,
+          "gradient_norm": 0.013652198947966099
+        },
+        "upload_day": {
+          "output_change": 0.04629002884030342,
+          "gradient_norm": 0.022495854645967484
+        },
+        "log_duration": {
+          "output_change": 0.03937748819589615,
+          "gradient_norm": 0.009067065082490444
+        },
+        "aspect_ratio": {
+          "output_change": 0.0413924865424633,
+          "gradient_norm": 0.008594284765422344
+        },
+        "portrait": {
+          "output_change": 0.046748511493206024,
+          "gradient_norm": 0.010214936919510365
+        },
+        "tag_count": {
+          "output_change": 0.04085059463977814,
+          "gradient_norm": 0.008226681500673294
+        }
+      },
+      "user_features": {
+        "count1": {
+          "output_change": 0.021461516618728638,
+          "gradient_norm": 0.0048928046599030495
+        },
+        "count7": {
+          "output_change": 0.020752273499965668,
+          "gradient_norm": 0.004198593087494373
+        },
+        "play": {
+          "output_change": 0.0009364336729049683,
+          "gradient_norm": 0.0001331731618847698
+        },
+        "completion": {
+          "output_change": 0.0016178861260414124,
+          "gradient_norm": 0.0003344380238559097
+        },
+        "likes": {
+          "output_change": 0.017204493284225464,
+          "gradient_norm": 0.0048302821815013885
+        },
+        "known": {
+          "output_change": 0.0016216635704040527,
+          "gradient_norm": 0.0002815553452819586
+        },
+        "age": {
+          "output_change": 0.002127721905708313,
+          "gradient_norm": 0.0002859648084267974
+        },
+        "like": {
+          "output_change": 0.00159434974193573,
+          "gradient_norm": 0.0003105912765022367
+        },
+        "user_id": {
+          "output_change": 0.15312480926513672,
+          "gradient_norm": 0.03024856559932232
+        },
+        "tab": {
+          "output_change": 0.08350828289985657,
+          "gradient_norm": 0.019357528537511826
+        },
+        "time_ms": {
+          "output_change": 0.004672378301620483
+        },
+        "history_mask": {
+          "output_change": 0.05368244647979736
+        },
+        "history_item_ids": {
+          "output_change": 0.06448037177324295
+        },
+        "author_preference": {
+          "output_change": 0.05649831146001816,
+          "gradient_norm": 0.012864750809967518
+        },
+        "tag_preference": {
+          "output_change": 0.05978161096572876,
+          "gradient_norm": 0.0127330981194973
+        },
+        "duration_preference": {
+          "output_change": 0.018635675311088562,
+          "gradient_norm": 0.00552050257101655
+        }
+      },
+      "item_mlp_input": 64,
+      "user_mlp_input": 131,
+      "user_shape": [
+        32,
+        64
+      ],
+      "item_shape": [
+        32,
+        64
+      ],
+      "history_encoder": "lstm",
+      "feature_version": "fixture-features-v2",
+      "passed": true,
+      "sampling_correction": {
+        "mode": "none",
+        "alpha": 0.0,
+        "smoothing": 0.0
+      },
+      "trainable_parameters": 139086,
+      "model_structure": "TwoTower(\n  (item): ItemTower(\n    (embeddings): ModuleList(\n      (0-6): 7 x Embedding(17, 8, padding_idx=0)\n    )\n    (net): Sequential(\n      (0): Linear(in_features=64, out_features=128, bias=True)\n      (1): Identity()\n      (2): ReLU()\n      (3): Dropout(p=0.0, inplace=False)\n      (4): Linear(in_features=128, out_features=64, bias=True)\n      (5): Identity()\n      (6): ReLU()\n      (7): Dropout(p=0.0, inplace=False)\n      (8): Linear(in_features=64, out_features=64, bias=True)\n    )\n  )\n  (user): UserTower(\n    (user_embedding): Embedding(5, 32)\n    (tab_embedding): Embedding(16, 8, padding_idx=0)\n    (feedback_projection): Linear(in_features=5, out_features=8, bias=True)\n    (feedback_gate): Linear(in_features=5, out_features=1, bias=True)\n    (history_projection): Linear(in_features=72, out_features=64, bias=True)\n    (lstm): LSTM(64, 64, batch_first=True)\n    (net): Sequential(\n      (0): Linear(in_features=131, out_features=256, bias=True)\n      (1): Identity()\n      (2): ReLU()\n      (3): Dropout(p=0.0, inplace=False)\n      (4): Linear(in_features=256, out_features=128, bias=True)\n      (5): Identity()\n      (6): ReLU()\n      (7): Dropout(p=0.0, inplace=False)\n      (8): Linear(in_features=128, out_features=64, bias=True)\n      (9): Identity()\n      (10): ReLU()\n      (11): Dropout(p=0.0, inplace=False)\n      (12): Linear(in_features=64, out_features=64, bias=True)\n    )\n  )\n)",
+      "device": "cpu",
+      "cuda_device": null,
+      "train_queries": 32,
+      "validation_queries": 16,
+      "candidate_rule": "upload_next_day",
+      "validation_target_coverage": 1.0,
+      "gpu_feature_acceptance": false,
+      "training_started": false,
+      "code_sha256": "0ce8af4998a2c679beaa5ae253d8c47cf996bdecdf726dff99bf65802c54c864",
+      "manifest_sha256": "672006c60267c40682df13da8372eabf095aa287edea9bfcdfd8e227b487cd26",
+      "config_sha256": "d14793fe9611a95841755c62f5f057f11c3e9877b588501e70ce2bae8f947bc7",
+      "limitations": [
+        "Uncovered targets remain in the Recall/NDCG denominator.",
+        "first_observed_exposure, when selected, has coverage by construction and is not verified catalog registration.",
+        "Unversioned publication attributes use the fixed-content assumption."
+      ]
+    },
+    "A2": {
+      "parameter_updates": 0,
+      "item_features": {
+        "item_id": {
+          "output_change": 0.18731646239757538,
+          "gradient_norm": 0.07138780504465103
+        },
+        "author_id": {
+          "output_change": 0.18102511763572693,
+          "gradient_norm": 0.093126580119133
+        },
+        "video_type": {
+          "output_change": 0.14460529386997223,
+          "gradient_norm": 0.09243273735046387
+        },
+        "upload_type": {
+          "output_change": 0.17099350690841675,
+          "gradient_norm": 0.13237446546554565
+        },
+        "music_id": {
+          "output_change": 0.14896051585674286,
+          "gradient_norm": 0.09528812021017075
+        },
+        "music_type": {
+          "output_change": 0.1286291480064392,
+          "gradient_norm": 0.10413806885480881
+        },
+        "tag": {
+          "output_change": 0.11123377084732056,
+          "gradient_norm": 0.05675791949033737
+        },
+        "video_duration": {
+          "output_change": 0.05141131579875946,
+          "gradient_norm": 0.020067287608981133
+        },
+        "server_width": {
+          "output_change": 0.06327895820140839,
+          "gradient_norm": 0.028989627957344055
+        },
+        "server_height": {
+          "output_change": 0.051705993711948395,
+          "gradient_norm": 0.023112723603844643
+        },
+        "upload_day": {
+          "output_change": 0.04910701513290405,
+          "gradient_norm": 0.021089447662234306
+        },
+        "log_duration": {
+          "output_change": 0.05467317998409271,
+          "gradient_norm": 0.012945258058607578
+        },
+        "aspect_ratio": {
+          "output_change": 0.045472145080566406,
+          "gradient_norm": 0.02019721455872059
+        },
+        "portrait": {
+          "output_change": 0.04786856099963188,
+          "gradient_norm": 0.017606107518076897
+        },
+        "tag_count": {
+          "output_change": 0.05378524959087372,
+          "gradient_norm": 0.026190700009465218
+        }
+      },
+      "user_features": {
+        "count1": {
+          "output_change": 0.039652545005083084,
+          "gradient_norm": 0.016808751970529556
+        },
+        "count7": {
+          "output_change": 0.03449372202157974,
+          "gradient_norm": 0.011529826559126377
+        },
+        "play": {
+          "output_change": 0.004188179969787598,
+          "gradient_norm": 0.0006624427624046803
+        },
+        "completion": {
+          "output_change": 0.0023882687091827393,
+          "gradient_norm": 0.00048208943917416036
+        },
+        "likes": {
+          "output_change": 0.032619401812553406,
+          "gradient_norm": 0.015482976101338863
+        },
+        "known": {
+          "output_change": 0.006027206778526306,
+          "gradient_norm": 0.0018495607655495405
+        },
+        "age": {
+          "output_change": 0.004432764369994402,
+          "gradient_norm": 0.0008529886836186051
+        },
+        "like": {
+          "output_change": 0.0026444345712661743,
+          "gradient_norm": 0.0005443210247904062
+        },
+        "user_id": {
+          "output_change": 0.22217047214508057,
+          "gradient_norm": 0.08314304798841476
+        },
+        "tab": {
+          "output_change": 0.11079229414463043,
+          "gradient_norm": 0.046925339847803116
+        },
+        "time_ms": {
+          "output_change": 0.007861318066716194
+        },
+        "history_mask": {
+          "output_change": 0.10453270375728607
+        },
+        "history_item_ids": {
+          "output_change": 0.10921617597341537
+        },
+        "author_preference": {
+          "output_change": 0.09586752206087112,
+          "gradient_norm": 0.0355568528175354
+        },
+        "tag_preference": {
+          "output_change": 0.08909564465284348,
+          "gradient_norm": 0.03991308435797691
+        },
+        "duration_preference": {
+          "output_change": 0.03086765855550766,
+          "gradient_norm": 0.014043871313333511
+        }
+      },
+      "item_mlp_input": 64,
+      "user_mlp_input": 131,
+      "user_shape": [
+        32,
+        64
+      ],
+      "item_shape": [
+        32,
+        64
+      ],
+      "history_encoder": "attention",
+      "feature_version": "fixture-features-v2",
+      "passed": true,
+      "sampling_correction": {
+        "mode": "none",
+        "alpha": 0.0,
+        "smoothing": 0.0
+      },
+      "trainable_parameters": 66702,
+      "model_structure": "TwoTower(\n  (item): ItemTower(\n    (embeddings): ModuleList(\n      (0-6): 7 x Embedding(17, 8, padding_idx=0)\n    )\n    (net): Sequential(\n      (0): Linear(in_features=64, out_features=64, bias=True)\n      (1): Identity()\n      (2): ReLU()\n      (3): Dropout(p=0.0, inplace=False)\n      (4): Linear(in_features=64, out_features=64, bias=True)\n    )\n  )\n  (user): UserTower(\n    (user_embedding): Embedding(5, 32)\n    (tab_embedding): Embedding(16, 8, padding_idx=0)\n    (feedback_projection): Linear(in_features=5, out_features=8, bias=True)\n    (feedback_gate): Linear(in_features=5, out_features=1, bias=True)\n    (history_projection): Linear(in_features=72, out_features=64, bias=True)\n    (query): Linear(in_features=50, out_features=64, bias=True)\n    (position): Embedding(50, 64)\n    (attention): MultiheadAttention(\n      (out_proj): NonDynamicallyQuantizableLinear(in_features=64, out_features=64, bias=True)\n    )\n    (net): Sequential(\n      (0): Linear(in_features=131, out_features=128, bias=True)\n      (1): Identity()\n      (2): ReLU()\n      (3): Dropout(p=0.0, inplace=False)\n      (4): Linear(in_features=128, out_features=64, bias=True)\n      (5): Identity()\n      (6): ReLU()\n      (7): Dropout(p=0.0, inplace=False)\n      (8): Linear(in_features=64, out_features=64, bias=True)\n    )\n  )\n)",
+      "device": "cpu",
+      "cuda_device": null,
+      "train_queries": 32,
+      "validation_queries": 16,
+      "candidate_rule": "upload_next_day",
+      "validation_target_coverage": 1.0,
+      "gpu_feature_acceptance": false,
+      "training_started": false,
+      "code_sha256": "0ce8af4998a2c679beaa5ae253d8c47cf996bdecdf726dff99bf65802c54c864",
+      "manifest_sha256": "672006c60267c40682df13da8372eabf095aa287edea9bfcdfd8e227b487cd26",
+      "config_sha256": "b27d57aea15462a5002de5ad2dbdb52d76de4c7b381aaf9d3c4ead189edb7d4b",
+      "limitations": [
+        "Uncovered targets remain in the Recall/NDCG denominator.",
+        "first_observed_exposure, when selected, has coverage by construction and is not verified catalog registration.",
+        "Unversioned publication attributes use the fixed-content assumption."
+      ]
+    },
+    "A3": {
+      "parameter_updates": 0,
+      "item_features": {
+        "item_id": {
+          "output_change": 0.18731646239757538,
+          "gradient_norm": 0.11232578009366989
+        },
+        "author_id": {
+          "output_change": 0.18102511763572693,
+          "gradient_norm": 0.08692023158073425
+        },
+        "video_type": {
+          "output_change": 0.14460529386997223,
+          "gradient_norm": 0.10383999347686768
+        },
+        "upload_type": {
+          "output_change": 0.17099350690841675,
+          "gradient_norm": 0.0956042930483818
+        },
+        "music_id": {
+          "output_change": 0.14896051585674286,
+          "gradient_norm": 0.13477256894111633
+        },
+        "music_type": {
+          "output_change": 0.1286291480064392,
+          "gradient_norm": 0.12265545129776001
+        },
+        "tag": {
+          "output_change": 0.11123377084732056,
+          "gradient_norm": 0.06005743518471718
+        },
+        "video_duration": {
+          "output_change": 0.05141131579875946,
+          "gradient_norm": 0.03180471062660217
+        },
+        "server_width": {
+          "output_change": 0.06327895820140839,
+          "gradient_norm": 0.022985121235251427
+        },
+        "server_height": {
+          "output_change": 0.051705993711948395,
+          "gradient_norm": 0.01679043658077717
+        },
+        "upload_day": {
+          "output_change": 0.04910701513290405,
+          "gradient_norm": 0.01752144657075405
+        },
+        "log_duration": {
+          "output_change": 0.05467317998409271,
+          "gradient_norm": 0.021901339292526245
+        },
+        "aspect_ratio": {
+          "output_change": 0.045472145080566406,
+          "gradient_norm": 0.02453974075615406
+        },
+        "portrait": {
+          "output_change": 0.04786856099963188,
+          "gradient_norm": 0.015468601137399673
+        },
+        "tag_count": {
+          "output_change": 0.05378524959087372,
+          "gradient_norm": 0.040330056101083755
+        }
+      },
+      "user_features": {
+        "count1": {
+          "output_change": 0.037944480776786804,
+          "gradient_norm": 0.011862881481647491
+        },
+        "count7": {
+          "output_change": 0.031203052029013634,
+          "gradient_norm": 0.011283131316304207
+        },
+        "play": {
+          "output_change": 0.004069659858942032,
+          "gradient_norm": 0.0004705147002823651
+        },
+        "completion": {
+          "output_change": 0.0006939545273780823,
+          "gradient_norm": 0.00016789491928648204
+        },
+        "likes": {
+          "output_change": 0.034748733043670654,
+          "gradient_norm": 0.013020121492445469
+        },
+        "known": {
+          "output_change": 0.006281889975070953,
+          "gradient_norm": 0.0010366966016590595
+        },
+        "age": {
+          "output_change": 0.00463259220123291,
+          "gradient_norm": 0.0008462243131361902
+        },
+        "like": {
+          "output_change": 0.0019380059093236923,
+          "gradient_norm": 0.00047906165127642453
+        },
+        "user_id": {
+          "output_change": 0.19751930236816406,
+          "gradient_norm": 0.108247309923172
+        },
+        "tab": {
+          "output_change": 0.15120624005794525,
+          "gradient_norm": 0.057299330830574036
+        },
+        "time_ms": {
+          "output_change": 0.00798042118549347
+        },
+        "history_mask": {
+          "output_change": 0.11736756563186646
+        },
+        "history_item_ids": {
+          "output_change": 0.13756954669952393
+        },
+        "author_preference": {
+          "output_change": 0.09282633662223816,
+          "gradient_norm": 0.040718693286180496
+        },
+        "tag_preference": {
+          "output_change": 0.09380879253149033,
+          "gradient_norm": 0.03602730482816696
+        },
+        "duration_preference": {
+          "output_change": 0.034486547112464905,
+          "gradient_norm": 0.014282990247011185
+        }
+      },
+      "item_mlp_input": 64,
+      "user_mlp_input": 131,
+      "user_shape": [
+        32,
+        64
+      ],
+      "item_shape": [
+        32,
+        64
+      ],
+      "history_encoder": "lstm",
+      "feature_version": "fixture-features-v2",
+      "passed": true,
+      "sampling_correction": {
+        "mode": "none",
+        "alpha": 0.0,
+        "smoothing": 0.0
+      },
+      "trainable_parameters": 76878,
+      "model_structure": "TwoTower(\n  (item): ItemTower(\n    (embeddings): ModuleList(\n      (0-6): 7 x Embedding(17, 8, padding_idx=0)\n    )\n    (net): Sequential(\n      (0): Linear(in_features=64, out_features=64, bias=True)\n      (1): Identity()\n      (2): ReLU()\n      (3): Dropout(p=0.0, inplace=False)\n      (4): Linear(in_features=64, out_features=64, bias=True)\n    )\n  )\n  (user): UserTower(\n    (user_embedding): Embedding(5, 32)\n    (tab_embedding): Embedding(16, 8, padding_idx=0)\n    (feedback_projection): Linear(in_features=5, out_features=8, bias=True)\n    (feedback_gate): Linear(in_features=5, out_features=1, bias=True)\n    (history_projection): Linear(in_features=72, out_features=64, bias=True)\n    (lstm): LSTM(64, 64, batch_first=True)\n    (net): Sequential(\n      (0): Linear(in_features=131, out_features=128, bias=True)\n      (1): Identity()\n      (2): ReLU()\n      (3): Dropout(p=0.0, inplace=False)\n      (4): Linear(in_features=128, out_features=64, bias=True)\n      (5): Identity()\n      (6): ReLU()\n      (7): Dropout(p=0.0, inplace=False)\n      (8): Linear(in_features=64, out_features=64, bias=True)\n    )\n  )\n)",
+      "device": "cpu",
+      "cuda_device": null,
+      "train_queries": 32,
+      "validation_queries": 16,
+      "candidate_rule": "upload_next_day",
+      "validation_target_coverage": 1.0,
+      "gpu_feature_acceptance": false,
+      "training_started": false,
+      "code_sha256": "0ce8af4998a2c679beaa5ae253d8c47cf996bdecdf726dff99bf65802c54c864",
+      "manifest_sha256": "672006c60267c40682df13da8372eabf095aa287edea9bfcdfd8e227b487cd26",
+      "config_sha256": "63fa75fda147d7cf169ed7c2031a263682fb63a728fa9eff50a7a57ad6a6c509",
+      "limitations": [
+        "Uncovered targets remain in the Recall/NDCG denominator.",
+        "first_observed_exposure, when selected, has coverage by construction and is not verified catalog registration.",
+        "Unversioned publication attributes use the fixed-content assumption."
+      ]
+    },
+    "A5": {
+      "parameter_updates": 0,
+      "item_features": {
+        "item_id": {
+          "output_change": 0.09637196362018585,
+          "gradient_norm": 0.041327882558107376
+        },
+        "author_id": {
+          "output_change": 0.10268863290548325,
+          "gradient_norm": 0.045315831899642944
+        },
+        "video_type": {
+          "output_change": 0.11914912611246109,
+          "gradient_norm": 0.04027210548520088
+        },
+        "upload_type": {
+          "output_change": 0.1252053827047348,
+          "gradient_norm": 0.04112732410430908
+        },
+        "music_id": {
+          "output_change": 0.10240890085697174,
+          "gradient_norm": 0.043969858437776566
+        },
+        "music_type": {
+          "output_change": 0.13486260175704956,
+          "gradient_norm": 0.05164986848831177
+        },
+        "tag": {
+          "output_change": 0.08507473766803741,
+          "gradient_norm": 0.025935610756278038
+        },
+        "video_duration": {
+          "output_change": 0.0387476310133934,
+          "gradient_norm": 0.005289006512612104
+        },
+        "server_width": {
+          "output_change": 0.04303804039955139,
+          "gradient_norm": 0.007075198460370302
+        },
+        "server_height": {
+          "output_change": 0.041929081082344055,
+          "gradient_norm": 0.007349563296884298
+        },
+        "upload_day": {
+          "output_change": 0.04629002884030342,
+          "gradient_norm": 0.009060392156243324
+        },
+        "log_duration": {
+          "output_change": 0.03937748819589615,
+          "gradient_norm": 0.006406606175005436
+        },
+        "aspect_ratio": {
+          "output_change": 0.0413924865424633,
+          "gradient_norm": 0.015808280557394028
+        },
+        "portrait": {
+          "output_change": 0.046748511493206024,
+          "gradient_norm": 0.011209530755877495
+        },
+        "tag_count": {
+          "output_change": 0.04085059463977814,
+          "gradient_norm": 0.014925044029951096
+        }
+      },
+      "user_features": {
+        "count1": {
+          "output_change": 0.018311679363250732,
+          "gradient_norm": 0.0031776144169270992
+        },
+        "count7": {
+          "output_change": 0.01680251955986023,
+          "gradient_norm": 0.0043556224554777145
+        },
+        "play": {
+          "output_change": 0.005944088101387024,
+          "gradient_norm": 0.0007073777378536761
+        },
+        "completion": {
+          "output_change": 0.009756900370121002,
+          "gradient_norm": 0.0012959043961018324
+        },
+        "likes": {
+          "output_change": 0.015757769346237183,
+          "gradient_norm": 0.00378966610878706
+        },
+        "known": {
+          "output_change": 0.0075738802552223206,
+          "gradient_norm": 0.0011215955018997192
+        },
+        "age": {
+          "output_change": 0.008601613342761993,
+          "gradient_norm": 0.0011848002905026078
+        },
+        "like": {
+          "output_change": 0.005507022142410278,
+          "gradient_norm": 0.0010863812640309334
+        },
+        "user_id": {
+          "output_change": 0.12450919300317764,
+          "gradient_norm": 0.026317253708839417
+        },
+        "tab": {
+          "output_change": 0.08901038020849228,
+          "gradient_norm": 0.014856831170618534
+        },
+        "time_ms": {
+          "output_change": 0.00435575470328331
+        },
+        "history_mask": {
+          "output_change": 0.05527834594249725
+        },
+        "history_item_ids": {
+          "output_change": 0.06495948880910873
+        },
+        "author_preference": {
+          "output_change": 0.04446520656347275,
+          "gradient_norm": 0.012077811174094677
+        },
+        "tag_preference": {
+          "output_change": 0.046234481036663055,
+          "gradient_norm": 0.012199717573821545
+        },
+        "duration_preference": {
+          "output_change": 0.017190109938383102,
+          "gradient_norm": 0.00390665465965867
+        }
+      },
+      "item_mlp_input": 64,
+      "user_mlp_input": 131,
+      "user_shape": [
+        32,
+        64
+      ],
+      "item_shape": [
+        32,
+        64
+      ],
+      "history_encoder": "mean",
+      "feature_version": "fixture-features-v2",
+      "passed": true,
+      "sampling_correction": {
+        "mode": "none",
+        "alpha": 0.0,
+        "smoothing": 0.0
+      },
+      "trainable_parameters": 105806,
+      "model_structure": "TwoTower(\n  (item): ItemTower(\n    (embeddings): ModuleList(\n      (0-6): 7 x Embedding(17, 8, padding_idx=0)\n    )\n    (net): Sequential(\n      (0): Linear(in_features=64, out_features=128, bias=True)\n      (1): Identity()\n      (2): ReLU()\n      (3): Dropout(p=0.0, inplace=False)\n      (4): Linear(in_features=128, out_features=64, bias=True)\n      (5): Identity()\n      (6): ReLU()\n      (7): Dropout(p=0.0, inplace=False)\n      (8): Linear(in_features=64, out_features=64, bias=True)\n    )\n  )\n  (user): UserTower(\n    (user_embedding): Embedding(5, 32)\n    (tab_embedding): Embedding(16, 8, padding_idx=0)\n    (feedback_projection): Linear(in_features=5, out_features=8, bias=True)\n    (feedback_gate): Linear(in_features=5, out_features=1, bias=True)\n    (history_projection): Linear(in_features=72, out_features=64, bias=True)\n    (net): Sequential(\n      (0): Linear(in_features=131, out_features=256, bias=True)\n      (1): Identity()\n      (2): ReLU()\n      (3): Dropout(p=0.0, inplace=False)\n      (4): Linear(in_features=256, out_features=128, bias=True)\n      (5): Identity()\n      (6): ReLU()\n      (7): Dropout(p=0.0, inplace=False)\n      (8): Linear(in_features=128, out_features=64, bias=True)\n      (9): Identity()\n      (10): ReLU()\n      (11): Dropout(p=0.0, inplace=False)\n      (12): Linear(in_features=64, out_features=64, bias=True)\n    )\n  )\n)",
+      "device": "cpu",
+      "cuda_device": null,
+      "train_queries": 32,
+      "validation_queries": 16,
+      "candidate_rule": "upload_next_day",
+      "validation_target_coverage": 1.0,
+      "gpu_feature_acceptance": false,
+      "training_started": false,
+      "code_sha256": "0ce8af4998a2c679beaa5ae253d8c47cf996bdecdf726dff99bf65802c54c864",
+      "manifest_sha256": "672006c60267c40682df13da8372eabf095aa287edea9bfcdfd8e227b487cd26",
+      "config_sha256": "23d6c1723fbb6ad6467bbb58e1c85ae9922e879558c3834ce5774b1b32d3f9b6",
+      "limitations": [
+        "Uncovered targets remain in the Recall/NDCG denominator.",
+        "first_observed_exposure, when selected, has coverage by construction and is not verified catalog registration.",
+        "Unversioned publication attributes use the fixed-content assumption."
+      ]
+    }
+  }
+}

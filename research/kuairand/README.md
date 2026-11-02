@@ -56,3 +56,12 @@ Git 保存聚合指标与版本证据；Drive 保存数据、模型、向量与�
 `stage_report.json` 的 `complete=true` 仅表示三组评估和 CUDA 恢复证据齐全，不代表效果胜出。恢复检查是同一 runtime 内的受控中断恢复，尚未验证重建 Colab runtime 后的恢复。正式测试集保持封存。
 
 旧目录迁移和本机 checkout 说明见 [workspace guide](../../docs/workspace.md)；[原项目计划](docs/project-plan.md) 保留作规划依据，以当前报告和 README 判断已完成状态。
+
+
+## Architecture v1 ablation (seed42)
+
+Six architecture configurations completed validation screening; additional seeds remain pending.
+
+- [Frozen code and reproduction instructions](training/architecture_v1/ARCHIVE_GUIDE.md)
+- [Seed42 results, protocol, formulas and limitations](reports/architecture_v1/seed42/README.md)
+- [Implementation plan](docs/architecture_v1_implementation_plan.md)

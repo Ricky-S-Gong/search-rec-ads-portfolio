@@ -1,0 +1,112 @@
+{
+  "version": "1k-architecture-v1",
+  "order": [
+    "B0",
+    "R0",
+    "A1",
+    "A2",
+    "A3",
+    "A5"
+  ],
+  "seeds": [
+    42,
+    2026,
+    3407
+  ],
+  "aliases": {
+    "A4": "B0"
+  },
+  "base_source_sha256": "c6ba01c80a8c377f022d87659a6e33a18a81febb325c124ed6d570a781a19459",
+  "tasks": [
+    {
+      "config_id": "B0",
+      "seed": 42,
+      "status": "pending"
+    },
+    {
+      "config_id": "B0",
+      "seed": 2026,
+      "status": "pending"
+    },
+    {
+      "config_id": "B0",
+      "seed": 3407,
+      "status": "pending"
+    },
+    {
+      "config_id": "R0",
+      "seed": 42,
+      "status": "pending"
+    },
+    {
+      "config_id": "R0",
+      "seed": 2026,
+      "status": "pending"
+    },
+    {
+      "config_id": "R0",
+      "seed": 3407,
+      "status": "pending"
+    },
+    {
+      "config_id": "A1",
+      "seed": 42,
+      "status": "pending"
+    },
+    {
+      "config_id": "A1",
+      "seed": 2026,
+      "status": "pending"
+    },
+    {
+      "config_id": "A1",
+      "seed": 3407,
+      "status": "pending"
+    },
+    {
+      "config_id": "A2",
+      "seed": 42,
+      "status": "pending"
+    },
+    {
+      "config_id": "A2",
+      "seed": 2026,
+      "status": "pending"
+    },
+    {
+      "config_id": "A2",
+      "seed": 3407,
+      "status": "pending"
+    },
+    {
+      "config_id": "A3",
+      "seed": 42,
+      "status": "pending"
+    },
+    {
+      "config_id": "A3",
+      "seed": 2026,
+      "status": "pending"
+    },
+    {
+      "config_id": "A3",
+      "seed": 3407,
+      "status": "pending"
+    },
+    {
+      "config_id": "A5",
+      "seed": 42,
+      "status": "pending"
+    },
+    {
+      "config_id": "A5",
+      "seed": 2026,
+      "status": "pending"
+    },
+    {
+      "config_id": "A5",
+      "seed": 3407,
+      "status": "pending"
+    }
+  ]
+}
