@@ -1,0 +1,41 @@
+{
+  "training.sampling_correction": {
+    "before": null,
+    "after": "logq"
+  },
+  "wandb.name": {
+    "before": "1k-attention-deeper-residual-bn-d01-lr0.001-bs256-e10-es3-seed42",
+    "after": "1k-attention-logq-d01-lr0.001-bs256-e10-es3-seed42"
+  },
+  "wandb.tags": {
+    "before": [
+      "1k",
+      "content-15-features",
+      "manual",
+      "deeper",
+      "behavior-content-v2",
+      "attention",
+      "residual",
+      "batchnorm",
+      "combined",
+      "dropout-0.1",
+      "epochs-10",
+      "early-stopping-3"
+    ],
+    "after": [
+      "1k",
+      "content-15-features",
+      "manual",
+      "deeper",
+      "behavior-content-v2",
+      "attention",
+      "residual",
+      "batchnorm",
+      "combined",
+      "dropout-0.1",
+      "epochs-10",
+      "early-stopping-3",
+      "logq"
+    ]
+  }
+}
